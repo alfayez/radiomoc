@@ -1,0 +1,38 @@
+#INCLUDE "course.module"
+
+
+-- Define the DBPSK Transmitter Block
+PROC dbpskTransmitter(CHAN INT valOut!, CHAN INT val?)
+  INT values :
+  SEQ
+    --out.string ("Enter transmitter ", 0, out!)
+    --out.string ("Hello, world! ", 0, out!)
+    --out.int    (values, 0, out!)
+    --out.string ("*n", 0, out!)
+    val ? values
+    values    := values*2
+    valOut ! values
+:
+-- Define the DBPSK Transmitter Block
+PROC channelFilter(CHAN BYTE out!, CHAN INT val?)
+  INT values :
+  SEQ
+    out.string ("Enter channel filter ", 0, out!)
+    val ? values
+    out.string ("Hello, world! ", 0, out!)
+    out.int    (values, 0, out!)
+    out.string ("*n", 0, out!)
+:
+
+PROC callOut(CHAN BYTE out!)
+  CHAN INT valOut :
+  CHAN INT val :
+  INT values :
+  SEQ
+    values := 33
+    PAR
+      -- save the values=33 to the input channel val
+      val ! values
+      dbpskTransmitter(valOut!, val?)
+      channelFilter(out!, valOut?)
+:
