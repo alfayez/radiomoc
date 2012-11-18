@@ -1,38 +1,58 @@
 #INCLUDE "course.module"
 
+PROC sinusoidCarrier()
+:
+
+PROC txGain()
+:
+
+PROC matchedFilter()
+:
+
+PROC dbpskReceiver()
+:
+
+PROC differentialEncoder()
+:
+
+PROC dbpskModulator()
+:
+
+PROC dbpskDemodulator()
+:
 
 -- Define the DBPSK Transmitter Block
-PROC dbpskTransmitter(CHAN INT valOut!, CHAN INT val?)
+PROC dbpskTransmitter(CHAN INT outC!, CHAN INT inC?)
   INT values :
   SEQ
     --out.string ("Enter transmitter ", 0, out!)
     --out.string ("Hello, world! ", 0, out!)
     --out.int    (values, 0, out!)
     --out.string ("*n", 0, out!)
-    val ? values
+    inC ? values
     values    := values*2
-    valOut ! values
+    outC ! values
 :
 -- Define the DBPSK Transmitter Block
-PROC channelFilter(CHAN BYTE out!, CHAN INT val?)
+PROC channelFilter(CHAN BYTE out!, CHAN INT inC?)
   INT values :
   SEQ
     out.string ("Enter channel filter ", 0, out!)
-    val ? values
+    inC ? values
     out.string ("Hello, world! ", 0, out!)
     out.int    (values, 0, out!)
     out.string ("*n", 0, out!)
 :
 
-PROC callOut(CHAN BYTE out!)
-  CHAN INT valOut :
-  CHAN INT val :
-  INT values :
+PROC setupGraphs(CHAN BYTE out!)
+  CHAN INT txToChanfiltC :
+  CHAN INT txValC :
+  INT txVal :
   SEQ
-    values := 33
+    txVal := 33
     PAR
       -- save the values=33 to the input channel val
-      val ! values
-      dbpskTransmitter(valOut!, val?)
-      channelFilter(out!, valOut?)
+      txValC ! txVal
+      dbpskTransmitter(txToChanfiltC!, txValC?)
+      channelFilter(out!, txToChanfiltC?)
 :
