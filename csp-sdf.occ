@@ -1,58 +1,79 @@
 #INCLUDE "course.module"
+#INCLUDE "hostio.inc"
+#INCLUDE "ioconv.module"
 
-PROC sinusoidCarrier()
-:
+#USE "hostio.lib"
+#USE "course.lib"
 
-PROC txGain()
-:
+VAL INT len IS 10:
 
-PROC matchedFilter()
-:
+--PROC sinusoidCarrier()
+--:
 
-PROC dbpskReceiver()
-:
+--PROC txGain()
+--:
 
-PROC differentialEncoder()
-:
+--PROC matchedFilter()
+--:
 
-PROC dbpskModulator()
-:
+--PROC dbpskReceiver()
+--:
 
-PROC dbpskDemodulator()
-:
+--PROC differentialEncoder()
+--:
 
+--PROC dbpskModulator()
+--:
+
+--PROC dbpskDemodulator()
+--:
+
+--PROC configOutput()
+--:
 -- Define the DBPSK Transmitter Block
-PROC dbpskTransmitter(CHAN INT outC!, CHAN INT inC?)
-  INT values :
+PROC channelFilter(CHAN BYTE inC?)
+  BYTE values :
   SEQ
-    --out.string ("Enter transmitter ", 0, out!)
+    --out.string ("Enter channel filter ", 0, out!)
+    SEQ i = 0 FOR 1
+      inC ? values
     --out.string ("Hello, world! ", 0, out!)
-    --out.int    (values, 0, out!)
+    --out.DSTRING    (values, 0, out!)
     --out.string ("*n", 0, out!)
-    inC ? values
-    values    := values*2
-    outC ! values
 :
 -- Define the DBPSK Transmitter Block
-PROC channelFilter(CHAN BYTE out!, CHAN INT inC?)
+--PROC dbpskTransmitter(CHAN BYTE out!, CHAN BYTE outC!, CHAN BYTE inC?)
+PROC dbpskTransmitter(CHAN INT outVal!, CHAN INT inC?)
   INT values :
+  INT txParam:
   SEQ
-    out.string ("Enter channel filter ", 0, out!)
-    inC ? values
-    out.string ("Hello, world! ", 0, out!)
-    out.int    (values, 0, out!)
-    out.string ("*n", 0, out!)
-:
+    -- We're not physically pushing data through the flowgraph
+    --inC ? values
 
+    txParam := 23
+    outVal ! txParam
+    txParam := 50
+    outVal ! txParam
+:
+PROC outputToScreen(CHAN BYTE out!, CHAN INT txParamC?)
+  INT txParam :
+  SEQ
+    txParamC ? txParam
+    out.int(txParam, 0 ,out)
+    out.string("*nDone*n", 0, out!)
+
+    txParamC ? txParam
+    out.int(txParam, 0 ,out)
+    out.string("*nDone*n", 0, out!)
+:
 PROC setupGraphs(CHAN BYTE out!)
   CHAN INT txToChanfiltC :
-  CHAN INT txValC :
-  INT txVal :
+  CHAN INT txValC:
+  CHAN INT msgC:
+  CHAN INT txParamC:
   SEQ
-    txVal := 33
     PAR
-      -- save the values=33 to the input channel val
-      txValC ! txVal
-      dbpskTransmitter(txToChanfiltC!, txValC?)
-      channelFilter(out!, txToChanfiltC?)
+      dbpskTransmitter(txParamC!, msgC?)
+      outputToScreen(out!, txParamC?)
+      --channelFilter(txToChanfiltC?)
 :
