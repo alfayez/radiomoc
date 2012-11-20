@@ -1,5 +1,7 @@
 prog:
-	occbuild --program csp-sdf.occ
+	occbuild --program csp-sdf-tx.occ
+	occbuild --program csp-sdf-rx.occ
 
 clean:
-	rm csp-sdf
+	rm csp-sdf-tx
+	rm csp-sdf-rx
