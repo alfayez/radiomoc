@@ -261,7 +261,7 @@ PROC dbpskTransmitter(CHAN INT outC!,      CHAN INT DTopC!,
     
     DTopC      ! rfGain
 :
-PROC outputToScreenParam(CHAN BYTE out!, CHAN INT txParamC?)
+PROC DoutputToScreenParam(CHAN BYTE out!, CHAN INT txParamC?)
   INT txParam :
   SEQ
 
@@ -295,7 +295,7 @@ PROC outputToScreenParam(CHAN BYTE out!, CHAN INT txParamC?)
     out.int(txParam, 0 ,out)
     out.string("*n", 0, out!)    
 :
-PROC outputToScreenTop(CHAN BYTE out!, CHAN INT carrierC?, CHAN INT carrierScaleC?, 
+PROC DoutputToScreenTop(CHAN BYTE out!, CHAN INT carrierC?, CHAN INT carrierScaleC?, 
                        CHAN INT dataSrcC?,                 CHAN INT dbpskModC?,      
                        CHAN INT rrcFiltC,                  CHAN INT rfScaleC?,
                        CHAN INT rfOutC?)
@@ -390,7 +390,7 @@ PROC main(CHAN BYTE out!)
       rfOut           (DRfOutC!,         scaleToRfOutC?)
       
       --outputToScreenParam(out!, txParamC?)
-      outputToScreenTop(out!, DCarrierC?, DCarrierScaleC?,
+      DoutputToScreenTop(out!, DCarrierC?, DCarrierScaleC?,
                         DDataSrcC?, DModulatorC?, DRrcFiltC?,
                         DRfScaleC?, DRfOutC?)      
 :

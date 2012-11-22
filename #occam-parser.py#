@@ -9,6 +9,10 @@ Checks if the token specifies an OCCAM process
 it basically checks if the token starts with
 the word PROC
 '''
+class graph_handler:
+    def __init__(self):
+        self.infile = NullHandler()
+
 def is_process(line):
     if "PROC" in line:
         if not_comment(line):
