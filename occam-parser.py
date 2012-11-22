@@ -87,8 +87,8 @@ def parse_input_file_param(seq_base, param_in, param_dict_orig,
                     if not line:
                         assign_cond = False
                         break
-                    r = param_first_occur(param_in, line)
-                    if(r['cond']):
+                    rloc = param_first_occur(param_in, line)
+                    if(rloc['cond']):
                         if is_assignment(line):
                             token_val = extract_val(line)
                             param_dict[r["occur"]] = token_val
@@ -127,6 +127,7 @@ if __name__ == "__main__":
     r = parse_input_file_param(seq_base, param_in, 
                                param_dict, infile,
                                outfile)
+    
 
     param_dict = r["param_dict"]
 
