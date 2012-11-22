@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import sys, string, types
+import sys, string, types, os
 import getopt
 import numpy as np
 
@@ -56,7 +56,8 @@ def extract_val(line):
         
     return token_val
 
-def parse_input_file(param_in, param_dict_orig, infile):
+def parse_input_file_param(seq_base, param_in, param_dict_orig,
+                           infile, outfile):
     param_dict = param_dict_orig
 
 
@@ -65,7 +66,11 @@ def parse_input_file(param_in, param_dict_orig, infile):
 
         # check to see if the processes of interest are in the current
         # line
-        
+        #print "line = ", line, "length = ", len(line)
+        #outfile.write(line)
+        #if line == ":\n" and len(line) == 2:
+        #    line = False
+        #    break
         if seq_base[0] in line:
 
             # make sure that the token specifies a process
@@ -73,6 +78,12 @@ def parse_input_file(param_in, param_dict_orig, infile):
                 assign_cond = False
                 while(assign_cond == False):
                     line = infile.readline()
+                    outfile.write(line)
+                    if line == ":\n" and len(line) == 2:
+                        line = False
+                        break
+
+                    #outfile.write(line)
                     if not line:
                         assign_cond = False
                         break
@@ -84,16 +95,7 @@ def parse_input_file(param_in, param_dict_orig, infile):
         line = infile.readline()
 
 
-    return {'param_dict:'=param_dict, 'infile:', infile}
-
-#def get_val(param, infile):
-#    cond = False
-#    val  = 0
-#    
-#    for line in infile:
-#        if 
-#
-#    return {'cond': cond, 'val':val}
+    return {'param_dict':param_dict, 'infile':infile}
 
 if __name__ == "__main__":
     # specifies processes of interest in the occam program
@@ -107,19 +109,28 @@ if __name__ == "__main__":
     assign_cond = False
     token_val = 0
 
-    # opens filestreams
-    outfile = file('tmp.txt', 'w')
+    # output filestream used to save the parameter generator
+    # body for further processing after we discover the requested
+    # topology in the main loop body
+    outfile = file('tmp_assignment_body.txt', 'w')
+    outfile.flush()
+    os.fsync(outfile)
+
+    # the input occam program which we will be processing
     infile  = file('csp-sdf-tx.occ', 'r')
 
 
     # create dictionary from sequence entries
     param_dict = make_dict_from_seq(param_in)
 
-    r = parse_input_file(param_in, param_dict, infile)
+    # peforms initial parameter parsing of the occam file
+    r = parse_input_file_param(seq_base, param_in, 
+                               param_dict, infile,
+                               outfile)
+
     param_dict = r["param_dict"]
 
     print "param_dict is = ", param_dict
-    outfile.write('This is a test output to a file ... yepee!')
     arr = np.zeros((10, 10))
 
     outfile.close()

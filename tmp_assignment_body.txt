@@ -1,0 +1,22 @@
+  INT symbolTime   :
+  INT samplingRate :
+  INT carrierFreq  :
+  INT rcFiltCoeff  :
+  INT carrierGain  :
+  INT rfGain       :
+  SEQ
+    symbolTime   := 2
+    samplingRate := 400
+    carrierFreq  := 4
+    rcFiltCoeff  := 1
+    carrierGain  := 1
+    rfGain       := 1
+    
+    paramOC ! symbolTime
+    paramOC ! samplingRate
+    paramOC ! carrierFreq
+    paramOC ! rcFiltCoeff
+    paramOC ! carrierGain
+    paramOC ! rfGain
+    
+:
