@@ -9,169 +9,168 @@ Checks if the token specifies an OCCAM process
 it basically checks if the token starts with
 the word PROC
 '''
-def is_process(line):
-    if "PROC" in line:
-        if not_comment(line):
-            return True
+class graph_handler:
+    def __init__(self, infile_name):
+        self.infile  = file(infile_name, 'r') 
+        self.outfile = file('tmp_assignment_body.txt', 'w')
+        self.chan_dict  = {}
+        self.param_dict = {}
+        self.fcn_interest = []
+    def __del__(self):
+        self.outfile.close()
+        self.infile.close()
+        
+    def is_process(self, line):
+        if "PROC" in line:
+            if self.not_comment(line):
+                return True
+            else:
+                return False
         else:
             return False
-    else:
-        return False
-def is_process_end(line):
-    if line == ":\n" and len(line) == 2:
-        if not_comment(line):
-            return True
+    def is_process_end(self, line):
+        if line == ":\n" and len(line) == 2:
+            if self.not_comment(line):
+                return True
+            else:
+                False
+        else:
+            return False
+    
+    def is_process_body(self, line):
+        if ("SEQ" in line or "PAR" in line):
+            if self.not_comment(line):
+                return True
+            else:
+                return False
+        else:
+            return False
+    def is_assignment(self, line):
+        if ":=" in line:
+            if self.not_comment(line):
+                return True
+            else:
+                return False
+        else:
+            return False
+    def is_int_declaration(self, line):
+        if "INT" in line:
+            if self.not_comment(line):
+                return True
+            else:
+                return False
         else:
             False
-    else:
-        return False
+    def is_channel_declaration(self, line):
+        if (("CHAN" in line) and (self.not_comment(line))):
+            return True
+        else:
+            return False
     
-def is_process_body(line):
-    if ("SEQ" in line or "PAR" in line):
-        if not_comment(line):
+    def not_comment(self, line):
+        if "--" not in line:
             return True
         else:
             return False
-    else:
-        return False
-def is_assignment(line):
-    if ":=" in line:
-        if not_comment(line):
-            return True
-        else:
-            return False
-    else:
-        return False
-def is_int_declaration(line):
-    if "INT" in line:
-        if not_comment(line):
-            return True
-        else:
-            return False
-    else:
-        False
-def is_channel_declaration(line):
-    if (("CHAN" in line) and (not_comment(line))):
-        return True
-    else:
-        return False
-    
-def not_comment(line):
-    if "--" not in line:
-        return True
-    else:
-        return False
-# extracts the value of the int variable
-def extract_val(line):
-    tokens = line.split()
-    token_val = 0
-    len_toks = len(tokens)
-    for i in range(len_toks):
-        if (tokens[i] == ":="):
-            token_val = tokens[i+1]
-        
-    return token_val
-# extract the name of the integer variable
-def extract_int_var(line):
-    tokens = line.split()
-    token_val = 0
-    len_toks = len(tokens)
-    for i in range(len_toks):
-        if (tokens[i] == ":="):
-            token_val = tokens[i-1]
-        
-    return token_val
+        # extracts the value of the int variable
+    def extract_val(self, line):
+        tokens = line.split()
+        token_val = 0
+        len_toks = len(tokens)
+        for i in range(len_toks):
+            if (tokens[i] == ":="):
+                token_val = tokens[i+1]
+        return token_val
+    # extract the name of the integer variable
+    def extract_int_var(self, line):
+        tokens = line.split()
+        token_val = 0
+        len_toks = len(tokens)
+        for i in range(len_toks):
+            if (tokens[i] == ":="):
+                token_val = tokens[i-1]
+        return token_val
+    def set_fcn_interest(self, fcn_pass):
+        self.fcn_interest = fcn_pass
+    def print_parameters(self):
+        print self.param_dict
+    def print_channels(self):
+        print self.chan_dict        
+    def parse_input_file_param(self):
+        # output filestream used to save the parameter generator
+        # body for further processing after we discover the requested
+        # topology in the main loop body
+        self.outfile.flush()
+        os.fsync(self.outfile)
 
-#def parse_topology_1(infile)
-def parse_input_file_param(seq_base, infile, outfile):
-    assign_cond  = False
-    param_dict   = {}
+        assign_cond  = False
 
-    line = infile.readline()
-    while line:
-        # check to see if the processes of interest are in the current
-        # line
-
-        if seq_base in line:
-            print "seq = ", seq_base, "Aline = ", line
-            # make sure that the token specifies a process
-            if is_process(line):
-                assign_cond  = False
+        line = self.infile.readline()
+        while line:
+            # check to see if the processes of interest are in the current
+            # line
+            if self.fcn_interest[0] in line:
+                # make sure that the token specifies a process
+                if self.is_process(line):
+                    assign_cond  = False
                         
-                while(assign_cond == False):
-                    line = infile.readline()
-                    print "ILINE= ", line
-                    outfile.write(line)
-                    # populate the list of radio parameters of
-                    # interest by parsing the variables declared in
-                    # the parameter definition process in the occam program
-                    if is_process_end(line):
-                        print "Quit1"
-                        assign_cond = True
-                        break
-                    if not line:
-                        print "Quit"    
-                        assign_cond = True
-                        break
-                    if is_assignment(line):
-                        token_name = extract_int_var(line)
-                        token_val  = extract_val(line)
-                        param_dict[token_name] = token_val
-        if assign_cond == True:
-            print "EXLine= ", line
-            break
-        line = infile.readline()
-        print "BLine= ", line
-    return {'param_dict':param_dict, 'infile':infile}
-def parse_input_file_channels(fcn_interest, infile2, outfile):
-    chan_dict = {}
-    chan_cond = False
+                    while(assign_cond == False):
+                        line = self.infile.readline()
+                        self.outfile.write(line)
+                        # populate the list of radio parameters of
+                        # interest by parsing the variables declared in
+                        # the parameter definition process in the occam program
+                        if self.is_process_end(line):
+                            assign_cond = True
+                            break
+                        if not line:
+                            assign_cond = True
+                            break
+                        if self.is_assignment(line):
+                            token_name = self.extract_int_var(line)
+                            token_val  = self.extract_val(line)
+                            self.param_dict[token_name] = token_val
+            if assign_cond == True:
+                break
+            line = self.infile.readline()
+        return True
+    def parse_input_file_channels(self):
+        chan_dict = {}
+        chan_cond = False
 
-    line_loc = infile2.readline()
-    print "lineO = ", line_loc
-    while line_loc:
-        if is_process_end(line_loc):
-            line_loc = False
-            break
-        if not line_loc:
-            assign_cond = False
-            break
-        if is_channel_declaration(line_loc):
-            print "line_loc = ", line_loc
-            #token_name = extract_int_var(line)
-            #token_val  = extract_val(line)
-            #param_dict[token_name] = token_val
-        print "lineO = ", line_loc
-        line_loc = infile2.readline()
-
-        return {'chan_dict':chan_dict, 'infile2':infile2}        
+        line = self.infile.readline()
+        while line:
+            if self.is_process_end(line):
+                line = False
+                break
+            if not line:
+                assign_cond = False
+                break
+            if self.is_channel_declaration(line):
+                print "line_loc = ", line
+            print "lineO = ", line
+            line = self.infile.readline()
+        return True
+        #return {'chan_dict':chan_dict, 'infile2':infile2}
     
 if __name__ == "__main__":
-    # specifies processes of interest in the occam program
-    fcn_interest= ["parameterGen", "main"]
-
-    assign_cond = False
-    token_val = 0
-
-    # output filestream used to save the parameter generator
-    # body for further processing after we discover the requested
-    # topology in the main loop body
-    outfile = file('tmp_assignment_body.txt', 'w')
-    outfile.flush()
-    os.fsync(outfile)
 
     # the input occam program which we will be processing
-    infile  = file('csp-sdf-tx.occ', 'r')
+    infile_name = 'csp-sdf-tx.occ'
+    # specifies processes of interest in the occam program
+    fcn_list    = ["parameterGen", "main"]
+    
+    top_handler = graph_handler(infile_name)
+    top_handler.set_fcn_interest(fcn_list)
+
 
     # peforms initial parameter parsing of the occam file
-    r = parse_input_file_param(fcn_interest[0], infile, outfile)
-    param_dict = r["param_dict"]
-    infile2     = r["infile"]
-    print "param_dict is = ", param_dict
-    r = parse_input_file_channels(fcn_interest, infile2, outfile)
-    #chan_dict = r["chan_dict"]
+    top_handler.parse_input_file_param()
+    top_handler.print_parameters()
+    top_handler.parse_input_file_channels()
+    top_handler.print_channels()
 
     arr = np.zeros((10, 10))
 
-    outfile.close()
-    infile.close()
+    #outfile.close()
+    #infile.close)(
