@@ -66,7 +66,11 @@ class graph_handler:
             return True
         else:
             return False
-    
+    def is_debug(self, token):
+        if (token[0] == "D"):
+            return True
+        else:
+            return False
     def not_comment(self, line):
         if "--" not in line:
             return True
@@ -89,6 +93,15 @@ class graph_handler:
         for i in range(len_toks):
             if (tokens[i] == ":="):
                 token_val = tokens[i-1]
+        return token_val
+    def extract_int_var2(self, line):
+        tokens = line.split()
+        token_val = ""
+        len_toks = len(tokens)
+        for i in range(len_toks):
+            if (tokens[i] == "INT"):
+                token_val = tokens[i+1]
+                break
         return token_val
     def set_fcn_interest(self, fcn_pass):
         self.fcn_interest = fcn_pass
@@ -146,9 +159,11 @@ class graph_handler:
             if not line:
                 assign_cond = False
                 break
-            if self.is_channel_declaration(line):
-                print "line_loc = ", line
-            print "lineO = ", line
+            if (self.is_channel_declaration(line) and
+                self.is_process(line) == False):
+                token_name = self.extract_int_var2(line)
+                if (self.is_debug(token_name) == False):
+                    self.chan_dict[token_name] = ["", ""]
             line = self.infile.readline()
         return True
         #return {'chan_dict':chan_dict, 'infile2':infile2}
