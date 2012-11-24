@@ -11,7 +11,7 @@ the word PROC
 '''
 OUT_CHAN = 0
 IN_CHAN  = 1
-
+IGNORE_PROC = ["parameterGen"]
 class graph_handler:
     def __init__(self, infile_name):
         self.infile  = file(infile_name, 'r') 
@@ -198,7 +198,6 @@ class graph_handler:
         token = token.replace("!", "")
         return token
     def channel_direction(self, token):
-        
         if "!" in token:
             return "out"
         elif "?" in token:
@@ -207,6 +206,13 @@ class graph_handler:
             return "debug"
         else:
             return ""
+    def is_ignore_proc(self, proc_name):
+        len_list = len(IGNORE_PROC);
+        for i in range(len_list):
+            if proc_name == IGNORE_PROC[i]:
+                return True
+        return False
+        
     def parse_channel_directions(self, line):
         tokens     = line.split()
         tokens     = self.clean_from_punc(tokens)
@@ -226,15 +232,15 @@ class graph_handler:
                 chan_name = self.channel_name(tokens[j])
                 chan_dir  = self.channel_direction(tokens[j])
                 if(self.is_debug(chan_name) == False):
-                    if chan_dir == "out":
-                        self.chan_dict[chan_name][OUT_CHAN] = proc_name
-                    elif chan_dir == "in":
-                        self.chan_dict[chan_name][IN_CHAN] = proc_name
-                    elif chan_dir == "debug":
-                        chan_dir = chan_dir
-                    else:
-                        
-                        return False
+                    if (self.is_ignore_proc(proc_name) == False):
+                        if chan_dir == "out":
+                            self.chan_dict[chan_name][OUT_CHAN] = proc_name
+                        elif chan_dir == "in":
+                            self.chan_dict[chan_name][IN_CHAN] = proc_name
+                        elif chan_dir == "debug":
+                            chan_dir = chan_dir
+                        else:                        
+                            return False
                 
             
     
