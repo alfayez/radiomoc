@@ -377,20 +377,16 @@ PROC main(CHAN BYTE out!)
   CHAN INT setup2C        :
 
   
-  SEQ
-    PAR
-      parameterGen    (setupC!)
-      parameterGen    (setup2C!)
-      carrier         (carrierToScaleC!, DCarrierC!,      setupC?)
-      carrierScale    (scaleToTxC!,      DCarrierScaleC!, carrierToScaleC?)
-      dataSrc         (dataToTxC!,       DDataSrcC!,      setup2C?)
-      dbpskTransmitter(txToChanFiltC!,   DModulatorC!,    scaleToTxC?, dataToTxC?)
-      channelFilter   (filterToScaleC!,  DRrcFiltC!,      txToChanFiltC?)
-      rfScale         (scaleToRfOutC!,   DRfScaleC!,      filterToScaleC?)
-      rfOut           (DRfOutC!,         scaleToRfOutC?)
-      
-      --outputToScreenParam(out!, txParamC?)
-      DoutputToScreenTop(out!, DCarrierC?, DCarrierScaleC?,
-                        DDataSrcC?, DModulatorC?, DRrcFiltC?,
-                        DRfScaleC?, DRfOutC?)      
-:
+  PAR
+    parameterGen     (setupC!)
+    parameterGen     (setup2C!)
+    carrier          (carrierToScaleC!, DCarrierC!,      setupC?)
+    carrierScale     (scaleToTxC!,      DCarrierScaleC!, carrierToScaleC?)
+    dataSrc          (dataToTxC!,       DDataSrcC!,      setup2C?)
+    dbpskTransmitter (txToChanFiltC!,   DModulatorC!,    scaleToTxC?, dataToTxC?)
+    channelFilter    (filterToScaleC!,  DRrcFiltC!,      txToChanFiltC?)
+    rfScale          (scaleToRfOutC!,   DRfScaleC!,      filterToScaleC?)
+    rfOut            (DRfOutC!,         scaleToRfOutC?)
+
+    --outputToScreenParam(out!, txParamC?)
+    DoutputToScreenTop (out!, DCarrierC?, DCarrierScaleC?, DDataSrcC?, DModulatorC?, DRrcFiltC?, DRfScaleC?, DRfOutC?)      :

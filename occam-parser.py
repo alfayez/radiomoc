@@ -9,6 +9,9 @@ Checks if the token specifies an OCCAM process
 it basically checks if the token starts with
 the word PROC
 '''
+OUT_CHAN = 0
+IN_CHAN  = 1
+
 class graph_handler:
     def __init__(self, infile_name):
         self.infile  = file(infile_name, 'r') 
@@ -76,6 +79,11 @@ class graph_handler:
             return True
         else:
             return False
+    def is_comment(self, line):
+        if "--" not in line:
+            return False
+        else:
+            return True        
         # extracts the value of the int variable
     def extract_val(self, line):
         tokens = line.split()
@@ -150,23 +158,85 @@ class graph_handler:
     def parse_input_file_channels(self):
         chan_dict = {}
         chan_cond = False
+        process_body = False
 
         line = self.infile.readline()
         while line:
             if self.is_process_end(line):
                 line = False
                 break
-            if not line:
+            elif not line:
                 assign_cond = False
                 break
-            if (self.is_channel_declaration(line) and
+            elif (process_body == True):
+                # make sure it's not an empty line
+                if len(line) > 1:
+                    # make sure it's not a commented out line
+                    if (self.is_comment(line) == False):
+                        self.parse_channel_directions(line)
+            elif (self.is_channel_declaration(line) and
                 self.is_process(line) == False):
                 token_name = self.extract_int_var2(line)
                 if (self.is_debug(token_name) == False):
                     self.chan_dict[token_name] = ["", ""]
+            elif self.is_process_body(line):
+                process_body = True
+                
             line = self.infile.readline()
+
         return True
         #return {'chan_dict':chan_dict, 'infile2':infile2}
+    def clean_from_punc(self, tokens):
+        len_tokens = len(tokens)
+        for i in range(len_tokens):
+            tokens[i] = tokens[i].replace(")", "")
+            tokens[i] = tokens[i].replace("(", "")
+            tokens[i] = tokens[i].replace(",", "")
+        return tokens
+    def channel_name(self, token):
+        token = token.replace("?", "")
+        token = token.replace("!", "")
+        return token
+    def channel_direction(self, token):
+        
+        if "!" in token:
+            return "out"
+        elif "?" in token:
+            return "in"
+        elif token[0] == "D":
+            return "debug"
+        else:
+            return ""
+    def parse_channel_directions(self, line):
+        tokens     = line.split()
+        tokens     = self.clean_from_punc(tokens)
+        len_tokens = len(tokens)
+        chan_name  = ""
+        chan_dir   = ""
+
+        proc_name  = tokens[0]
+
+        # the first token is the function name.  If this is a debug
+        # function then ignore it
+        if (self.is_debug(proc_name) or self.is_comment(line)):
+            return True
+        else:
+            # Start at "1" since 0->Process Name
+            for j in range(1, len_tokens):
+                chan_name = self.channel_name(tokens[j])
+                chan_dir  = self.channel_direction(tokens[j])
+                if(self.is_debug(chan_name) == False):
+                    if chan_dir == "out":
+                        self.chan_dict[chan_name][OUT_CHAN] = proc_name
+                    elif chan_dir == "in":
+                        self.chan_dict[chan_name][IN_CHAN] = proc_name
+                    elif chan_dir == "debug":
+                        chan_dir = chan_dir
+                    else:
+                        
+                        return False
+                
+            
     
 if __name__ == "__main__":
 
