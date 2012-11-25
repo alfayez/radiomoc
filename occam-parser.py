@@ -12,13 +12,22 @@ the word PROC
 OUT_CHAN = 0
 IN_CHAN  = 1
 IGNORE_PROC = ["parameterGen"]
+INIT_PROC = "parameterGen"
+
 class graph_handler:
     def __init__(self, infile_name):
         self.infile  = file(infile_name, 'r') 
         self.outfile = file('tmp_assignment_body.txt', 'w')
-        self.chan_dict  = {}
-        self.param_dict = {}
+        self.chan_dict    = {}
+        self.chan_list    = []
+        self.proc_dict    = {}
+        self.proc_list    = []        
+        self.param_dict   = {}
+        self.param_list   = []
+        self.top_matrix   = np.zeros((1,1))
+        
         self.fcn_interest = []
+        self.init_chans   = []
     def __del__(self):
         self.outfile.close()
         self.infile.close()
@@ -114,9 +123,23 @@ class graph_handler:
     def set_fcn_interest(self, fcn_pass):
         self.fcn_interest = fcn_pass
     def print_parameters(self):
+        print "Parameter Dictionary"
         print self.param_dict
     def print_channels(self):
-        print self.chan_dict        
+        print "Channel Dictionary"
+        print self.chan_dict
+    def print_proc_dict(self):
+        print "Process Dictionary"
+        print self.proc_dict
+    def print_chan_list(self):
+        print "Channel List"
+        print self.chan_list
+    def print_proc_list(self):
+        print "Processes list"
+        print self.proc_list
+    def print_top_matrix(self):
+        print "Topology Matrix"
+        print self.top_matrix
     def parse_input_file_param(self):
         # output filestream used to save the parameter generator
         # body for further processing after we discover the requested
@@ -150,6 +173,8 @@ class graph_handler:
                         if self.is_assignment(line):
                             token_name = self.extract_int_var(line)
                             token_val  = self.extract_val(line)
+                            if ((token_name in self.param_dict) == False):
+                                self.param_list.append(token_name)
                             self.param_dict[token_name] = token_val
             if assign_cond == True:
                 break
@@ -179,6 +204,8 @@ class graph_handler:
                 token_name = self.extract_int_var2(line)
                 if (self.is_debug(token_name) == False):
                     self.chan_dict[token_name] = ["", ""]
+                    self.chan_list.append(token_name)                    
+
             elif self.is_process_body(line):
                 process_body = True
                 
@@ -233,17 +260,45 @@ class graph_handler:
                 chan_dir  = self.channel_direction(tokens[j])
                 if(self.is_debug(chan_name) == False):
                     if (self.is_ignore_proc(proc_name) == False):
+                    #if True:
                         if chan_dir == "out":
+                           # if ( ((proc_name in self.proc_list) == False)
+                           #      and (self.is_ignore_proc(proc_name) == False)):
+                           #     self.proc_list.append(proc_name)
+                           #     self.proc_dict[proc_name] = len(self.proc_dict)
                             self.chan_dict[chan_name][OUT_CHAN] = proc_name
+                            if proc_name == INIT_PROC:
+                                self.init_chans = self.init_chans+[chan_name]
                         elif chan_dir == "in":
                             self.chan_dict[chan_name][IN_CHAN] = proc_name
                         elif chan_dir == "debug":
                             chan_dir = chan_dir
                         else:                        
                             return False
-                
+                        if chan_dir != "debug":
+                            if ((proc_name in self.proc_list) ==
+                                False):
+                                if(self.is_ignore_proc(proc_name)==False):
+                                    self.proc_list.append(proc_name)
+                                    self.proc_dict[proc_name] = len(self.proc_dict)                                    
+                        
+            len_proc = len(self.proc_list)
+            self.top_matrix = np.zeros((len_proc, len_proc))    
+    def parse_proc_connection(self):
+        len_chans = len(self.chan_list)
+        for i in range(len_chans):
             
-    
+            chan_name = self.chan_list[i]
+            
+            proc_out  = self.chan_dict[chan_name][0]
+            proc_in   = self.chan_dict[chan_name][1]
+
+            if (proc_out != ""):
+                proc_out_index  = self.proc_dict[proc_out]
+                if (proc_in != ""):                
+                    proc_in_index   = self.proc_dict[proc_in]
+                self.top_matrix[proc_out_index][proc_in_index] = 1
+        
 if __name__ == "__main__":
 
     # the input occam program which we will be processing
@@ -261,7 +316,13 @@ if __name__ == "__main__":
     top_handler.parse_input_file_channels()
     top_handler.print_channels()
 
-    arr = np.zeros((10, 10))
+    top_handler.parse_proc_connection()
+
+    top_handler.print_proc_list()
+    top_handler.print_chan_list()
+    top_handler.print_proc_dict()
+    top_handler.print_top_matrix()
+    
 
     #outfile.close()
     #infile.close)(
