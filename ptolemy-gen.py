@@ -3,8 +3,11 @@
 import sys, string, types, os
 import getopt
 import numpy as np
-from xml.dom.minidom import parse, parseString, Document, getDOMImplementation
+#from xml.dom.minidom import parse, parseString, Document,
+#getDOMImplementation
+from xml.dom import EMPTY_NAMESPACE, XML_NAMESPACE
 from ptolemy_param import *
+import pxdom
 
 XML_HEADER1 = "<?xml version=\"1.0\" standalone=\"no\"?>"
 XML_HEADER2 = """<!DOCTYPE entity PUBLIC \"-//UC Berkeley//DTD MoML 1//EN\"
@@ -21,8 +24,11 @@ class ptolemy_writer:
         self.model_name = model_name
         self.outfile_name = outfile_name
 
-        self.impl = getDOMImplementation('')
-        self.doc = self.impl.createDocument(None, 'entity', None)
+        self.impl = pxdom.getDOMImplementation('')
+
+        self.doctype = self.impl.createDocumentType("entity", None, None)
+        #self.doc = self.impl.createDocument(EMPTY_NAMESPACE, 'entity',self.doctype)
+        self.doc = self.impl.createDocument(EMPTY_NAMESPACE, 'entity',self.doctype)
         self.top_element = self.doc.documentElement
         
 
@@ -30,8 +36,6 @@ class ptolemy_writer:
         self.outfile.close()
         
     def write_element(self, tag_str, name_str, class_str, value_str):
-        #wml = self.doc.createElement('card')
-        #self.top_element.appendChild(wml)
 
         node = self.doc.createElement(tag_str)
 
@@ -44,9 +48,14 @@ class ptolemy_writer:
         return node
 
     def write_to_xmlfile(self):
-        outfile_temp = file('tmp_xml_read.xml', 'w')
-        outfile_temp.write(self.doc.toprettyxml())
-        outfile_temp.close()
+        
+        ser = self.impl.createLSSerializer()
+        ser.domConfig.setParameter('format-pretty-print', True)
+        ser.writeToURI(self.doc, 'tmp_xml_read.xml')
+        
+        #outfile_temp = file('tmp_xml_read.xml', 'w')
+        #outfile_temp.write(self.doc.toprettyxml())
+        #outfile_temp.close()
 
         infile_temp = file ('tmp_xml_read.xml', 'r')
 
@@ -57,17 +66,26 @@ class ptolemy_writer:
 
         line = infile_temp.readline()
         mod_model_name = "<entity name=\""+self.model_name+"\" class=\"ptolemy.actor.TypedCompositeActor\">\n"
+        print "line1 = ", line
         self.outfile.write(mod_model_name)
         
         line = infile_temp.readline()
+        line = infile_temp.readline()
+        i = 0
         while line:
+            #self.outfile.write("line %d=", i)
+            print "Line ", i, "= ", line
             self.outfile.write(line)
             line = infile_temp.readline()
+            i = i + 1
         
-        outfile_temp.close()
+        #outfile_temp.close()
         infile_temp.close()
         
     def print_xmlfile(self):
+        
+        #print self.doc.saveXML()
+
         self.outfile.close()
         infile_temp = file(self.outfile_name, 'r')
 
@@ -77,19 +95,22 @@ class ptolemy_writer:
             sys.stdout.write(line)
             line = infile_temp.readline()
         infile_temp.close()
+        print "\n"
         
 if __name__ == "__main__":
     filename   = "xml-tmp.xml"
     model_name = "xml-tmp"
 
     pgen = ptolemy_writer(filename, model_name)
-    #pgen.write_element("property", "_createBy", "ptolemy.kernel.attributes.VersionAttribute", "8.0.1_20101021")
+    pgen.write_element("property", "_createBy", "ptolemy.kernel.attributes.VersionAttribute", "8.0.1_20101021")
+
     node1 = pgen.write_element(PROP, "period_time", CLASS_PARAMETER, "400")
     node2 = pgen.write_element(PROP, NAME_ICON, CLASS_ICON, NONE)
     node3 = pgen.write_element(PROP, NAME_COLOR, CLASS_COLOR, VAL_COLOR_PARAMETER)
     node4 = pgen.write_element(PROP, NAME_LOCATION, CLASS_LOCATION, "{1, 1}")
 
     pgen.top_element.appendChild(node1)
+
     node1.appendChild(node2)
     node2.appendChild(node3)
     node1.appendChild(node4)    
