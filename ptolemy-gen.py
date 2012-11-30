@@ -57,8 +57,9 @@ class ptolemy_writer:
 
         node = self.doc.createElement(tag_str)
 
-        node.setAttribute("name", name_str)        
-        node.setAttribute("class", class_str)
+        node.setAttribute("name", name_str)
+        if (class_str != "None"):        
+            node.setAttribute("class", class_str)
         if (value_str != "None"):
             node.setAttribute("value", value_str)        
 
@@ -87,6 +88,8 @@ class ptolemy_writer:
         while line:
             self.outfile.write(line)
             line = infile_temp.readline()
+            # Fix pxdom & XML escaping issue
+            line = line.replace("&amp;", "&")            
             i = i + 1
         
         #outfile_temp.close()
@@ -167,9 +170,66 @@ class ptolemy_writer:
                 node2 = self.write_element(PROP, NAME_TAPS, CLASS_PARAMETER, taps_str)
                 node3 = self.write_element(PROP, NAME_LOCATION, CLASS_LOCATION, loc_str)
                 node1.appendChild(node2)
-                node1.appendChild(node3)                
+                node1.appendChild(node3)
                 infile_temp.close()
+            elif class_str is CLASS_CHOP:
+                loc_str = self.ptolemy_location_update(BLOCK, offset)
+                node1 = self.write_element(ENT, name, class_str, "None")
+                node2 = self.write_element(PROP, "numberToRead", CLASS_PARAMETER, value)
+                node3 = self.write_element(PROP, "numberToWrite", CLASS_PARAMETER, "1")
+                node4 = self.write_element(PROP, NAME_LOCATION, CLASS_LOCATION, loc_str)
+                node1.appendChild(node2)
+                node1.appendChild(node3)
+                node1.appendChild(node4)
+            elif class_str is CLASS_COMP:
+                loc_str = self.ptolemy_location_update(BLOCK, offset)
+                node1 = self.write_element(ENT, name, class_str, "None")
+                node2 = self.write_element(PROP, "comparison", CLASS_STR_ATTR, "&gt;")
+                node3 = self.write_element(PROP, "style", CLASS_CHOICE_STYLE, "None")
+                node4 = self.write_element(PROP, "gt", CLASS_STR_ATTR, "&gt;")
+                node5 = self.write_element(PROP, "ge", CLASS_STR_ATTR, "&gt;")
+                node6 = self.write_element(PROP, "lt", CLASS_STR_ATTR, "&lt;")
+                node7 = self.write_element(PROP, "le", CLASS_STR_ATTR, "&lt;=")
+                node8 = self.write_element(PROP, "eq", CLASS_STR_ATTR, "==")
+                node1.appendChild(node2)
+                node2.appendChild(node3)
+                node3.appendChild(node4)
+                node3.appendChild(node5)
+                node3.appendChild(node6)
+                node3.appendChild(node7)
+                node3.appendChild(node8)
 
+                node2 = self.write_element(PROP, NAME_ICON, CLASS_ATTR_ICON, "None")
+                node3 = self.write_element(PROP, NAME_ATTR, CLASS_STR_ATTR, "comparison")
+                node1.appendChild(node2)
+                node2.appendChild(node3)
+                
+                node2 = self.write_element(PROP, NAME_LOCATION, CLASS_LOCATION, loc_str)
+                node1.appendChild(node2)
+                
+            elif class_str is CLASS_CONST:
+                loc_str = self.ptolemy_location_update(BLOCK, offset)
+                node1 = self.write_element(ENT, name, class_str, "None")
+                node2 = self.write_element(PROP, "value", CLASS_PARAMETER, value)
+                node3 = self.write_element(PROP, NAME_ICON, CLASS_BICON, "None")
+                node4 = self.write_element(PROP, NAME_ATTR, CLASS_STR_ATTR, "value")
+                node5 = self.write_element(PROP, NAME_DISP_WIDTH, CLASS_PARAMETER, "60")
+                node6 = self.write_element(PROP, NAME_LOCATION, CLASS_LOCATION, loc_str)
+                node1.appendChild(node2)
+                node1.appendChild(node3)
+                node3.appendChild(node4)
+                node3.appendChild(node5)
+                node1.appendChild(node6)
+
+            elif class_str is CLASS_SEQ_PLOT:
+                loc_str = self.ptolemy_location_update(BLOCK, offset)
+                node1 = self.write_element(ENT, name, class_str, "None")
+                node2 = self.write_element(PROP, NAME_WIN_PROP, CLASS_WIN_PROP, "None")
+                node3 = self.write_element(PROP, NAME_PLOT_SIZE, CLASS_SIZE_ATTR, "None")    
+                node4 = self.write_element(PROP, NAME_LOCATION, CLASS_LOCATION, loc_str)
+                node1.appendChild(node2)
+                node1.appendChild(node3)
+                node1.appendChild(node4)
             else:
                exit("ERROR: Found in write_to_ptolemy method. Unknown Block Class\n")
                 
@@ -211,6 +271,18 @@ if __name__ == "__main__":
 
     node1 = pgen.write_to_ptolemy_file(BLOCK, CLASS_FIR, NAME_LOWPASS, "rxrc1.dat", 0)
     pgen.top_element.appendChild(node1)
+
+    node1 = pgen.write_to_ptolemy_file(BLOCK, CLASS_CHOP, NAME_CHOP, "sampling_freq*symbol_time", 0)
+    pgen.top_element.appendChild(node1)
+
+    node1 = pgen.write_to_ptolemy_file(BLOCK, CLASS_COMP, NAME_COMP, "None", 0)
+    pgen.top_element.appendChild(node1)
+
+    node1 = pgen.write_to_ptolemy_file(BLOCK, CLASS_CONST, "constant", "0.2", 100)
+    pgen.top_element.appendChild(node1)
+
+    node1 = pgen.write_to_ptolemy_file(BLOCK, CLASS_SEQ_PLOT, "Data In", "None", 0)
+    pgen.top_element.appendChild(node1)    
     
     pgen.write_to_xmlfile()
     pgen.print_xmlfile()
