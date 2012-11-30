@@ -66,15 +66,12 @@ class ptolemy_writer:
 
         line = infile_temp.readline()
         mod_model_name = "<entity name=\""+self.model_name+"\" class=\"ptolemy.actor.TypedCompositeActor\">\n"
-        print "line1 = ", line
         self.outfile.write(mod_model_name)
         
         line = infile_temp.readline()
         line = infile_temp.readline()
         i = 0
         while line:
-            #self.outfile.write("line %d=", i)
-            print "Line ", i, "= ", line
             self.outfile.write(line)
             line = infile_temp.readline()
             i = i + 1
