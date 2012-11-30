@@ -14,7 +14,14 @@ XML_HEADER2 = """<!DOCTYPE entity PUBLIC \"-//UC Berkeley//DTD MoML 1//EN\"
 \"http://ptolemy.eecs.berkley.edu/xml/dtd/MoML_1.dtd\">
 """
 PARAM_COLOR = [0.0, 0.0, 1.0, 1.0]
-VERG_ORIG   = [1,1]
+PARAM_ORIG  = [1,1]
+PARAM_STEP  = 5
+
+BLOCK_ORIG  = [10, 1]
+BLOCK_STEP  = 15 
+
+X_AXIS = 0
+Y_AXIS = 1
 
 #XML_INIT = "entity "
 class ptolemy_writer:
@@ -27,10 +34,11 @@ class ptolemy_writer:
         self.impl = pxdom.getDOMImplementation('')
 
         self.doctype = self.impl.createDocumentType("entity", None, None)
-        #self.doc = self.impl.createDocument(EMPTY_NAMESPACE, 'entity',self.doctype)
         self.doc = self.impl.createDocument(EMPTY_NAMESPACE, 'entity',self.doctype)
         self.top_element = self.doc.documentElement
         
+        self.param_loc = PARAM_ORIG
+        self.block_loc = BLOCK_ORIG
 
     def __del__(self):
         self.outfile.close()
@@ -93,7 +101,21 @@ class ptolemy_writer:
             line = infile_temp.readline()
         infile_temp.close()
         print "\n"
-        
+
+    def write_parameter(self, name, value):
+        node1 = pgen.write_element(PROP, "period_time", CLASS_PARAMETER, "400")
+        node2 = pgen.write_element(PROP, NAME_ICON, CLASS_ICON, NONE)
+        node3 = pgen.write_element(PROP, NAME_COLOR, CLASS_COLOR, VAL_COLOR_PARAMETER)
+
+        self.param_loc[Y_AXIS] = self.param_loc[Y_AXIS] + PARAM_STEP
+        loc_str = "{" + str(self.param_loc[X_AXIS]) + ", " + str(self.param_loc[Y_AXIS]) + "}"
+        node4 = pgen.write_element(PROP, NAME_LOCATION, CLASS_LOCATION, loc_str)
+
+        node1.appendChild(node2)
+        node2.appendChild(node3)
+        node1.appendChild(node4)
+
+        return node1
 if __name__ == "__main__":
     filename   = "xml-tmp.xml"
     model_name = "xml-tmp"
@@ -101,16 +123,9 @@ if __name__ == "__main__":
     pgen = ptolemy_writer(filename, model_name)
     pgen.write_element("property", "_createBy", "ptolemy.kernel.attributes.VersionAttribute", "8.0.1_20101021")
 
-    node1 = pgen.write_element(PROP, "period_time", CLASS_PARAMETER, "400")
-    node2 = pgen.write_element(PROP, NAME_ICON, CLASS_ICON, NONE)
-    node3 = pgen.write_element(PROP, NAME_COLOR, CLASS_COLOR, VAL_COLOR_PARAMETER)
-    node4 = pgen.write_element(PROP, NAME_LOCATION, CLASS_LOCATION, "{1, 1}")
+    node = pgen.write_parameter("period_time", "400")
 
-    pgen.top_element.appendChild(node1)
-
-    node1.appendChild(node2)
-    node2.appendChild(node3)
-    node1.appendChild(node4)    
+    pgen.top_element.appendChild(node)
 
     pgen.write_to_xmlfile()
     pgen.print_xmlfile()
