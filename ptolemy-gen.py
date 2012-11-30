@@ -16,9 +16,11 @@ XML_HEADER2 = """<!DOCTYPE entity PUBLIC \"-//UC Berkeley//DTD MoML 1//EN\"
 PARAM_COLOR = [0.0, 0.0, 1.0, 1.0]
 PARAM_ORIG  = [1,0]
 PARAM_STEP  = 15
+PARAM_OFFSET = 25
 
-BLOCK_ORIG  = [0, 1]
-BLOCK_STEP  = 50 
+BLOCK_ORIG  = [0, 200]
+BLOCK_STEP  = 200
+BLOCK_OFFSET = 25
 
 DIRECT_LOC = [200, 10]
 ERROR_LOC = "{-1, -1}"
@@ -105,30 +107,34 @@ class ptolemy_writer:
         infile_temp.close()
         print "\n"
 
-    def ptolemy_location_update(self, req_type):
+    def ptolemy_location_update(self, req_type, offset):
 
         if req_type is PARAM:
             self.param_loc[Y_AXIS] = self.param_loc[Y_AXIS] + PARAM_STEP
-            loc_str = "{" + str(self.param_loc[X_AXIS]) + ", " + str(self.param_loc[Y_AXIS]) + "}"
+            x_axis_temp = self.param_loc[X_AXIS] + offset
+            loc_str = "{" + str(x_axis_temp) + ", " + str(self.param_loc[Y_AXIS]) + "}"
         elif req_type is BLOCK:
-            self.param_loc[X_AXIS] = self.param_loc[X_AXIS] + PARAM_STEP
-            loc_str = "{" + str(self.param_loc[X_AXIS]) + ", " + str(self.param_loc[Y_AXIS]) + "}"
+            self.block_loc[X_AXIS] = self.block_loc[X_AXIS] + BLOCK_STEP
+            y_axis_temp = self.block_loc[Y_AXIS] + offset
+            loc_str = "{" + str(self.block_loc[X_AXIS]) + ", " + str(y_axis_temp) + "}"
         elif req_type is DIRECT:
             loc_str = "{" + str(DIRECT_LOC[X_AXIS]) + ", " + str(DIRECT_LOC[Y_AXIS]) + "}"            
         else:
             exit("ERROR: Found in ptolemy_location_update method. Parameter passed is incompatible\n")
         return loc_str
-        
-    def write_to_ptolemy_file(self, type_str, name, value):
+
+    # offset = offset in x-axis for parameters and y-axis for blocks.
+    # Used to make things look better visually
+    def write_to_ptolemy_file(self, type_str, class_str, name, value, offset):
 
         if type_str is PARAM:
 
             node1 = self.write_element(PROP, name, CLASS_PARAMETER, value)
-            node1 = self.write_element(PROP, name, CLASS_PARAMETER, "None")
+            node1 = self.write_element(PROP, name, CLASS_PARAMETER, value)
             node2 = self.write_element(PROP, NAME_ICON, CLASS_ICON, "None")
             node3 = self.write_element(PROP, NAME_COLOR, CLASS_COLOR, VAL_COLOR_PARAMETER)
 
-            loc_str = self.ptolemy_location_update(PARAM)
+            loc_str = self.ptolemy_location_update(PARAM, offset)
             node4 = self.write_element(PROP, NAME_LOCATION, CLASS_LOCATION, loc_str)
 
             node1.appendChild(node2)
@@ -136,10 +142,40 @@ class ptolemy_writer:
             node1.appendChild(node4)
             
         elif type_str is BLOCK:
-            print "NLOCK"
+            if class_str is CLASS_MULTDIV:
+                loc_str = self.ptolemy_location_update(BLOCK, offset)
+                node1 = self.write_element(ENT, name, class_str, "None")
+                node2 = self.write_element(PROP, NAME_LOCATION, CLASS_LOCATION, loc_str)
+                node1.appendChild(node2)
+            elif class_str is CLASS_DELAY:
+                loc_str = self.ptolemy_location_update(BLOCK, offset)
+                node1 = self.write_element(ENT, name, class_str, "None")
+                node2 = self.write_element(PROP, "initialOutputs", CLASS_PARAMETER, value)
+                node3 = self.write_element(PROP, NAME_ICON, CLASS_BICON, "None")
+                node4 = self.write_element(PROP, NAME_ATTR, CLASS_STR_ATTR, "initialOutputs")
+                node5 = self.write_element(PROP, NAME_LOCATION, CLASS_LOCATION, loc_str)
+                node1.appendChild(node2)
+                node1.appendChild(node3)
+                node3.appendChild(node4)
+                node1.appendChild(node5)
+            elif class_str is CLASS_FIR:
+                loc_str = self.ptolemy_location_update(BLOCK, offset)
+                node1 = self.write_element(ENT, name, class_str, "None")
+                infile_temp = open(value, 'r')
+                taps_str = infile_temp.read()
+                taps_str = "{"+taps_str+"}"
+                node2 = self.write_element(PROP, NAME_TAPS, CLASS_PARAMETER, taps_str)
+                node3 = self.write_element(PROP, NAME_LOCATION, CLASS_LOCATION, loc_str)
+                node1.appendChild(node2)
+                node1.appendChild(node3)                
+                infile_temp.close()
+
+            else:
+               exit("ERROR: Found in write_to_ptolemy method. Unknown Block Class\n")
+                
         elif type_str is DIRECT:
             node1 = self.write_element(PROP, NAME_SDF, CLASS_SDF, "None")
-            loc_str = self.ptolemy_location_update(DIRECT)
+            loc_str = self.ptolemy_location_update(DIRECT, offset)
             node2 = self.write_element(PROP, NAME_LOCATION, CLASS_LOCATION, loc_str)
             node1.appendChild(node2)
         else:
@@ -153,21 +189,28 @@ if __name__ == "__main__":
     pgen = ptolemy_writer(filename, model_name)
     pgen.write_element("property", "_createBy", "ptolemy.kernel.attributes.VersionAttribute", "8.0.1_20101021")
 
-    node1 = pgen.write_to_ptolemy_file(PARAM, "period_time", "4000")
-    node2 = pgen.write_to_ptolemy_file(PARAM, "carrier_freq", "4.0")
-    node3 = pgen.write_to_ptolemy_file(PARAM, "carrier_phase", "0")
-    node4 = pgen.write_to_ptolemy_file(PARAM, "sampling_freq", "400")
-    node5 = pgen.write_to_ptolemy_file(PARAM, "symbol_time", "2")
-
+    node1 = pgen.write_to_ptolemy_file(PARAM, CLASS_PARAMETER, "period_time", "4000", 0)
+    node2 = pgen.write_to_ptolemy_file(PARAM, CLASS_PARAMETER, "carrier_freq", "4.0", 0)
+    node3 = pgen.write_to_ptolemy_file(PARAM, CLASS_PARAMETER, "carrier_phase", "0", 0)
+    node4 = pgen.write_to_ptolemy_file(PARAM, CLASS_PARAMETER, "sampling_freq", "400", 0)
+    node5 = pgen.write_to_ptolemy_file(PARAM, CLASS_PARAMETER, "symbol_time", "2", 0)
     pgen.top_element.appendChild(node1)
     pgen.top_element.appendChild(node2)
     pgen.top_element.appendChild(node3)
     pgen.top_element.appendChild(node4)
     pgen.top_element.appendChild(node5)
 
-    node1 = pgen.write_to_ptolemy_file(DIRECT, NAME_SDF, "None")
-
+    node1 = pgen.write_to_ptolemy_file(DIRECT, CLASS_SDF, NAME_SDF, "None", 0)
     pgen.top_element.appendChild(node1)
 
+    node1 = pgen.write_to_ptolemy_file(BLOCK, CLASS_MULTDIV, NAME_MULTDIV, "None", 0)
+    pgen.top_element.appendChild(node1)
+
+    node1 = pgen.write_to_ptolemy_file(BLOCK, CLASS_DELAY, NAME_DELAY, "repeat(sampling_freq*symbol_time, 0)", 100)
+    pgen.top_element.appendChild(node1)
+
+    node1 = pgen.write_to_ptolemy_file(BLOCK, CLASS_FIR, NAME_LOWPASS, "rxrc1.dat", 0)
+    pgen.top_element.appendChild(node1)
+    
     pgen.write_to_xmlfile()
     pgen.print_xmlfile()
