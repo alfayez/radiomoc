@@ -20,4 +20,35 @@
         <property name="_location" class="ptolemy.kernel.util.Location" value="{190, 175}">
         </property>
     </entity>
+    <entity name="Const Obj" class="ptolemy.actor.lib.Const">
+        <doc>Create a constant sequence.</doc>
+        <property name="_icon" class="ptolemy.vergil.icon.BoxedValueIcon">
+            <property name="attributeName" class="ptolemy.kernel.util.StringAttribute" value="value">
+            </property>
+            <property name="displayWidth" class="ptolemy.data.expr.Parameter" value="60">
+            </property>
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="{80, 170}">
+        </property>
+    </entity>
+    <entity name="Mult Here" class="ptolemy.actor.lib.MultiplyDivide">
+        <property name="_location" class="ptolemy.kernel.util.Location" value="{70, 230}">
+        </property>
+    </entity>
+    <entity name="SequencePlotter2" class="ptolemy.actor.lib.gui.SequencePlotter">
+        <property name="_windowProperties" class="ptolemy.actor.gui.WindowPropertiesAttribute">
+        </property>
+        <property name="_plotSize" class="ptolemy.actor.gui.SizeAttribute">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="[150.0, 230.0]">
+        </property>
+    </entity>
+    <relation name="relation" class="ptolemy.actor.TypedIORelation">
+    </relation>
+    <relation name="relation2" class="ptolemy.actor.TypedIORelation">
+    </relation>
+    <link port="SequencePlotter.input" relation="relation"/>
+    <link port="Const Obj.output" relation="relation"/>
+    <link port="Mult Here.output" relation="relation2"/>
+    <link port="SequencePlotter2.input" relation="relation2"/>
 </entity>

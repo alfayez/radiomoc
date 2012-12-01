@@ -31,6 +31,7 @@ Y_AXIS = 1
 PARAM  = 0
 BLOCK  = 1
 DIRECT = 2
+CH = 3
 
 SDF = 0
 #XML_INIT = "entity "
@@ -125,6 +126,15 @@ class ptolemy_writer:
         else:
             exit("ERROR: Found in ptolemy_location_update method. Parameter passed is incompatible\n")
         return loc_str
+    # used to generate locations for virteces without updating the
+    # global objection location parameters
+    def ptolemy_location_gen(self, offset):
+
+        x_axis_temp = self.block_loc[X_AXIS] + BLOCK_STEP/2
+        y_axis_temp = self.block_loc[Y_AXIS] + offset
+        loc_str = "{" + str(self.block_loc[X_AXIS]) + ", " + str(y_axis_temp) + "}"
+       
+        return loc_str    
 
     # offset = offset in x-axis for parameters and y-axis for blocks.
     # Used to make things look better visually
@@ -232,7 +242,19 @@ class ptolemy_writer:
                 node1.appendChild(node4)
             else:
                exit("ERROR: Found in write_to_ptolemy method. Unknown Block Class\n")
-                
+
+        elif type_str is CH:
+            node1 = self.write_element(RELATION, name, class_str,"None")
+
+            # "yes" means we need to add a virtex
+            if (value == "yes"):
+                loc_str = self.ptolemy_location_gen(0)
+                node2 = self.write_element(PROP, "width", CLASS_PARAMETER,"-1")
+                node3 = self.write_element(VERTEX, name, class_str,loc_str)
+                node1.appendChild(node2)
+                node1.appendChild(node3)
+            return node1
+            
         elif type_str is DIRECT:
             node1 = self.write_element(PROP, NAME_SDF, CLASS_SDF, "None")
             loc_str = self.ptolemy_location_update(DIRECT, offset)
@@ -242,6 +264,25 @@ class ptolemy_writer:
             exit("ERROR: Found in write_to_ptolemy method. Parameter passed is incompatible\n")
 
         return node1
+    def link_in_ptolemy_file(self, out_unit, in_unit, name_relation):
+
+        if in_unit != "None":
+            node1 = self.doc.createElement(LINK)
+            node1.setAttribute("port", in_unit+".input")
+            node1.setAttribute(RELATION, name_relation)
+        else:
+            node1 = "None"
+
+        if out_unit != "None":
+            node2 = self.doc.createElement(LINK)
+            node2.setAttribute("port", out_unit+".output")
+            node2.setAttribute(RELATION, name_relation)
+        else:
+            node2 = "None"
+
+        return [node1, node2]
+        
+
 if __name__ == "__main__":
     filename   = "xml-tmp.xml"
     model_name = "xml-tmp"
@@ -260,29 +301,64 @@ if __name__ == "__main__":
     pgen.top_element.appendChild(node4)
     pgen.top_element.appendChild(node5)
 
+
+    name_mult = "Multiply Here"
+    name_delay = "SDF Feedback Delay"
+    name_fir = "Channel Filter"
+    name_chop = "Downsample Unit"
+    name_comp = "Comparator Unit"
+    name_const = "Thrshold Value"
+    name_seq_plot = "Data In Monitor"
+
+    node1 = pgen.write_to_ptolemy_file(BLOCK, CLASS_DELAY, name_delay, "repeat(sampling_freq*symbol_time, 0)", 100)
+    pgen.top_element.appendChild(node1)
+
+
+    
+    ##########################################
+    name_relation = "MultToFir"
+    chan1 = pgen.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_relation, "yes", 0)
+    pgen.top_element.appendChild(chan1)
+    
+
+
+    ############################################
+    
     node1 = pgen.write_to_ptolemy_file(DIRECT, CLASS_SDF, NAME_SDF, "None", 0)
     pgen.top_element.appendChild(node1)
 
-    node1 = pgen.write_to_ptolemy_file(BLOCK, CLASS_MULTDIV, NAME_MULTDIV, "None", 0)
+    node1 = pgen.write_to_ptolemy_file(BLOCK, CLASS_MULTDIV, name_mult, "None", 0)
     pgen.top_element.appendChild(node1)
 
-    node1 = pgen.write_to_ptolemy_file(BLOCK, CLASS_DELAY, NAME_DELAY, "repeat(sampling_freq*symbol_time, 0)", 100)
+    [chana, chanb] = pgen.link_in_ptolemy_file(name_mult, name_fir, name_relation)
+    pgen.top_element.appendChild(chana)
+    pgen.top_element.appendChild(chanb)
+
+
+    node1 = pgen.write_to_ptolemy_file(BLOCK, CLASS_FIR, name_fir, "rxrc1.dat", 0)
     pgen.top_element.appendChild(node1)
 
-    node1 = pgen.write_to_ptolemy_file(BLOCK, CLASS_FIR, NAME_LOWPASS, "rxrc1.dat", 0)
+    node1 = pgen.write_to_ptolemy_file(BLOCK, CLASS_CHOP, name_chop, "sampling_freq*symbol_time", 0)
     pgen.top_element.appendChild(node1)
 
-    node1 = pgen.write_to_ptolemy_file(BLOCK, CLASS_CHOP, NAME_CHOP, "sampling_freq*symbol_time", 0)
+    node1 = pgen.write_to_ptolemy_file(BLOCK, CLASS_COMP, name_comp, "None", 0)
     pgen.top_element.appendChild(node1)
 
-    node1 = pgen.write_to_ptolemy_file(BLOCK, CLASS_COMP, NAME_COMP, "None", 0)
+    node1 = pgen.write_to_ptolemy_file(BLOCK, CLASS_CONST, name_const, "0.2", 100)
     pgen.top_element.appendChild(node1)
 
-    node1 = pgen.write_to_ptolemy_file(BLOCK, CLASS_CONST, "constant", "0.2", 100)
-    pgen.top_element.appendChild(node1)
-
-    node1 = pgen.write_to_ptolemy_file(BLOCK, CLASS_SEQ_PLOT, "Data In", "None", 0)
+    node1 = pgen.write_to_ptolemy_file(BLOCK, CLASS_SEQ_PLOT, name_seq_plot, "None", 0)
     pgen.top_element.appendChild(node1)    
-    
+
+    #name_relation = "MultToDelay"
+    name_relation = "MultToFir"
+    #chan1 = pgen.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_relation, "None", 0)
+    [chana, chanb] = pgen.link_in_ptolemy_file("None", name_delay, name_relation)
+    #pgen.top_element.appendChild(chan1)
+    pgen.top_element.appendChild(chana)
+    #pgen.top_element.appendChild(chanb)
+
+
+
     pgen.write_to_xmlfile()
     pgen.print_xmlfile()
