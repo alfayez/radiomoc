@@ -18,6 +18,7 @@ NAME_WIN_PROP = "_windowProperties"
 NAME_PLOT_SIZE = "_plotSize"
 
 # Ptolemy Classes
+CLASS_COMP_ACT  = "ptolemy.actor.TypedCompositeActor"
 CLASS_PARAMETER = "ptolemy.data.expr.Parameter"
 CLASS_ICON      = "ptolemy.vergil.icon.ValueIcon"
 CLASS_BICON     = "ptolemy.vergil.icon.BoxedValueIcon"
@@ -40,8 +41,8 @@ CLASS_SEQ_PLOT = "ptolemy.actor.lib.gui.SequencePlotter"
 CLASS_WIN_PROP = "ptolemy.actor.gui.WindowPropertiesAttribute"
 CLASS_SIZE_ATTR = "ptolemy.actor.gui.SizeAttribute"
 
-# Properties
-
+# USER Defined Composite Blocks
+CLASS_DBPSK_RX = "CLASS_DSBPSK_RX"
 
 # Ptolemy Parameters
 VAL_COLOR_PARAMETER = "{0.0, 0.0, 1.0, 1.0}"
@@ -52,3 +53,4 @@ NONE = "None"
 RELATION = "relation"
 LINK = "link"
 VERTEX= "vertex"
+PORT = "port"

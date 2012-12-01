@@ -58,7 +58,8 @@ class ptolemy_writer:
 
         node = self.doc.createElement(tag_str)
 
-        node.setAttribute("name", name_str)
+        if (name_str != "None"):        
+            node.setAttribute("name", name_str)
         if (class_str != "None"):        
             node.setAttribute("class", class_str)
         if (value_str != "None"):
@@ -126,8 +127,26 @@ class ptolemy_writer:
         else:
             exit("ERROR: Found in ptolemy_location_update method. Parameter passed is incompatible\n")
         return loc_str
+    def convert_loc_to_str(self, loc):
+        loc_str = "{" + str(loc[X_AXIS]) + ", " + str(loc[Y_AXIS]) + "}"
+        return loc_str
+        
     # used to generate locations for virteces without updating the
     # global objection location parameters
+    def current_location(self, type_str):
+        if type_str == PARAM:
+            return self.param_loc
+        elif type_str == BLOCK:
+            return self.block_loc
+        else:
+            exit("ERROR: Found in current_location method.  Invalid request\n")
+    def set_location(self, type_str, loc):
+        if type_str == PARAM:
+            self.param_loc = loc
+        elif type_str == BLOCK:
+            self.block_loc = loc
+        else:
+            exit("ERROR: Found in current_location method.  Invalid request\n")
     def ptolemy_location_gen(self, offset):
 
         x_axis_temp = self.block_loc[X_AXIS] + BLOCK_STEP/2
@@ -240,9 +259,85 @@ class ptolemy_writer:
                 node1.appendChild(node2)
                 node1.appendChild(node3)
                 node1.appendChild(node4)
-            else:
-               exit("ERROR: Found in write_to_ptolemy method. Unknown Block Class\n")
+                
+            # User Defined Composite Blocks
+            elif class_str is CLASS_DBPSK_RX:
+                name_mult  = name+" Multiply Here"
+                name_delay = name+" SDF Feedback Delay"
+                name_fir   = name+" Channel Filter"
+                name_chop  = name+" Downsample Unit"
+                name_comp  = name+" Comparator Unit"
+                name_const = name+" Thrshold Value"
+    
+                # save the current location in the flowgraph so we can
+                # go back to it after we're done building the current
+                # composite actor
+                
+                cur_loc = self.current_location(BLOCK)
+                self.set_location(BLOCK, BLOCK_ORIG)
+                
+                ############################
+                ### Instantiate Blocks   ###
+                ############################
 
+                # Instantiate the container composite actor
+                node0 = self.write_element(ENT, name, CLASS_COMP_ACT, "None")
+                # set location the composite actor
+                loc_str = self.convert_loc_to_str(cur_loc)
+
+                node1 = self.write_element(PROP, NAME_LOCATION, CLASS_LOCATION, loc_str)
+                node0.appendChild(node1)
+
+                # create ports for the composite actor
+                node1 = self.write_element(PORT, "carrier", CLASS_NAMED_IO_PORT, "None")
+                node2 = self.write_element(PROP, "input", "None", "None")
+
+                node0.appendChild(node1)
+                node1.appendChild(node2)
+                
+                node1 = self.write_to_ptolemy_file(BLOCK, CLASS_DELAY, name_delay, "repeat(sampling_freq*symbol_time, 0)", 100)
+                node0.appendChild(node1)
+
+                node1 = self.write_to_ptolemy_file(DIRECT, CLASS_SDF, NAME_SDF, "None", 0)
+                node0.appendChild(node1)
+
+                node1 = self.write_to_ptolemy_file(BLOCK, CLASS_MULTDIV, name_mult, "None", 0)
+                node0.appendChild(node1)
+
+                node1 = self.write_to_ptolemy_file(BLOCK, CLASS_FIR, name_fir, "rxrc1.dat", 0)
+                node0.appendChild(node1)
+
+                node1 = self.write_to_ptolemy_file(BLOCK, CLASS_CHOP, name_chop, "sampling_freq*symbol_time", 0)
+                node0.appendChild(node1)
+
+                node1 = self.write_to_ptolemy_file(BLOCK, CLASS_COMP, name_comp, "None", 0)
+                node0.appendChild(node1)
+
+                node1 = self.write_to_ptolemy_file(BLOCK, CLASS_CONST, name_const, "0.2", 100)
+                node0.appendChild(node1)
+
+                ############################
+                ### Instantiate Channels ###
+                ############################
+                
+                name_relation = "MultToFir"
+                chan1 = self.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_relation, "yes", 0)
+                node0.appendChild(chan1)
+
+                [chana, chanb] = self.link_in_ptolemy_file(name_mult, name_fir, name_relation)
+                node0.appendChild(chana)
+                node0.appendChild(chanb)
+                
+                #When we are done building the composite actor return
+                #the last coordinates we were using in building the flowgraph
+                self.set_location(BLOCK, cur_loc)
+
+                return node0
+                
+            else:
+               print "ERROR: Found in write_to_ptolemy_file method. Unknown Block Class = ", class_str
+               exit(-1)
+        
         elif type_str is CH:
             node1 = self.write_element(RELATION, name, class_str,"None")
 
@@ -260,8 +355,21 @@ class ptolemy_writer:
             loc_str = self.ptolemy_location_update(DIRECT, offset)
             node2 = self.write_element(PROP, NAME_LOCATION, CLASS_LOCATION, loc_str)
             node1.appendChild(node2)
+            return node1
+        elif type_str is PORT:
+            node1 = self.write_element(PORT, name, class_str,
+                                       "None")
+            loc_str = self.ptolemy_location_update(DIRECT, offset)
+            node2 = self.write_element(PROP, NAME_LOCATION,
+                                       CLASS_LOCATION, loc_str)
+            node3 = self.write_element(PROP, NAME_SHOW_NAME,
+                                       CLASS_SING_PARAM, "true")
+            node1.appendChild(node2)
+            node1.appendChild(node3)
+            return node1
         else:
-            exit("ERROR: Found in write_to_ptolemy method. Parameter passed is incompatible\n")
+            print "ERROR: Found in write_to_ptolemy method. Parameter passed is incompatible= ",  type_str
+            exit(-1)
 
         return node1
     def link_in_ptolemy_file(self, out_unit, in_unit, name_relation):
@@ -310,53 +418,53 @@ if __name__ == "__main__":
     name_const = "Thrshold Value"
     name_seq_plot = "Data In Monitor"
 
-    node1 = pgen.write_to_ptolemy_file(BLOCK, CLASS_DELAY, name_delay, "repeat(sampling_freq*symbol_time, 0)", 100)
-    pgen.top_element.appendChild(node1)
+    #node1 = pgen.write_to_ptolemy_file(BLOCK, CLASS_DELAY, name_delay, "repeat(sampling_freq*symbol_time, 0)", 100)
+    #pgen.top_element.appendChild(node1)
 
 
     
     ##########################################
-    name_relation = "MultToFir"
-    chan1 = pgen.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_relation, "yes", 0)
-    pgen.top_element.appendChild(chan1)
+    #name_relation = "MultToFir"
+    #chan1 = pgen.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_relation, "yes", 0)
+    #pgen.top_element.appendChild(chan1)
     
 
 
     ############################################
     
-    node1 = pgen.write_to_ptolemy_file(DIRECT, CLASS_SDF, NAME_SDF, "None", 0)
-    pgen.top_element.appendChild(node1)
+    #node1 = pgen.write_to_ptolemy_file(DIRECT, CLASS_SDF, NAME_SDF, "None", 0)
+    #pgen.top_element.appendChild(node1)
 
-    node1 = pgen.write_to_ptolemy_file(BLOCK, CLASS_MULTDIV, name_mult, "None", 0)
-    pgen.top_element.appendChild(node1)
+    #node1 = pgen.write_to_ptolemy_file(BLOCK, CLASS_MULTDIV, name_mult, "None", 0)
+    #pgen.top_element.appendChild(node1)
 
-    [chana, chanb] = pgen.link_in_ptolemy_file(name_mult, name_fir, name_relation)
-    pgen.top_element.appendChild(chana)
-    pgen.top_element.appendChild(chanb)
+    #[chana, chanb] = pgen.link_in_ptolemy_file(name_mult, name_fir, name_relation)
+    #pgen.top_element.appendChild(chana)
+    #pgen.top_element.appendChild(chanb)
 
 
-    node1 = pgen.write_to_ptolemy_file(BLOCK, CLASS_FIR, name_fir, "rxrc1.dat", 0)
-    pgen.top_element.appendChild(node1)
+    #node1 = pgen.write_to_ptolemy_file(BLOCK, CLASS_FIR, name_fir, "rxrc1.dat", 0)
+    #pgen.top_element.appendChild(node1)
 
-    node1 = pgen.write_to_ptolemy_file(BLOCK, CLASS_CHOP, name_chop, "sampling_freq*symbol_time", 0)
-    pgen.top_element.appendChild(node1)
+    #node1 = pgen.write_to_ptolemy_file(BLOCK, CLASS_CHOP, name_chop, "sampling_freq*symbol_time", 0)
+    #pgen.top_element.appendChild(node1)
 
-    node1 = pgen.write_to_ptolemy_file(BLOCK, CLASS_COMP, name_comp, "None", 0)
-    pgen.top_element.appendChild(node1)
+    #node1 = pgen.write_to_ptolemy_file(BLOCK, CLASS_COMP, name_comp, "None", 0)
+    #pgen.top_element.appendChild(node1)
 
-    node1 = pgen.write_to_ptolemy_file(BLOCK, CLASS_CONST, name_const, "0.2", 100)
-    pgen.top_element.appendChild(node1)
+    #node1 = pgen.write_to_ptolemy_file(BLOCK, CLASS_CONST, name_const, "0.2", 100)
+    #pgen.top_element.appendChild(node1)
+
+    node1 = pgen.write_to_ptolemy_file(BLOCK, CLASS_DBPSK_RX, "My Receiver", "None", 0)
+    pgen.top_element.appendChild(node1)    
 
     node1 = pgen.write_to_ptolemy_file(BLOCK, CLASS_SEQ_PLOT, name_seq_plot, "None", 0)
     pgen.top_element.appendChild(node1)    
 
     #name_relation = "MultToDelay"
-    name_relation = "MultToFir"
-    #chan1 = pgen.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_relation, "None", 0)
-    [chana, chanb] = pgen.link_in_ptolemy_file("None", name_delay, name_relation)
-    #pgen.top_element.appendChild(chan1)
-    pgen.top_element.appendChild(chana)
-    #pgen.top_element.appendChild(chanb)
+    #name_relation = "MultToFir"
+    #[chana, chanb] = pgen.link_in_ptolemy_file("None", name_delay, name_relation)
+    #pgen.top_element.appendChild(chana)
 
 
 

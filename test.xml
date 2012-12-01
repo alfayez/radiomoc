@@ -4,51 +4,82 @@
 <entity name="test" class="ptolemy.actor.TypedCompositeActor">
     <property name="_createdBy" class="ptolemy.kernel.attributes.VersionAttribute" value="9.0.devel">
     </property>
-    <property name="_windowProperties" class="ptolemy.actor.gui.WindowPropertiesAttribute" value="{bounds={236, 136, 808, 527}, maximized=false}">
+    <property name="_windowProperties" class="ptolemy.actor.gui.WindowPropertiesAttribute" value="{bounds={-1, 24, 1282, 757}, maximized=true}">
     </property>
-    <property name="_vergilSize" class="ptolemy.actor.gui.SizeAttribute" value="[600, 400]">
+    <property name="_vergilSize" class="ptolemy.actor.gui.SizeAttribute" value="[1074, 630]">
     </property>
     <property name="_vergilZoomFactor" class="ptolemy.data.expr.ExpertParameter" value="1.0">
     </property>
-    <property name="_vergilCenter" class="ptolemy.data.expr.ExpertParameter" value="{300.0, 200.0}">
+    <property name="_vergilCenter" class="ptolemy.data.expr.ExpertParameter" value="{537.0, 315.0}">
     </property>
-    <entity name="SequencePlotter" class="ptolemy.actor.lib.gui.SequencePlotter">
-        <property name="_windowProperties" class="ptolemy.actor.gui.WindowPropertiesAttribute">
+    <entity name="Test Actor" class="ptolemy.actor.TypedCompositeActor">
+        <property name="_location" class="ptolemy.kernel.util.Location" value="82.2265625, 163.6875">
         </property>
-        <property name="_plotSize" class="ptolemy.actor.gui.SizeAttribute">
+        <property name="_windowProperties" class="ptolemy.actor.gui.WindowPropertiesAttribute" value="{bounds={-1, 24, 1282, 757}, maximized=true}">
         </property>
-        <property name="_location" class="ptolemy.kernel.util.Location" value="{190, 175}">
+        <property name="_vergilSize" class="ptolemy.actor.gui.SizeAttribute" value="[1074, 630]">
         </property>
-    </entity>
-    <entity name="Const Obj" class="ptolemy.actor.lib.Const">
-        <doc>Create a constant sequence.</doc>
-        <property name="_icon" class="ptolemy.vergil.icon.BoxedValueIcon">
-            <property name="attributeName" class="ptolemy.kernel.util.StringAttribute" value="value">
+        <property name="_vergilZoomFactor" class="ptolemy.data.expr.ExpertParameter" value="0.8">
+        </property>
+        <property name="_vergilCenter" class="ptolemy.data.expr.ExpertParameter" value="{537.0, 315.0}">
+        </property>
+        <port name="port" class="ptolemy.actor.TypedIOPort">
+            <property name="input"/>
+            <property name="_location" class="ptolemy.kernel.util.Location" value="[0.0, 240.0]">
             </property>
-            <property name="displayWidth" class="ptolemy.data.expr.Parameter" value="60">
+        </port>
+        <port name="port2" class="ptolemy.actor.TypedIOPort">
+            <property name="output"/>
+            <property name="_location" class="ptolemy.kernel.util.Location" value="[485.0, 345.0]">
             </property>
-        </property>
-        <property name="_location" class="ptolemy.kernel.util.Location" value="{80, 170}">
-        </property>
+        </port>
+        <entity name="SequencePlotter" class="ptolemy.actor.lib.gui.SequencePlotter">
+            <property name="_windowProperties" class="ptolemy.actor.gui.WindowPropertiesAttribute">
+            </property>
+            <property name="_plotSize" class="ptolemy.actor.gui.SizeAttribute">
+            </property>
+            <property name="_location" class="ptolemy.kernel.util.Location" value="{190, 175}">
+            </property>
+        </entity>
+        <entity name="Const Obj" class="ptolemy.actor.lib.Const">
+            <doc>Create a constant sequence.</doc>
+            <property name="_icon" class="ptolemy.vergil.icon.BoxedValueIcon">
+                <property name="attributeName" class="ptolemy.kernel.util.StringAttribute" value="value">
+                </property>
+                <property name="displayWidth" class="ptolemy.data.expr.Parameter" value="60">
+                </property>
+            </property>
+            <property name="_location" class="ptolemy.kernel.util.Location" value="{80, 170}">
+            </property>
+        </entity>
+        <entity name="Mult Here" class="ptolemy.actor.lib.MultiplyDivide">
+            <property name="_location" class="ptolemy.kernel.util.Location" value="{70, 230}">
+            </property>
+        </entity>
+        <entity name="SequencePlotter2" class="ptolemy.actor.lib.gui.SequencePlotter">
+            <property name="_windowProperties" class="ptolemy.actor.gui.WindowPropertiesAttribute">
+            </property>
+            <property name="_plotSize" class="ptolemy.actor.gui.SizeAttribute">
+            </property>
+            <property name="_location" class="ptolemy.kernel.util.Location" value="[455.0, 235.0]">
+            </property>
+        </entity>
+        <relation name="relation" class="ptolemy.actor.TypedIORelation">
+        </relation>
+        <relation name="relation3" class="ptolemy.actor.TypedIORelation">
+            <property name="width" class="ptolemy.data.expr.Parameter" value="-1">
+            </property>
+            <vertex name="vertex1" value="{105.0, 230.0}">
+            </vertex>
+        </relation>
+        <relation name="relation2" class="ptolemy.actor.TypedIORelation">
+        </relation>
+        <link port="port" relation="relation2"/>
+        <link port="port2" relation="relation3"/>
+        <link port="SequencePlotter.input" relation="relation"/>
+        <link port="Const Obj.output" relation="relation"/>
+        <link port="Mult Here.divide" relation="relation2"/>
+        <link port="Mult Here.output" relation="relation3"/>
+        <link port="SequencePlotter2.input" relation="relation3"/>
     </entity>
-    <entity name="Mult Here" class="ptolemy.actor.lib.MultiplyDivide">
-        <property name="_location" class="ptolemy.kernel.util.Location" value="{70, 230}">
-        </property>
-    </entity>
-    <entity name="SequencePlotter2" class="ptolemy.actor.lib.gui.SequencePlotter">
-        <property name="_windowProperties" class="ptolemy.actor.gui.WindowPropertiesAttribute">
-        </property>
-        <property name="_plotSize" class="ptolemy.actor.gui.SizeAttribute">
-        </property>
-        <property name="_location" class="ptolemy.kernel.util.Location" value="[150.0, 230.0]">
-        </property>
-    </entity>
-    <relation name="relation" class="ptolemy.actor.TypedIORelation">
-    </relation>
-    <relation name="relation2" class="ptolemy.actor.TypedIORelation">
-    </relation>
-    <link port="SequencePlotter.input" relation="relation"/>
-    <link port="Const Obj.output" relation="relation"/>
-    <link port="Mult Here.output" relation="relation2"/>
-    <link port="SequencePlotter2.input" relation="relation2"/>
 </entity>
