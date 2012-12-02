@@ -47,6 +47,16 @@ class ptolemy_writer:
         self.doctype = self.impl.createDocumentType("entity", None, None)
         self.doc = self.impl.createDocument(EMPTY_NAMESPACE, 'entity',self.doctype)
         self.top_element = self.doc.documentElement
+
+        init_node0 = self.write_element(PROP, NAME_WIN_PROP, CLASS_WIN_PROP, VAL_WIN_PROP)
+        init_node1 = self.write_element(PROP, NAME_VERG_SIZE, CLASS_SIZE_ATTR, VAL_VERG_SIZE_ATTR)
+        init_node2 = self.write_element(PROP, NAME_VERG_ZOOM, CLASS_EXP_PARAM, VAL_VERG_ZOOM)
+        init_node3 = self.write_element(PROP, NAME_VERG_CENTER, CLASS_EXP_PARAM, VAL_VERG_CENTER)
+
+        self.top_element.appendChild(init_node0)        
+        self.top_element.appendChild(init_node1)
+        self.top_element.appendChild(init_node2)
+        self.top_element.appendChild(init_node3)        
         
         self.param_loc = PARAM_ORIG
         self.block_loc = BLOCK_ORIG
@@ -262,12 +272,24 @@ class ptolemy_writer:
                 
             # User Defined Composite Blocks
             elif class_str is CLASS_DBPSK_RX:
+
+                name_inport1 = "carrier"
+                name_inport2 = "rfsig"
+                name_outport = "output"
+                
                 name_mult  = name+" Multiply Here"
                 name_delay = name+" SDF Feedback Delay"
                 name_fir   = name+" Channel Filter"
                 name_chop  = name+" Downsample Unit"
                 name_comp  = name+" Comparator Unit"
                 name_const = name+" Thrshold Value"
+
+                name_rel_inport = "inportChanO"
+                name_rel_multdiv = "multdivChanO"
+                name_rel_fir = "firChanO"
+                name_rel_const = "constChanO"
+                name_rel_comp = "compChanO"
+                name_rel_delay = "delayChanO"
     
                 # save the current location in the flowgraph so we can
                 # go back to it after we're done building the current
@@ -289,20 +311,46 @@ class ptolemy_writer:
                 node0.appendChild(node1)
 
                 # create ports for the composite actor
-                node1 = self.write_element(PORT, "carrier", CLASS_NAMED_IO_PORT, "None")
+                node1 = self.write_element(PORT, name_inport1, CLASS_NAMED_IO_PORT, "None")
                 node2 = self.write_element(PROP, "input", "None", "None")
-
                 node0.appendChild(node1)
                 node1.appendChild(node2)
-                
-                node1 = self.write_to_ptolemy_file(BLOCK, CLASS_DELAY, name_delay, "repeat(sampling_freq*symbol_time, 0)", 100)
+
+                chan1 = self.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_rel_inport, "yes", 0)
+                node0.appendChild(chan1)
+
+                #####################################################################
+                ## DELAY
+                #####################################################################
+                node1 = self.write_to_ptolemy_file(BLOCK, CLASS_DELAY,
+                name_delay, "repeat(sampling_freq*symbol_time, 0)",
+                100)
                 node0.appendChild(node1)
+                chan1 = self.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_rel_delay, "no", 0)
+                node0.appendChild(chan1)
+                #######################################################################
 
                 node1 = self.write_to_ptolemy_file(DIRECT, CLASS_SDF, NAME_SDF, "None", 0)
                 node0.appendChild(node1)
 
+                #####################################################################
+                ## MULT
+                #####################################################################
                 node1 = self.write_to_ptolemy_file(BLOCK, CLASS_MULTDIV, name_mult, "None", 0)
                 node0.appendChild(node1)
+
+                [chana, chanb] = self.link_in_ptolemy_file(name_delay+".output", name_mult+".multiply", name_rel_delay)
+                node0.appendChild(chana)
+                node0.appendChild(chanb)
+                #####################################################################
+                
+                chan1 = self.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_rel_inport, "yes", 0)
+                node0.appendChild(chan1)
+                [chana, chanb] = self.link_in_ptolemy_file(name_inport1, name_mult+".multiply", name_rel_inport)
+                node0.appendChild(chana)
+                node0.appendChild(chanb)
+                [chana, chanb] = self.link_in_ptolemy_file("None", name_delay+".input", name_rel_inport)
+                node0.appendChild(chanb)                
 
                 node1 = self.write_to_ptolemy_file(BLOCK, CLASS_FIR, name_fir, "rxrc1.dat", 0)
                 node0.appendChild(node1)
@@ -320,13 +368,11 @@ class ptolemy_writer:
                 ### Instantiate Channels ###
                 ############################
                 
-                name_relation = "MultToFir"
-                chan1 = self.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_relation, "yes", 0)
-                node0.appendChild(chan1)
 
-                [chana, chanb] = self.link_in_ptolemy_file(name_mult, name_fir, name_relation)
-                node0.appendChild(chana)
-                node0.appendChild(chanb)
+
+                #[chana, chanb] = self.link_in_ptolemy_file(name_mult, name_fir, name_relation)
+                #node0.appendChild(chana)
+                #node0.appendChild(chanb)
                 
                 #When we are done building the composite actor return
                 #the last coordinates we were using in building the flowgraph
@@ -345,7 +391,7 @@ class ptolemy_writer:
             if (value == "yes"):
                 loc_str = self.ptolemy_location_gen(0)
                 node2 = self.write_element(PROP, "width", CLASS_PARAMETER,"-1")
-                node3 = self.write_element(VERTEX, name, class_str,loc_str)
+                node3 = self.write_element(VERTEX, name, "None",loc_str)
                 node1.appendChild(node2)
                 node1.appendChild(node3)
             return node1
@@ -374,19 +420,21 @@ class ptolemy_writer:
         return node1
     def link_in_ptolemy_file(self, out_unit, in_unit, name_relation):
 
-        if in_unit != "None":
+        if out_unit != "None":
             node1 = self.doc.createElement(LINK)
-            node1.setAttribute("port", in_unit+".input")
+            node1.setAttribute("port", out_unit)
             node1.setAttribute(RELATION, name_relation)
         else:
             node1 = "None"
-
-        if out_unit != "None":
+            
+        if in_unit != "None":
             node2 = self.doc.createElement(LINK)
-            node2.setAttribute("port", out_unit+".output")
+            node2.setAttribute("port", in_unit)
             node2.setAttribute(RELATION, name_relation)
         else:
             node2 = "None"
+
+
 
         return [node1, node2]
         
