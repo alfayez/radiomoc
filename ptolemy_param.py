@@ -49,6 +49,8 @@ CLASS_SIZE_ATTR = "ptolemy.actor.gui.SizeAttribute"
 CLASS_SCALE = "ptolemy.actor.lib.Scale"
 CLASS_REPEAT = "ptolemy.domains.sdf.lib.Repeat"
 CLASS_BOOL_ANY = "ptolemy.actor.lib.conversions.BooleanToAnything"
+CLASS_EXPRESSION = "ptolemy.actor.lib.Expression"
+CLASS_RAMP = "ptolemy.actor.lib.Ramp"
 
 # USER Defined Composite Blocks
 CLASS_DBPSK_RX = "CLASS_DSBPSK_RX"

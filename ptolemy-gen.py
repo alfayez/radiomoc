@@ -292,6 +292,11 @@ class ptolemy_writer:
                 node1 = self.write_element(ENT, name, class_str, "None")
                 node2 = self.write_element(PROP, NAME_LOCATION, CLASS_LOCATION, loc_str)                
                 node1.appendChild(node2)
+            elif class_str is CLASS_RAMP:
+                loc_str = self.ptolemy_location_update(BLOCK, offset)
+                node1 = self.write_element(ENT, name, class_str, "None")
+                node2 = self.write_element(PROP, NAME_LOCATION, CLASS_LOCATION, loc_str)                
+                node1.appendChild(node2)                
             elif class_str is CLASS_SEQ_PLOT:
                 loc_str = self.ptolemy_location_update(BLOCK, offset)
                 node1 = self.write_element(ENT, name, class_str, "None")
@@ -421,8 +426,18 @@ class ptolemy_writer:
             elif class_str is CLASS_DATA_BITSTREAM:
                 name_inport = "input"
                 name_outport = "output"
+                name_exp1 = "Expression1"
+                name_exp2 = "Expression2"
+                name_exp3 = "Expression3"
+                name_ramp = "Bit Iterator"
+                name_byte = "Byte"
                 
                 name_rel_inport = "inputCh"
+                name_rel_exp1 = "Exp1Ch"
+                name_rel_exp2 = "Exp2Ch"
+                name_rel_exp3 = "Exp3Ch"
+                name_rel_ramp = "RampCh"
+                name_rel_byte = "byteCh"
                 
                 # save the current location in the flowgraph so we can
                 # go back to it after we're done building the current
@@ -452,6 +467,15 @@ class ptolemy_writer:
                 
                 chan1 = self.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_rel_inport, "no", 0)
                 node0.appendChild(chan1)
+
+                #####################################################################
+                ## RAMP - Bit Iterator
+                #####################################################################
+                node1 = self.write_to_ptolemy_file(BLOCK, CLASS_RAMP, name_ramp, "None", 100)
+                node0.appendChild(node1)
+                node1 = self.write_to_ptolemy_file(BLOCK, CLASS_CONST, name_byte, "8", 200)
+                node0.appendChild(node1)
+
 
                 loc_str = self.ptolemy_location_update(BLOCK, offset)
                 node1 = self.write_element(PORT, name_outport, CLASS_NAMED_IO_PORT, "None")
