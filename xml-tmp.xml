@@ -52,13 +52,23 @@
             <property name="attributeName" class="ptolemy.kernel.util.StringAttribute" value="value"/><property name="displayWidth" class="ptolemy.data.expr.Parameter" value="60"/>
           </property><property name="_location" class="ptolemy.kernel.util.Location" value="{400, 500}"/>
         </entity><entity name="Expression1" class="ptolemy.actor.lib.Expression">
-          <property name="expression" class="ptolemy.kernel.util.StringAttribute" value="input>>bit"/><property name="_location" class="ptolemy.kernel.util.Location" value="{600, 400}"/><port name="input" class="ptolemy.actor.TypedIOPort">
+          <property name="expression" class="ptolemy.kernel.util.StringAttribute" value="input%bit"/><property name="_location" class="ptolemy.kernel.util.Location" value="{600, 400}"/><port name="input" class="ptolemy.actor.TypedIOPort">
             <property name="input"/>
           </port><port name="bit" class="ptolemy.actor.TypedIOPort">
             <property name="input"/>
           </port>
-        </entity><port name="output" class="ptolemy.actor.TypedIOPort">
-          <property name="output"/><property name="_location" class="ptolemy.kernel.util.Location" value="{800, 200}"/>
+        </entity><relation name="RampCh" class="ptolemy.actor.TypedIORelation"/><link port="Bit Iterator.output" relation="RampCh"/><link port="Expression1.input" relation="RampCh"/><relation name="byteCh" class="ptolemy.actor.TypedIORelation"/><link port="Byte.output" relation="byteCh"/><link port="Expression1.bit" relation="byteCh"/><entity name="Expression2" class="ptolemy.actor.lib.Expression">
+          <property name="expression" class="ptolemy.kernel.util.StringAttribute" value="input>>bit"/><property name="_location" class="ptolemy.kernel.util.Location" value="{800, 200}"/><port name="input" class="ptolemy.actor.TypedIOPort">
+            <property name="input"/>
+          </port><port name="bit" class="ptolemy.actor.TypedIOPort">
+            <property name="input"/>
+          </port>
+        </entity><relation name="inputCh" class="ptolemy.actor.TypedIORelation"/><link port="input" relation="inputCh"/><link port="Expression2.input" relation="inputCh"/><entity name="Expression3" class="ptolemy.actor.lib.Expression">
+          <property name="expression" class="ptolemy.kernel.util.StringAttribute" value="input%1"/><property name="_location" class="ptolemy.kernel.util.Location" value="{1000, 200}"/><port name="input" class="ptolemy.actor.TypedIOPort">
+            <property name="input"/>
+          </port>
+        </entity><relation name="Exp2Ch" class="ptolemy.actor.TypedIORelation"/><link port="Expression2.output" relation="Exp2Ch"/><link port="Expression3.input" relation="Exp2Ch"/><relation name="Exp3Ch" class="ptolemy.actor.TypedIORelation"/><link port="Expression3.output" relation="Exp3Ch"/><link port="output" relation="Exp3Ch"/><relation name="Exp1Ch" class="ptolemy.actor.TypedIORelation"/><link port="Expression1.output" relation="Exp1Ch"/><link port="Expression2.bit" relation="Exp1Ch"/><port name="output" class="ptolemy.actor.TypedIOPort">
+          <property name="output"/><property name="_location" class="ptolemy.kernel.util.Location" value="{1200, 200}"/>
         </port>
       </entity><relation name="inputCh" class="ptolemy.actor.TypedIORelation"/><link port="input" relation="inputCh"/><link port="Data to Bitstream.input" relation="inputCh"/><entity name="DBPSK Bitstream Logic Level" class="ptolemy.actor.TypedCompositeActor">
         <property name="_location" class="ptolemy.kernel.util.Location" value="{400, 200}"/><port name="datain" class="ptolemy.actor.TypedIOPort">
@@ -86,8 +96,18 @@
         <property name="input"/>
       </port><relation name="modinCh" class="ptolemy.actor.TypedIORelation"/><port name="carrier" class="ptolemy.actor.TypedIOPort">
         <property name="input"/>
-      </port><relation name="carrierCh" class="ptolemy.actor.TypedIORelation"/><port name="output" class="ptolemy.actor.TypedIOPort">
-        <property name="output"/><property name="_location" class="ptolemy.kernel.util.Location" value="{200, 200}"/>
+      </port><relation name="carrierCh" class="ptolemy.actor.TypedIORelation">
+        <property name="width" class="ptolemy.data.expr.Parameter" value="-1"/><vertex name="carrierCh" value="{100, 200}"/>
+      </relation><entity name="Invert" class="ptolemy.actor.lib.Const">
+        <property name="value" class="ptolemy.data.expr.Parameter"/><property name="_icon" class="ptolemy.vergil.icon.BoxedValueIcon">
+          <property name="attributeName" class="ptolemy.kernel.util.StringAttribute" value="value"/><property name="displayWidth" class="ptolemy.data.expr.Parameter" value="60"/>
+        </property><property name="_location" class="ptolemy.kernel.util.Location" value="{200, 400}"/>
+      </entity><relation name="invertCh" class="ptolemy.actor.TypedIORelation"/><link port="Invert.output" relation="invertCh"/><link port="Mixer.multiply" relation="invertCh"/><entity name="Mixer" class="ptolemy.actor.lib.MultiplyDivide">
+        <property name="_location" class="ptolemy.kernel.util.Location" value="{400, 300}"/>
+      </entity><relation name="mixerCh" class="ptolemy.actor.TypedIORelation"/><link port="Mixer.output" relation="mixerCh"/><link port="Multiplexer.input" relation="mixerCh"/><link port="carrier" relation="carrierCh"/><link port="Mixer.multiply" relation="carrierCh"/><entity name="Multiplexer" class="ptolemy.actor.lib.Multiplexor">
+        <property name="_location" class="ptolemy.kernel.util.Location" value="{600, 200}"/>
+      </entity><relation name="modinCh" class="ptolemy.actor.TypedIORelation"/><link port="modin" relation="modinCh"/><link port="Multiplexer.select" relation="modinCh"/><relation name="muxCh" class="ptolemy.actor.TypedIORelation"/><link port="Multiplexer.output" relation="muxCh"/><link port="output" relation="muxCh"/><relation name="carrierCh" class="ptolemy.actor.TypedIORelation"/><link port="Multiplexer.input" relation="carrierCh"/><port name="output" class="ptolemy.actor.TypedIOPort">
+        <property name="output"/><property name="_location" class="ptolemy.kernel.util.Location" value="{800, 200}"/>
       </port>
     </entity><relation name="repeatCh" class="ptolemy.actor.TypedIORelation"/><link port="Repeat Block.output" relation="repeatCh"/><link port="DBPSK Modulator.modin" relation="repeatCh"/><relation name="dbpskModCh" class="ptolemy.actor.TypedIORelation"/><link port="DBPSK Modulator.output" relation="dbpskModCh"/><link port="output" relation="dbpskModCh"/><relation name="datainCh" class="ptolemy.actor.TypedIORelation"/><link port="datain" relation="datainCh"/><link port="DBPSK Modulator.carrier" relation="datainCh"/><port name="output" class="ptolemy.actor.TypedIOPort">
       <property name="output"/><property name="_location" class="ptolemy.kernel.util.Location" value="{800, 200}"/>
