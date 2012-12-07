@@ -23,6 +23,7 @@ NAME_VERG_CENTER = "_vergilCenter"
 # Ptolemy Classes
 CLASS_COMP_ACT  = "ptolemy.actor.TypedCompositeActor"
 CLASS_PARAMETER = "ptolemy.data.expr.Parameter"
+CLASS_PORT_PARAM= "ptolemy.actor.parameters.PortParameter"
 CLASS_EXP_PARAM = "ptolemy.data.expr.ExpertParameter"
 CLASS_ICON      = "ptolemy.vergil.icon.ValueIcon"
 CLASS_BICON     = "ptolemy.vergil.icon.BoxedValueIcon"
@@ -40,14 +41,19 @@ CLASS_CHOICE_STYLE = "ptolemy.actor.gui.style.ChoiceStyle"
 CLASS_NAMED_IO_PORT = "ptolemy.actor.TypedIOPort"
 CLASS_NAMED_IO_RELATION = "ptolemy.actor.TypedIORelation"
 CLASS_SING_PARAM = "ptolemy.data.expr.SingletonParameter"
+CLASS_SINE = "ptolemy.actor.lib.Sinewave"
 CLASS_CONST = "ptolemy.actor.lib.Const"
 CLASS_SEQ_PLOT = "ptolemy.actor.lib.gui.SequencePlotter"
 CLASS_WIN_PROP = "ptolemy.actor.gui.WindowPropertiesAttribute"
 CLASS_SIZE_ATTR = "ptolemy.actor.gui.SizeAttribute"
+CLASS_SCALE = "ptolemy.actor.lib.Scale"
+CLASS_REPEAT = "ptolemy.domains.sdf.lib.Repeat"
 
 # USER Defined Composite Blocks
 CLASS_DBPSK_RX = "CLASS_DSBPSK_RX"
-
+CLASS_DBPSK_TX = "CLASS_DSBPSK_TX"
+CLASS_DBPSK_MOD = "CLASS_DSBPSK_MOD"
+CLASS_DIFF_ENC = "CLASS_DIFF_ENC"
 # Ptolemy Parameters
 VAL_COLOR_PARAMETER = "{0.0, 0.0, 1.0, 1.0}"
 VAL_WIN_PROP = "{bounds={175, 249, 808, 527}, maximized=true}"
