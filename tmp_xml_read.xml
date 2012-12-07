@@ -49,9 +49,15 @@
         </entity><entity name="Byte" class="ptolemy.actor.lib.Const">
           <property name="value" class="ptolemy.data.expr.Parameter" value="8"/><property name="_icon" class="ptolemy.vergil.icon.BoxedValueIcon">
             <property name="attributeName" class="ptolemy.kernel.util.StringAttribute" value="value"/><property name="displayWidth" class="ptolemy.data.expr.Parameter" value="60"/>
-          </property><property name="_location" class="ptolemy.kernel.util.Location" value="{400, 400}"/>
+          </property><property name="_location" class="ptolemy.kernel.util.Location" value="{400, 500}"/>
+        </entity><entity name="Expression1" class="ptolemy.actor.lib.Expression">
+          <property name="expression" class="ptolemy.kernel.util.StringAttribute" value="input>>bit"/><property name="_location" class="ptolemy.kernel.util.Location" value="{600, 400}"/><port name="input" class="ptolemy.actor.TypedIOPort">
+            <property name="input"/>
+          </port><port name="bit" class="ptolemy.actor.TypedIOPort">
+            <property name="input"/>
+          </port>
         </entity><port name="output" class="ptolemy.actor.TypedIOPort">
-          <property name="output"/><property name="_location" class="ptolemy.kernel.util.Location" value="{600, 200}"/>
+          <property name="output"/><property name="_location" class="ptolemy.kernel.util.Location" value="{800, 200}"/>
         </port>
       </entity><relation name="inputCh" class="ptolemy.actor.TypedIORelation"/><link port="input" relation="inputCh"/><link port="Data to Bitstream.input" relation="inputCh"/><entity name="DBPSK Bitstream Logic Level" class="ptolemy.actor.TypedCompositeActor">
         <property name="_location" class="ptolemy.kernel.util.Location" value="{400, 200}"/><port name="datain" class="ptolemy.actor.TypedIOPort">

@@ -66,6 +66,8 @@ class ptolemy_writer:
         
     def write_element(self, tag_str, name_str, class_str, value_str):
 
+        #print "tag_str= ", tag_str, " name_str= ", name_str,
+        #"value_str= ", value_str, "class_str= ", class_str, "\n"
         node = self.doc.createElement(tag_str)
 
         if (name_str != "None"):        
@@ -423,6 +425,41 @@ class ptolemy_writer:
                 self.set_location(BLOCK, orig_loc)
 
                 return node0
+            elif class_str is CLASS_EXPRESSION:
+                name_port1 = value[0]
+                name_op = value[1]
+                name_port2 = value[2]
+
+                if name_port1 == "":
+                    print "Error in CLASS_EXPRESSION, need to specify port1"
+                elif name_op == "":
+                    print "Error in CLASS_EXPRESSION, need to specify operator"
+                elif name_port2 == "":
+                    print "Error in CLASS_EXPRESSION, need to specify port2"
+
+                loc_str = self.ptolemy_location_update(BLOCK, offset)
+                node1 = self.write_element(ENT, name, CLASS_EXPRESSION, "None")
+                exp_str = name_port1+name_op+name_port2
+
+                node2 = self.write_element(PROP, "expression", CLASS_STR_ATTR, exp_str)
+                node3 = self.write_element(PROP, NAME_LOCATION, CLASS_LOCATION, loc_str)
+                node4 = self.write_element(PORT, name_port1, CLASS_NAMED_IO_PORT, "None")
+                node5 = self.write_element(PROP, "input", "None", "None")
+
+                # if the second port name is a digit it means we're
+                # passing a constant as the parameter
+                if name_port2.isdigit() == False:
+                    node6 = self.write_element(PORT, name_port2, CLASS_NAMED_IO_PORT, "None")
+                    node7 = self.write_element(PROP, "input", "None", "None")
+                node1.appendChild(node2)
+                node1.appendChild(node3)
+                node1.appendChild(node4)
+                node4.appendChild(node5)
+                
+                if name_port2.isdigit() == False:
+                    node1.appendChild(node6)
+                    node6.appendChild(node7)                
+                
             elif class_str is CLASS_DATA_BITSTREAM:
                 name_inport = "input"
                 name_outport = "output"
@@ -473,9 +510,18 @@ class ptolemy_writer:
                 #####################################################################
                 node1 = self.write_to_ptolemy_file(BLOCK, CLASS_RAMP, name_ramp, "None", 100)
                 node0.appendChild(node1)
-                node1 = self.write_to_ptolemy_file(BLOCK, CLASS_CONST, name_byte, "8", 200)
+                node1 = self.write_to_ptolemy_file(BLOCK, CLASS_CONST, name_byte, "8", 300)
                 node0.appendChild(node1)
 
+
+                #####################################################################
+                ## Expression -> extract bit value
+                #####################################################################
+                node1 = self.write_to_ptolemy_file(BLOCK,
+                                                   CLASS_EXPRESSION,
+                                                   name_exp1, ["input", ">>", "bit"], 200)
+                node0.appendChild(node1)
+                
 
                 loc_str = self.ptolemy_location_update(BLOCK, offset)
                 node1 = self.write_element(PORT, name_outport, CLASS_NAMED_IO_PORT, "None")
