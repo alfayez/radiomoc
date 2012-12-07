@@ -48,12 +48,16 @@ CLASS_WIN_PROP = "ptolemy.actor.gui.WindowPropertiesAttribute"
 CLASS_SIZE_ATTR = "ptolemy.actor.gui.SizeAttribute"
 CLASS_SCALE = "ptolemy.actor.lib.Scale"
 CLASS_REPEAT = "ptolemy.domains.sdf.lib.Repeat"
+CLASS_BOOL_ANY = "ptolemy.actor.lib.conversions.BooleanToAnything"
 
 # USER Defined Composite Blocks
 CLASS_DBPSK_RX = "CLASS_DSBPSK_RX"
 CLASS_DBPSK_TX = "CLASS_DSBPSK_TX"
 CLASS_DBPSK_MOD = "CLASS_DSBPSK_MOD"
 CLASS_DIFF_ENC = "CLASS_DIFF_ENC"
+CLASS_DBPSK_CHOICE = "CLASS_DBPSK_CHOICE"
+CLASS_DATA_BITSTREAM = "CLASS_DATA_BITSTREAM"
+
 # Ptolemy Parameters
 VAL_COLOR_PARAMETER = "{0.0, 0.0, 1.0, 1.0}"
 VAL_WIN_PROP = "{bounds={175, 249, 808, 527}, maximized=true}"

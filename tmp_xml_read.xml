@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE entity>
 <entity>
-  <property name="period_time" class="ptolemy.data.expr.Parameter" value="4000">
+  <property name="_windowProperties" class="ptolemy.actor.gui.WindowPropertiesAttribute" value="{bounds={175, 249, 808, 527}, maximized=true}"/><property name="_vergilSize" class="ptolemy.actor.gui.SizeAttribute" value="[600, 400]"/><property name="_vergilZoomFactor" class="ptolemy.data.expr.ExpertParameter" value="1.0"/><property name="_vergilCenter" class="ptolemy.data.expr.ExpertParameter" value="{300.0, 200.0}"/><property name="period_time" class="ptolemy.data.expr.Parameter" value="4000">
     <property name="_icon" class="ptolemy.vergil.icon.ValueIcon">
       <property name="_color" class="ptolemy.actor.gui.ColorAttribute" value="{0.0, 0.0, 1.0, 1.0}"/>
     </property><property name="_location" class="ptolemy.kernel.util.Location" value="{1, 15}"/>
@@ -41,8 +41,30 @@
     </port><entity name="Differential Encoder" class="ptolemy.actor.TypedCompositeActor">
       <property name="_location" class="ptolemy.kernel.util.Location" value="{200, 200}"/><port name="input" class="ptolemy.actor.TypedIOPort">
         <property name="input"/>
-      </port><relation name="inputCh" class="ptolemy.actor.TypedIORelation"/><port name="output" class="ptolemy.actor.TypedIOPort">
-        <property name="output"/><property name="_location" class="ptolemy.kernel.util.Location" value="{200, 200}"/>
+      </port><relation name="inputCh" class="ptolemy.actor.TypedIORelation"/><entity name="Data to Bitstream" class="ptolemy.actor.TypedCompositeActor">
+        <property name="_location" class="ptolemy.kernel.util.Location" value="{200, 200}"/><port name="input" class="ptolemy.actor.TypedIOPort">
+          <property name="input"/>
+        </port><relation name="inputCh" class="ptolemy.actor.TypedIORelation"/><port name="output" class="ptolemy.actor.TypedIOPort">
+          <property name="output"/><property name="_location" class="ptolemy.kernel.util.Location" value="{200, 200}"/>
+        </port>
+      </entity><relation name="inputCh" class="ptolemy.actor.TypedIORelation"/><link port="input" relation="inputCh"/><link port="Data to Bitstream.input" relation="inputCh"/><entity name="DBPSK Bitstream Logic Level" class="ptolemy.actor.TypedCompositeActor">
+        <property name="_location" class="ptolemy.kernel.util.Location" value="{400, 200}"/><port name="datain" class="ptolemy.actor.TypedIOPort">
+          <property name="input"/>
+        </port><relation name="datainCh" class="ptolemy.actor.TypedIORelation"/><port name="choice" class="ptolemy.actor.TypedIOPort">
+          <property name="input"/>
+        </port><relation name="choiceCh" class="ptolemy.actor.TypedIORelation"/><port name="output" class="ptolemy.actor.TypedIOPort">
+          <property name="output"/><property name="_location" class="ptolemy.kernel.util.Location" value="{200, 200}"/>
+        </port>
+      </entity><entity name="Boolean To Anything" class="ptolemy.actor.lib.conversions.BooleanToAnything">
+        <property name="_location" class="ptolemy.kernel.util.Location" value="{600, 300}"/>
+      </entity><relation name="booltoanythingCh" class="ptolemy.actor.TypedIORelation"/><link port="Boolean To Anything.output" relation="booltoanythingCh"/><link port="SampleDelay.input" relation="booltoanythingCh"/><entity name="SampleDelay" class="ptolemy.domains.sdf.lib.SampleDelay">
+        <property name="initialOutputs" class="ptolemy.data.expr.Parameter" value="{false}"/><property name="_icon" class="ptolemy.vergil.icon.BoxedValueIcon">
+          <property name="attributeName" class="ptolemy.kernel.util.StringAttribute" value="initialOutputs"/>
+        </property><property name="_location" class="ptolemy.kernel.util.Location" value="{800, 300}"/>
+      </entity><relation name="delayCh" class="ptolemy.actor.TypedIORelation"/><link port="SampleDelay.output" relation="delayCh"/><link port="DBPSK Bitstream Logic Level.datain" relation="delayCh"/><relation name="databitstreamCh" class="ptolemy.actor.TypedIORelation"/><link port="Data to Bitstream.output" relation="databitstreamCh"/><link port="DBPSK Bitstream Logic Level.choice" relation="databitstreamCh"/><relation name="dbpskchoiceCh" class="ptolemy.actor.TypedIORelation">
+        <property name="width" class="ptolemy.data.expr.Parameter" value="-1"/><vertex name="dbpskchoiceCh" value="{900, 200}"/>
+      </relation><link port="DBPSK Bitstream Logic Level.output" relation="dbpskchoiceCh"/><link port="output" relation="dbpskchoiceCh"/><relation name="dbpskchoiceCh" class="ptolemy.actor.TypedIORelation"/><link port="Boolean To Anything.input" relation="dbpskchoiceCh"/><port name="output" class="ptolemy.actor.TypedIOPort">
+        <property name="output"/><property name="_location" class="ptolemy.kernel.util.Location" value="{1000, 200}"/>
       </port>
     </entity><relation name="carrierCh" class="ptolemy.actor.TypedIORelation"/><link port="carrier" relation="carrierCh"/><link port="Differential Encoder.input" relation="carrierCh"/><entity name="Repeat Block" class="ptolemy.domains.sdf.lib.Repeat">
       <property name="numberOfTimes" class="ptolemy.data.expr.Parameter" value="sampling_freq*symbol_time"/><property name="_location" class="ptolemy.kernel.util.Location" value="{400, 200}"/>
