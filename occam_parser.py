@@ -4,6 +4,7 @@ import sys, string, types, os
 import getopt
 import numpy as np
 
+from ptolemy_gen import *
 '''
 Checks if the token specifies an OCCAM process
 it basically checks if the token starts with
@@ -322,7 +323,7 @@ if __name__ == "__main__":
     top_handler.print_chan_list()
     top_handler.print_proc_dict()
     top_handler.print_top_matrix()
-    
+    test_ptolemy()
 
     #outfile.close()
     #infile.close)(

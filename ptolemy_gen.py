@@ -1126,7 +1126,7 @@ class ptolemy_writer:
         return [node1, node2]
         
 
-if __name__ == "__main__":
+def test_ptolemy():
     filename   = "xml-tmp.xml"
     model_name = "xml-tmp"
 
