@@ -9,7 +9,7 @@
 
 
 -- Define the RF Out Block
-PROC rfOut(CHAN INT outC!, CHAN INT DTopC!, CHAN INT inC?)
+PROC rfIn(CHAN INT outC!, CHAN INT DTopC!, CHAN INT inC?)
   INT symbolTime  :
   INT samplingRate:
   INT carrierFreq :
@@ -309,11 +309,11 @@ PROC outputToScreenParam(CHAN BYTE out!, CHAN INT rxParamC?)
 PROC outputToScreenTop(CHAN BYTE out!, CHAN INT carrierC?, CHAN INT carrierScaleC?, 
                        CHAN INT dataSrcC?,                 CHAN INT dbpskModC?,      
                        CHAN INT rrcFiltC,                  CHAN INT rfScaleC?,
-                       CHAN INT rfOutC?)
+                       CHAN INT rfInC?)
   INT rxParam :
   SEQ
 
-    rfOutC ? rxParam
+    rfInC ? rxParam
     out.string("*tRF Out*t", 0, out!)
     out.string("*n", 0, out!)    
 
@@ -368,7 +368,7 @@ PROC parameterGen(CHAN INT paramOC!)
 
 PROC main(CHAN BYTE out!)
   
-  CHAN INT rfOutToScaleC   :
+  CHAN INT rfInToScaleC    :
   CHAN INT scaleToRrcFiltC :
   CHAN INT rrcFiltToDemodC :
   CHAN INT carrierToScaleC :
@@ -381,7 +381,7 @@ PROC main(CHAN BYTE out!)
   CHAN INT DModulatorC    :
   CHAN INT DRrcFiltC      :
   CHAN INT DRfScaleC      :
-  CHAN INT DRfOutC        :
+  CHAN INT DRfInC         :
 
   CHAN INT DrxParamC      :
   
@@ -392,8 +392,8 @@ PROC main(CHAN BYTE out!)
   PAR
     parameterGen    (setupC!)
     parameterGen    (setup2C!)
-    rfOut           (rfOutToScaleC!,    DRfOutC!,         setupC?)
-    rfScale         (scaleToRrcFiltC!,  DRfScaleC!,      rfOutToScaleC?)
+    rfIn            (rfInToScaleC!,    DRfInC!,         setupC?)
+    rfScale         (scaleToRrcFiltC!,  DRfScaleC!,      rfInToScaleC?)
     channelFilter   (rrcFiltToDemodC!,  DRrcFiltC!,      scaleToRrcFiltC?)
     carrier         (carrierToScaleC!, DCarrierC!,      setup2C?)
     carrierScale    (scaleToDemodC!,   DCarrierScaleC!, carrierToScaleC?)      
@@ -401,5 +401,5 @@ PROC main(CHAN BYTE out!)
     dataOut         (DDataSrcC!,      demodToDataOutC?)
 
     --outputToScreenParam(out!, rxParamC?)
-    outputToScreenTop(out!, DCarrierC?, DCarrierScaleC?, DDataSrcC?, DModulatorC?, DRrcFiltC?, DRfScaleC?, DRfOutC?)      
+    outputToScreenTop(out!, DCarrierC?, DCarrierScaleC?, DDataSrcC?, DModulatorC?, DRrcFiltC?, DRfScaleC?, DRfInC?)      
 :

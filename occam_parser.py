@@ -29,6 +29,15 @@ class graph_handler:
         
         self.fcn_interest = []
         self.init_chans   = []
+
+        self.block_map_dict = ['rfOut':[CLASS_DISCARD],
+                               'channelFilter': [CLASS_FIR],
+                               'rfScale': [CLASS_SCALE],
+                               'dataSrc':[CLASS_CONST],
+                               'carrierScale':[CLASS_SCALE],
+                               'carrier':[CLASS_SINE],
+                               'dbpskTransmitter':[CLASS_DBPSK_TX],
+                               ]
     def __del__(self):
         self.outfile.close()
         self.infile.close()

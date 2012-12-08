@@ -190,6 +190,11 @@ class ptolemy_writer:
                 node1 = self.write_element(ENT, name, class_str, "None")
                 node2 = self.write_element(PROP, NAME_LOCATION, CLASS_LOCATION, loc_str)
                 node1.appendChild(node2)
+            elif class_str is CLASS_DISCARD:
+                loc_str = self.ptolemy_location_update(BLOCK, offset)
+                node1 = self.write_element(ENT, name, class_str, "None")
+                node2 = self.write_element(PROP, NAME_LOCATION, CLASS_LOCATION, loc_str)
+                node1.appendChild(node2)                
             elif class_str is CLASS_GAUSS:
                 loc_str = self.ptolemy_location_update(BLOCK, offset)
                 node1 = self.write_element(ENT, name, class_str, "None")
@@ -1206,7 +1211,9 @@ def test_ptolemy():
     node1 = pgen.write_to_ptolemy_file(BLOCK, CLASS_DBPSK_RX, name_rcv, "None", 0)
     pgen.top_element.appendChild(node1)    
 
-    node1 = pgen.write_to_ptolemy_file(BLOCK, CLASS_SEQ_PLOT, name_seq_plot, "None", 0)
+    #node1 = pgen.write_to_ptolemy_file(BLOCK, CLASS_SEQ_PLOT, name_seq_plot, "None", 0)
+    #pgen.top_element.appendChild(node1)    
+    node1 = pgen.write_to_ptolemy_file(BLOCK, CLASS_DISCARD, name_seq_plot, "None", 0)
     pgen.top_element.appendChild(node1)    
 
     ############################################
