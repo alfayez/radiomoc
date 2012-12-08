@@ -52,7 +52,9 @@ CLASS_BOOL_ANY = "ptolemy.actor.lib.conversions.BooleanToAnything"
 CLASS_EXPRESSION = "ptolemy.actor.lib.Expression"
 CLASS_RAMP = "ptolemy.actor.lib.Ramp"
 CLASS_MUX = "ptolemy.actor.lib.Multiplexor"
-
+CLASS_NOT = "ptolemy.actor.lib.logic.LogicalNot"
+CLASS_GAUSS = "ptolemy.actor.lib.Gaussian"
+CLASS_SHARED_PARAM = "ptolemy.actor.parameters.SharedParameter"
 # USER Defined Composite Blocks
 CLASS_DBPSK_RX = "CLASS_DSBPSK_RX"
 CLASS_DBPSK_TX = "CLASS_DSBPSK_TX"

@@ -190,6 +190,15 @@ class ptolemy_writer:
                 node1 = self.write_element(ENT, name, class_str, "None")
                 node2 = self.write_element(PROP, NAME_LOCATION, CLASS_LOCATION, loc_str)
                 node1.appendChild(node2)
+            elif class_str is CLASS_GAUSS:
+                loc_str = self.ptolemy_location_update(BLOCK, offset)
+                node1 = self.write_element(ENT, name, class_str, "None")
+                node2 = self.write_element(PROP, "resetOnEachRun", CLASS_SHARED_PARAM, "false")
+                node3 = self.write_element(PROP, "standardDeviation", CLASS_PORT_PARAM, value)
+                node4 = self.write_element(PROP, NAME_LOCATION, CLASS_LOCATION, loc_str)
+                node1.appendChild(node2)
+                node1.appendChild(node3)
+                node1.appendChild(node4)
             elif class_str is CLASS_SCALE:
                 loc_str = self.ptolemy_location_update(BLOCK, offset)
                 node1 = self.write_element(ENT, name, class_str, "None")
@@ -292,7 +301,11 @@ class ptolemy_writer:
                 node3.appendChild(node4)
                 node3.appendChild(node5)
                 node1.appendChild(node6)
-
+            elif class_str is CLASS_NOT:
+                loc_str = self.ptolemy_location_update(BLOCK, offset)
+                node1 = self.write_element(ENT, name, class_str, "None")
+                node2 = self.write_element(PROP, NAME_LOCATION, CLASS_LOCATION, loc_str)                
+                node1.appendChild(node2)                
             elif class_str is CLASS_BOOL_ANY:
                 loc_str = self.ptolemy_location_update(BLOCK, offset)
                 node1 = self.write_element(ENT, name, class_str, "None")
@@ -321,7 +334,7 @@ class ptolemy_writer:
 
                 name_data_bitstream = "Data to Bitstream"
                 name_rel_data_bitstream = "databitstreamCh"
-                name_dbpsk_choice = "DBPSK Bitstream Logic Level"
+                name_dbpsk_choice = "DBPSK Choice"
                 name_rel_dbpsk_choice = "dbpskchoiceCh"
                 
                 name_delay = "SampleDelay"
@@ -595,12 +608,16 @@ class ptolemy_writer:
 
                 return node0
             elif class_str is CLASS_DBPSK_CHOICE:
-                name_inport1 = "datain"
-                name_inport2 = "choice"
+                name_inport2 = "datain"
+                name_inport1 = "choice"
                 name_outport = "output"
+                name_not = "Not"
+                name_mux = "Multiplexor"
                 
-                name_rel_inport1 = "datainCh"
-                name_rel_inport2 = "choiceCh"                
+                name_rel_inport2 = "datainCh"
+                name_rel_inport1 = "choiceCh"
+                name_rel_not = "notCh"
+                name_rel_mux = "muxCh"
                 
                 # save the current location in the flowgraph so we can
                 # go back to it after we're done building the current
@@ -633,9 +650,42 @@ class ptolemy_writer:
                 node2 = self.write_element(PROP, "input", "None", "None")
                 node0.appendChild(node1)
                 node1.appendChild(node2)
-                chan1 = self.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_rel_inport2, "no", 0)
+                chan1 = self.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_rel_inport2, "yes", 100)
+                node0.appendChild(chan1)
+                
+                chan1 = self.write_to_ptolemy_file(BLOCK, CLASS_NOT, name_not, "None", -100)
+                node0.appendChild(chan1)
+                
+                chan1 = self.write_to_ptolemy_file(BLOCK, CLASS_MUX, name_mux, "None", 0)
                 node0.appendChild(chan1)
 
+
+                chan1 = self.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_rel_mux, "no", 0)
+                node0.appendChild(chan1)
+                [chana, chanb] = self.link_in_ptolemy_file(name_mux+".output", name_outport, name_rel_mux)
+                node0.appendChild(chana)
+                node0.appendChild(chanb)
+
+                [chana, chanb] = self.link_in_ptolemy_file(name_inport1, name_mux+".select", name_rel_inport1)
+                node0.appendChild(chana)
+                node0.appendChild(chanb)
+
+                chan1 = self.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_rel_not, "no", 0)
+                node0.appendChild(chan1)
+                [chana, chanb] = self.link_in_ptolemy_file(name_not+".output", name_mux+".input", name_rel_not)
+                node0.appendChild(chana)
+                node0.appendChild(chanb)
+
+                [chana, chanb] = self.link_in_ptolemy_file(name_inport2, name_not+".input", name_rel_inport2)
+                node0.appendChild(chana)
+                node0.appendChild(chanb)
+                [chana, chanb] = self.link_in_ptolemy_file("None", name_mux+".input", name_rel_inport2)
+                #node0.appendChild(chana)
+                node0.appendChild(chanb)
+                
+                #####################################################################
+                ## OUTPUT Port
+                #####################################################################
                 loc_str = self.ptolemy_location_update(BLOCK, offset)
                 node1 = self.write_element(PORT, name_outport, CLASS_NAMED_IO_PORT, "None")
                 node2 = self.write_element(PROP, "output", "None", "None")
@@ -692,7 +742,7 @@ class ptolemy_writer:
                 node2 = self.write_element(PROP, "input", "None", "None")
                 node0.appendChild(node1)
                 node1.appendChild(node2)
-                chan1 = self.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_rel_inport2, "yes", 0)
+                chan1 = self.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_rel_inport2, "yes", 100)
                 node0.appendChild(chan1)
 
                 node1 = self.write_to_ptolemy_file(BLOCK, CLASS_CONST, name_invert, "None", 200)
@@ -706,11 +756,7 @@ class ptolemy_writer:
                 
                 node1 = self.write_to_ptolemy_file(BLOCK, CLASS_MULTDIV, name_mixer, "None", 100)
                 node0.appendChild(node1)
-                chan1 = self.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_rel_mixer, "no", 0)
-                node0.appendChild(chan1)
-                [chana, chanb] = self.link_in_ptolemy_file(name_mixer+".output", name_mux+".input", name_rel_mixer)
-                node0.appendChild(chana)
-                node0.appendChild(chanb)
+
                 #chan1 = self.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_rel_inport2, "yes", 0)
                 #node0.appendChild(chan1)
                 [chana, chanb] = self.link_in_ptolemy_file(name_inport2, name_mixer+".multiply", name_rel_inport2)
@@ -735,6 +781,13 @@ class ptolemy_writer:
                 node0.appendChild(chan1)
                 [chana, chanb] = self.link_in_ptolemy_file("None", name_mux+".input", name_rel_inport2)
                 #node0.appendChild(chana)
+                node0.appendChild(chanb)
+
+
+                chan1 = self.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_rel_mixer, "no", 0)
+                node0.appendChild(chan1)
+                [chana, chanb] = self.link_in_ptolemy_file(name_mixer+".output", name_mux+".input", name_rel_mixer)
+                node0.appendChild(chana)
                 node0.appendChild(chanb)
 
                 loc_str = self.ptolemy_location_update(BLOCK, offset)
@@ -1023,7 +1076,7 @@ class ptolemy_writer:
 
             # "yes" means we need to add a virtex
             if (value == "yes"):
-                loc_str = self.ptolemy_location_gen(0)
+                loc_str = self.ptolemy_location_gen(offset)
                 node2 = self.write_element(PROP, "width", CLASS_PARAMETER,"-1")
                 node3 = self.write_element(VERTEX, name, "None",loc_str)
                 node1.appendChild(node2)
@@ -1099,6 +1152,7 @@ if __name__ == "__main__":
     name_pulse_filt = "Pulse Shaping Filter"
     name_data_in = "Data In"
     name_tx = "My DBPSK Transmitter"
+    name_gauss = "Gaussian Noise"
 
     name_carrier_rel = "carrierCon0"
     name_rcv_rel = "recvconn"
@@ -1106,6 +1160,7 @@ if __name__ == "__main__":
     name_carrier_scale_rel = "carrscaleO"
     name_data_in_rel = "datainO"
     name_tx_rel = "dbpskTxCh"
+    name_guass_rel = "guassCh"
 
     node1 = pgen.write_to_ptolemy_file(DIRECT, CLASS_SDF, NAME_SDF, "None", 0)
     pgen.top_element.appendChild(node1)
@@ -1137,6 +1192,11 @@ if __name__ == "__main__":
     ## Pulse Shaping Filter
     #####################################################################
     node1 = pgen.write_to_ptolemy_file(BLOCK, CLASS_FIR, name_pulse_filt, "rxrc1.dat", 0)
+    pgen.top_element.appendChild(node1)
+
+    ###########3
+    ## Guassian Noise
+    node1 = pgen.write_to_ptolemy_file(BLOCK, CLASS_GAUSS, name_gauss, "0.35", 0)
     pgen.top_element.appendChild(node1)
 
     #####################################################################                
