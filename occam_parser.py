@@ -15,6 +15,11 @@ IN_CHAN  = 1
 IGNORE_PROC = ["parameterGen"]
 INIT_PROC = "parameterGen"
 
+# Code Generation Modes
+PTOLEMY  = 0
+GNURADIO = 1
+SDF3     = 2
+ 
 class graph_handler:
     def __init__(self, infile_name):
         self.infile  = file(infile_name, 'r') 
@@ -37,6 +42,9 @@ class graph_handler:
                                'carrierScale':[CLASS_SCALE],
                                'carrier':[CLASS_SINE],
                                'dbpskTransmitter':[CLASS_DBPSK_TX],
+                               'rfIn':[CLASS_CONST],
+                               'dbpskReceiver':[CLASS_DBPSK_RX],
+                               'dataOut':[CLASS_DISCARD]
                                ]
     def __del__(self):
         self.outfile.close()
@@ -308,6 +316,15 @@ class graph_handler:
                 if (proc_in != ""):                
                     proc_in_index   = self.proc_dict[proc_in]
                 self.top_matrix[proc_out_index][proc_in_index] = 1
+    def generate_code(self, mode):
+        if   mode == PTOLEMY:
+            
+        elif mode == GNURADIO:
+        elif mode == SDF3:
+        else:
+            print "ERROR in generate_code.  You chose an unsupported
+                code generation mode"
+            exit(-1)
         
 if __name__ == "__main__":
 
