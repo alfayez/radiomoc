@@ -1,0 +1,405 @@
+#INCLUDE "course.module"
+#INCLUDE "hostio.inc"
+#INCLUDE "ioconv.module"
+
+#USE "hostio.lib"
+#USE "course.lib"
+
+
+
+
+-- Define the RF Out Block
+PROC rfIn(CHAN INT outC!, CHAN INT DTopC!, CHAN INT inC?)
+  INT symbolTime  :
+  INT samplingRate:
+  INT carrierFreq :
+  INT rcFiltCoeff :  -- provides the name of the file with the coeff rcFilt<int>.dat
+  INT carrierGain :
+  INT rfGain      :
+  
+  SEQ
+    inC  ? symbolTime
+    outC ! symbolTime
+    
+    inC  ? samplingRate
+    outC ! samplingRate
+    
+    inC  ? carrierFreq
+    outC ! carrierFreq
+    
+    inC  ? rcFiltCoeff
+    outC ! rcFiltCoeff
+    
+    inC  ? carrierGain
+    outC ! carrierGain
+    
+    inC  ? rfGain
+    outC ! rfGain
+    
+    DTopC ! rfGain
+:
+-- Define the Raised Root Cosine Channel Filter Block
+PROC channelFilter(CHAN INT outC!, CHAN INT DTopC!, CHAN INT inC?)
+  INT symbolTime  :
+  INT samplingRate:
+  INT carrierFreq :
+  INT rcFiltCoeff :  -- provides the name of the file with the coeff rcFilt<int>.dat
+  INT carrierGain :
+  INT rfGain      :
+
+  SEQ
+    -- We're rcv/fw radio configuration parameters through the channel
+
+    inC ? symbolTime
+    --DParamOC ! symbolTime
+    outC     ! symbolTime
+
+    inC ? samplingRate    
+    --DParamOC ! samplingRate
+    outC     ! samplingRate
+        
+    inC ? carrierFreq
+    --DParamOC ! carrierFreq
+    outC     ! carrierFreq
+    
+    inC ? rcFiltCoeff
+    --DParamOC ! rcFiltCoeff
+    outC     ! rcFiltCoeff
+    
+    inC ? carrierGain
+    --DParamOC ! carrierGain
+    outC     ! carrierGain
+
+    inC ? rfGain
+    --DParamOC ! rfGain
+    outC     ! rfGain
+    
+    DTopC ! rfGain
+:
+
+-- Define the RF Scaling Block
+PROC rfScale(CHAN INT outC!, CHAN INT DTopC!, CHAN INT inC?)
+  INT symbolTime  :
+  INT samplingRate:
+  INT carrierFreq :
+  INT rcFiltCoeff :  -- provides the name of the file with the coeff rcFilt<int>.dat
+  INT carrierGain :
+  INT rfGain      :
+
+  SEQ
+    -- We're rcv/fw radio configuration parameters through the channel
+
+    inC ? symbolTime
+    --DParamOC ! symbolTime
+    outC     ! symbolTime
+
+    inC ? samplingRate    
+    --DParamOC ! samplingRate
+    outC     ! samplingRate
+        
+    inC ? carrierFreq
+    --DParamOC ! carrierFreq
+    outC     ! carrierFreq
+    
+    inC ? rcFiltCoeff
+    --DParamOC ! rcFiltCoeff
+    outC     ! rcFiltCoeff
+    
+    inC ? carrierGain
+    --DParamOC ! carrierGain
+    outC     ! carrierGain
+
+    inC ? rfGain
+    --DParamOC ! rfGain
+    outC     ! rfGain
+    
+    DTopC ! rfGain
+:
+-- Define the Data Source Block
+PROC dataOut(CHAN INT DTopC!, CHAN INT inC?)
+  INT symbolTime  :
+  INT samplingRate:
+  INT carrierFreq :
+  INT rcFiltCoeff :  -- provides the name of the file with the coeff rcFilt<int>.dat
+  INT carrierGain :
+  INT rfGain      :
+
+  SEQ
+    -- We're rcv/fw radio configuration parameters through the channel
+
+    inC ? symbolTime
+    --DParamOC ! symbolTime
+
+    inC ? samplingRate    
+    --DParamOC ! samplingRate
+        
+    inC ? carrierFreq
+    --DParamOC ! carrierFreq
+    
+    inC ? rcFiltCoeff
+    --DParamOC ! rcFiltCoeff
+    
+    inC ? carrierGain
+    --DParamOC ! carrierGain
+
+    inC ? rfGain
+    --DParamOC ! rfGain
+    
+    DTopC ! rfGain
+:
+
+-- Define the Carrier Scaling Block
+PROC carrierScale(CHAN INT outC!, CHAN INT DTopC!, CHAN INT inC?)
+  INT symbolTime  :
+  INT samplingRate:
+  INT carrierFreq :
+  INT rcFiltCoeff :  -- provides the name of the file with the coeff rcFilt<int>.dat
+  INT carrierGain :
+  INT rfGain      :
+
+  SEQ
+    -- We're rcv/fw radio configuration parameters through the channel
+
+    inC ? symbolTime
+    --DParamOC ! symbolTime
+    outC     ! symbolTime
+
+    inC ? samplingRate    
+    --DParamOC ! samplingRate
+    outC     ! samplingRate
+        
+    inC ? carrierFreq
+    --DParamOC ! carrierFreq
+    outC     ! carrierFreq
+    
+    inC ? rcFiltCoeff
+    --DParamOC ! rcFiltCoeff
+    outC     ! rcFiltCoeff
+    
+    inC ? carrierGain
+    --DParamOC ! carrierGain
+    outC     ! carrierGain
+
+    inC ? rfGain
+    --DParamOC ! rfGain
+    outC     ! rfGain
+    
+    DTopC ! rfGain
+:
+
+-- Define the Carrier Block
+PROC carrier(CHAN INT outC!, CHAN INT DTopC!, CHAN INT inC?)
+  INT symbolTime  :
+  INT samplingRate:
+  INT carrierFreq :
+  INT rcFiltCoeff :  -- provides the name of the file with the coeff rcFilt<int>.dat
+  INT carrierGain :
+  INT rfGain      :
+
+  SEQ
+    -- We're rcv/fw radio configuration parameters through the channel
+
+    inC ? symbolTime
+    --DParamOC ! symbolTime
+    outC     ! symbolTime
+
+    inC ? samplingRate    
+    --DParamOC ! samplingRate
+    outC     ! samplingRate
+        
+    inC ? carrierFreq
+    --DParamOC ! carrierFreq
+    outC     ! carrierFreq
+    
+    inC ? rcFiltCoeff
+    --DParamOC ! rcFiltCoeff
+    outC     ! rcFiltCoeff
+    
+    inC ? carrierGain
+    --DParamOC ! carrierGain
+    outC     ! carrierGain
+
+    inC ? rfGain
+    --DParamOC ! rfGain
+    outC     ! rfGain
+    
+    DTopC ! rfGain
+:
+
+
+-- Define the DBPSK Transmitter Block
+PROC dbpskReceiver(CHAN INT outC!,      CHAN INT DTopC!,
+                   CHAN INT inCarrierC?,CHAN INT inDataC?)
+  INT symbolTime  :
+  INT samplingRate:
+  INT carrierFreq :
+  INT rcFiltCoeff :  -- provides the name of the file with the coeff rcFilt<int>.dat
+  INT carrierGain :
+  INT rfGain      :
+
+  SEQ
+    -- We're rcv/fw radio configuration parameters through the channel
+
+    inCarrierC ? symbolTime
+    inDataC    ? symbolTime
+    --DParamOC   ! symbolTime
+    outC       ! symbolTime
+
+    inCarrierC ? samplingRate
+    inDataC    ? samplingRate
+    --DParamOC   ! samplingRate
+    outC       ! samplingRate
+        
+    inCarrierC ? carrierFreq
+    inDataC    ? carrierFreq
+    --DParamOC   ! carrierFreq
+    outC       ! carrierFreq
+    
+    inCarrierC ? rcFiltCoeff
+    inDataC    ? rcFiltCoeff
+    --DParamOC   ! rcFiltCoeff
+    outC       ! rcFiltCoeff
+    
+    inCarrierC ? carrierGain
+    inDataC    ? carrierGain
+    --DParamOC   ! carrierGain
+    outC       ! carrierGain
+
+    inCarrierC ? rfGain
+    inDataC    ? rfGain
+    --DParamOC   ! rfGain
+    outC       ! rfGain
+    
+    DTopC      ! rfGain
+:
+PROC outputToScreenParam(CHAN BYTE out!, CHAN INT rxParamC?)
+  INT rxParam :
+  SEQ
+
+    rxParamC ? rxParam
+    out.string("*tDBPSK Rx Symbol Time *t= ", 0, out!)
+    out.int(rxParam, 0 ,out)
+    out.string("*n", 0, out!)
+    
+    rxParamC ? rxParam    
+    out.string("*tDBPSK Rx Sampling Freq *t= ", 0, out!)
+    out.int(rxParam, 0 ,out)
+    out.string("*n", 0, out)
+    
+    rxParamC ? rxParam
+    out.string("*tDBPSK Rx Carrier Freq *t= ", 0, out!)
+    out.int(rxParam, 0 ,out)
+    out.string("*n", 0, out!)
+    
+    rxParamC ? rxParam
+    out.string("*tDBPSK Raised Cos Filt *t= ", 0, out!)
+    out.int(rxParam, 0 ,out)
+    out.string("*n", 0, out!)
+    
+    rxParamC ? rxParam
+    out.string("*tDBPSK Carrier Gain *t= ", 0, out!)
+    out.int(rxParam, 0 ,out)
+    out.string("*n", 0, out!)
+    
+    rxParamC ? rxParam
+    out.string("*tDBPSK RF Gain *t*t= ", 0, out!)
+    out.int(rxParam, 0 ,out)
+    out.string("*n", 0, out!)    
+:
+PROC outputToScreenTop(CHAN BYTE out!, CHAN INT carrierC?, CHAN INT carrierScaleC?, 
+                       CHAN INT dataSrcC?,                 CHAN INT dbpskModC?,      
+                       CHAN INT rrcFiltC,                  CHAN INT rfScaleC?,
+                       CHAN INT rfInC?)
+  INT rxParam :
+  SEQ
+
+    rfInC ? rxParam
+    out.string("*tRF Out*t", 0, out!)
+    out.string("*n", 0, out!)    
+
+    rfScaleC ? rxParam
+    out.string("*tRF Scaling*t", 0, out!)
+    out.string("*n", 0, out!)
+    
+    rrcFiltC ? rxParam
+    out.string("*tChannel Filter*t", 0, out!)
+    out.string("*n", 0, out!)
+    
+    carrierC ? rxParam
+    out.string("*tCarrier*t", 0, out!)
+    out.string("*n", 0, out!)
+    
+    carrierScaleC ? rxParam    
+    out.string("*tCarrier Scaling*t", 0, out!)
+    out.string("*n", 0, out)
+    
+    dbpskModC ? rxParam
+    out.string("*tDBPSK Modulator*t", 0, out!)
+    out.string("*n", 0, out!)
+    
+    dataSrcC ? rxParam
+    out.string("*tData Input*t", 0, out!)
+    out.string("*n", 0, out!)    
+:
+
+PROC parameterGen(CHAN INT paramOC!)
+  INT symbolTime   :
+  INT samplingRate :
+  INT carrierFreq  :
+  INT rcFiltCoeff  :
+  INT carrierGain  :
+  INT rfGain       :
+  SEQ
+    symbolTime   := 2
+    samplingRate := 400
+    carrierFreq  := 4
+    rcFiltCoeff  := 1
+    carrierGain  := 1
+    rfGain       := 1
+    
+    paramOC ! symbolTime
+    paramOC ! samplingRate
+    paramOC ! carrierFreq
+    paramOC ! rcFiltCoeff
+    paramOC ! carrierGain
+    paramOC ! rfGain
+    
+:
+
+PROC main(CHAN BYTE out!)
+  
+  CHAN INT rfInToScaleC    :
+  CHAN INT scaleToRrcFiltC :
+  CHAN INT rrcFiltToDemodC :
+  CHAN INT carrierToScaleC :
+  CHAN INT scaleToDemodC   :
+  CHAN INT demodToDataOutC :
+  
+  CHAN INT DCarrierC :
+  CHAN INT DCarrierScaleC :
+  CHAN INT DDataSrcC      :
+  CHAN INT DModulatorC    :
+  CHAN INT DRrcFiltC      :
+  CHAN INT DRfScaleC      :
+  CHAN INT DRfInC         :
+
+  CHAN INT DrxParamC      :
+  
+  CHAN INT setupC         :
+  CHAN INT setup2C        :
+
+  
+  PAR
+    parameterGen    (setupC!)
+    parameterGen    (setup2C!)
+    rfIn            (rfInToScaleC!,    DRfInC!,         setupC?)
+    rfScale         (scaleToRrcFiltC!,  DRfScaleC!,      rfInToScaleC?)
+    channelFilter   (rrcFiltToDemodC!,  DRrcFiltC!,      scaleToRrcFiltC?)
+    carrier         (carrierToScaleC!, DCarrierC!,      setup2C?)
+    carrierScale    (scaleToDemodC!,   DCarrierScaleC!, carrierToScaleC?)      
+    dbpskReceiver   (demodToDataOutC!,   DModulatorC!,    scaleToDemodC?, rrcFiltToDemodC?)      
+    dataOut         (DDataSrcC!,      demodToDataOutC?)
+
+    --outputToScreenParam(out!, rxParamC?)
+    outputToScreenTop(out!, DCarrierC?, DCarrierScaleC?, DDataSrcC?, DModulatorC?, DRrcFiltC?, DRfScaleC?, DRfInC?)      
+:

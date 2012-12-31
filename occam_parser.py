@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import sys, string, types, os
+import sys, string, types, os, copy
 import getopt
 import numpy as np
 
@@ -16,10 +16,13 @@ IGNORE_PROC = ["parameterGen"]
 INIT_PROC = "parameterGen"
 
 # Code Generation Modes
-PTOLEMY  = 0
-GNURADIO = 1
-SDF3     = 2
- 
+
+PTOLEMY       = 0
+GNURADIO      = 1
+SDF3          = 2
+
+INPORT_COUNT  = 1
+OUTPORT_COUNT = 2 
 class graph_handler:
     def __init__(self, infile_name):
         self.infile  = file(infile_name, 'r') 
@@ -34,18 +37,63 @@ class graph_handler:
         
         self.fcn_interest = []
         self.init_chans   = []
-
-        self.block_map_dict = {'rfOut': [CLASS_DISCARD],
-                               'channelFilter': [CLASS_FIR],
-                               'rfScale': [CLASS_SCALE],
-                               'dataSrc':[CLASS_CONST],
-                               'carrierScale':[CLASS_SCALE],
-                               'carrier':[CLASS_SINE],
-                               'dbpskTransmitter':[CLASS_DBPSK_TX],
-                               'rfIn':[CLASS_CONST],
-                               'dbpskReceiver':[CLASS_DBPSK_RX],
-                               'dataOut':[CLASS_DISCARD]
-                               }
+        # PORT_COUNT = used to iterate through connecting ports for
+        # blocks with multiple input or output ports
+        self.block_map_dict = {'rfOut'            :[CLASS_DISCARD,  0, 0],
+                               'channelFilter'    :[CLASS_FIR,      0, 0],
+                               'rfScale'          :[CLASS_SCALE,    0, 0],
+                               'dataSrc'          :[CLASS_CONST,    0, 0],
+                               'carrierScale'     :[CLASS_SCALE,    0, 0],
+                               'carrier'          :[CLASS_SINE,     0, 0],
+                               'dbpskTransmitter' :[CLASS_DBPSK_TX, 0, 0],
+                               'rfIn'             :[CLASS_CONST,    0, 0],
+                               'dbpskReceiver'    :[CLASS_DBPSK_RX, 0, 0],
+                               'dataOut'          :[CLASS_DISCARD,  0, 0]
+                              }
+        self.block_port_dict_input = {'rfOut'    :[".input"],
+                               'channelFilter'   :[".input"],
+                               'rfScale'         :[".input"],
+                               'dataSrc'         :[".input"],
+                               'carrierScale'    :[".input"],
+                               'carrier'         :[".input"],
+                               'dbpskTransmitter':[".carrier", ".datain"],
+                               'rfIn'            :[".input"],
+                               'dbpskReceiver'   :[".input"],
+                               'dataOut'         :[".input"]
+                              }
+        self.block_port_dict_output = {'rfOut'   :[".output"],
+                               'channelFilter'   :[".output"],
+                               'rfScale'         :[".output"],
+                               'dataSrc'         :[".output"],
+                               'carrierScale'    :[".output"],
+                               'carrier'         :[".output"],
+                               'dbpskTransmitter':[".output"],
+                               'rfIn'            :[".output"],
+                               'dbpskReceiver'   :[".output"],
+                               'dataOut'         :[".output"]
+                              }
+        self.offset_dict = {'rfOut'            :[0],
+                             'channelFilter'   :[0],
+                             'rfScale'         :[0],
+                             'dataSrc'         :[0],
+                             'carrierScale'    :[50],
+                             'carrier'         :[50],
+                             'dbpskTransmitter':[0],
+                             'rfIn'            :[0],
+                             'dbpskReceiver'   :[0],
+                             'dataOut'         :[0]
+                           }
+        self.value_dict = {'rfOut'           :["None"],
+                           'channelFilter'   :["None"],
+                           'rfScale'         :["None"],
+                           'dataSrc'         :["None"],
+                           'carrierScale'    :["None"],
+                           'carrier'         :["None"],
+                           'dbpskTransmitter':["None"],
+                           'rfIn'            :["None"],
+                           'dbpskReceiver'   :["None"],
+                           'dataOut'         :["None"]
+                            }
     def __del__(self):
         self.outfile.close()
         self.infile.close()
@@ -143,6 +191,9 @@ class graph_handler:
     def print_parameters(self):
         print "Parameter Dictionary"
         print self.param_dict
+    def print_parameter_list(self):
+        print "Parameter List"
+        print self.param_list
     def print_channels(self):
         print "Channel Dictionary"
         print self.chan_dict
@@ -242,6 +293,9 @@ class graph_handler:
         token = token.replace("?", "")
         token = token.replace("!", "")
         return token
+    def get_filename(self, filename_with_ext):
+        new_name = os.path.splitext(filename_with_ext)[0]
+        return new_name
     def channel_direction(self, token):
         if "!" in token:
             return "out"
@@ -316,9 +370,95 @@ class graph_handler:
                 if (proc_in != ""):                
                     proc_in_index   = self.proc_dict[proc_in]
                 self.top_matrix[proc_out_index][proc_in_index] = 1
+    def set_param_values(self):
+        self.value_dict = {'rfOut'            :["None"],
+                           'channelFilter'    :["rc"+self.param_dict["rcFiltCoeff"]+".dat"],
+                           'rfScale'          :["rfGain"],
+                           'dataSrc'          :["0.2"],
+                           'carrierScale'     :["carrierGain"],
+                           'carrier'          :["samplingFreq", "carrierFreq", "carrierPhase"],
+                           'dbpskTransmitter' :["samplingRate*symbolTime"],
+                           'rfIn'             :["None"],
+                           'dbpskReceiver'    :["samplingRate*symbolTime"],
+                           'dataOut'          :["None"]
+                            }
+    def get_port_count(self, block_name, direction):
+        if direction == "input":
+            return self.block_map_dict[block_name][INPORT_COUNT]
+        elif direction == "output":
+            return self.block_map_dict[block_name][OUTPORT_COUNT]
+        else:
+            print "ERROR in get_port_count, didn't select valid direction (input or output)"
+            exit(1)
+    def inc_port_count(self, block_name, direction):
+        if direction == "input":
+            cur = self.block_map_dict[block_name][INPORT_COUNT]
+            self.block_map_dict[block_name][INPORT_COUNT] = cur+1
+        elif direction == "output":
+            cur = self.block_map_dict[block_name][OUTPORT_COUNT]
+            self.block_map_dict[block_name][OUTPORT_COUNT] = cur+1
+        else:
+            print "ERROR in inc_port_direction, didn't select valid direction (input or output)"
+    def reset_port_count(self):
+        len_list = len(self.proc_list)
+        for i in range(len_list):
+            block_name = self.proc_list[i]
+            self.block_map_dict[block_name][INPORT_COUNT]=0
+            self.block_map_dict[block_name][OUTPORT_COUNT]=0            
     def generate_code(self, mode):
         if   mode == PTOLEMY:
             print "PTOLEMY Mode"
+            filename = self.get_filename(infile_name)
+            model_name = filename
+            filename = filename + ".xml"
+            pgen = ptolemy_writer(filename, model_name)
+            # Generate and Instantiate Parameters
+            len_list = len(self.param_list)
+            for i in range(len_list):
+                param_name = self.param_list[i]
+                param_val  = self.param_dict[param_name]
+                node1 = pgen.write_to_ptolemy_file(PARAM, CLASS_PARAMETER, param_name, [param_val], 0)
+                pgen.top_element.appendChild(node1)
+            # Generate and Instantiate Blocks
+            len_list = len(self.proc_list)
+            for i in range(len_list):
+                block_name   = self.proc_list[i]
+                class_name   = self.block_map_dict[block_name][PTOLEMY]
+                block_offset = self.offset_dict[block_name][PTOLEMY]
+                block_value  = self.value_dict[block_name]
+                node1 = pgen.write_to_ptolemy_file(BLOCK, class_name, block_name, block_value, block_offset)
+                pgen.top_element.appendChild(node1)
+            #Generate and Instantiate Connections
+            len_list = len(self.chan_list)
+            for i in range(len_list):
+                chan_name      = self.chan_list[i]
+                block_out_name = self.chan_dict[chan_name][OUT_CHAN]
+                block_in_name  = self.chan_dict[chan_name][IN_CHAN]
+                if ((len(block_in_name)>0) and (len(block_out_name)>0)):
+                    out_index = self.get_port_count(block_out_name, "output")
+                    in_index  = self.get_port_count(block_in_name, "input")
+
+                    chan1 = pgen.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, chan_name, "no", 0)
+                    pgen.top_element.appendChild(chan1)
+
+                    # this allows connections into blocks with
+                    # multiple input ports or non-default port names.
+                    # Each time a block name appears an index is
+                    # iterated which allows us to access the name of
+                    # the next physical port in the block
+                    outport_name = block_out_name+self.block_port_dict_output[block_out_name][out_index]
+                    inport_name  = block_in_name+self.block_port_dict_input[block_in_name][in_index]
+
+                    [chana, chanb] = pgen.link_in_ptolemy_file(outport_name, inport_name, chan_name)
+                    pgen.top_element.appendChild(chana)
+                    pgen.top_element.appendChild(chanb)
+                    
+                    self.inc_port_count(block_out_name, "output")
+                    self.inc_port_count(block_in_name, "input")
+                    
+            self.reset_port_count()
+            pgen.write_to_xmlfile()
+
         elif mode == GNURADIO:
             print "GNURADIO Mode"
         elif mode == SDF3:
@@ -330,7 +470,7 @@ class graph_handler:
 if __name__ == "__main__":
 
     # the input occam program which we will be processing
-    infile_name = 'csp-sdf-tx.occ'
+    infile_name = 'csp-sdf-rx.occ'
     # specifies processes of interest in the occam program
     fcn_list    = ["parameterGen", "main"]
     
@@ -341,6 +481,8 @@ if __name__ == "__main__":
     # peforms initial parameter parsing of the occam file
     top_handler.parse_input_file_param()
     top_handler.print_parameters()
+    top_handler.print_parameter_list()    
+    top_handler.set_param_values()
     top_handler.parse_input_file_channels()
     top_handler.print_channels()
 
@@ -351,6 +493,7 @@ if __name__ == "__main__":
     top_handler.print_proc_dict()
     top_handler.print_top_matrix()
     test_ptolemy()
+    top_handler.generate_code(PTOLEMY)
 
     #outfile.close()
     #infile.close)(
