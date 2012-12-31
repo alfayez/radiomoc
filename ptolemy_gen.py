@@ -190,6 +190,11 @@ class ptolemy_writer:
                 node1 = self.write_element(ENT, name, class_str, "None")
                 node2 = self.write_element(PROP, NAME_LOCATION, CLASS_LOCATION, loc_str)
                 node1.appendChild(node2)
+            elif class_str is CLASS_ADDSUB:
+                loc_str = self.ptolemy_location_update(BLOCK, offset)
+                node1 = self.write_element(ENT, name, class_str, "None")
+                node2 = self.write_element(PROP, NAME_LOCATION, CLASS_LOCATION, loc_str)
+                node1.appendChild(node2)
             elif class_str is CLASS_DISCARD:
                 loc_str = self.ptolemy_location_update(BLOCK, offset)
                 node1 = self.write_element(ENT, name, class_str, "None")
@@ -1166,7 +1171,7 @@ def test_ptolemy():
     name_carrier_scale_rel = "carrscaleO"
     name_data_in_rel = "datainO"
     name_tx_rel = "dbpskTxCh"
-    name_guass_rel = "guassCh"
+    name_gauss_rel = "guassCh"
     name_add_rel = "addCh"
 
     node1 = pgen.write_to_ptolemy_file(DIRECT, CLASS_SDF, NAME_SDF, "None", 0)
@@ -1201,11 +1206,12 @@ def test_ptolemy():
     node1 = pgen.write_to_ptolemy_file(BLOCK, CLASS_FIR, name_pulse_filt, "rxrc1.dat", 0)
     pgen.top_element.appendChild(node1)
 
-    ###########3
+    ############
     ## Guassian Noise
     node1 = pgen.write_to_ptolemy_file(BLOCK, CLASS_GAUSS, name_gauss, "0.35", 50)
     pgen.top_element.appendChild(node1)
     node1 = pgen.write_to_ptolemy_file(BLOCK, CLASS_ADDSUB, name_add, "None", 0)
+    pgen.top_element.appendChild(node1)
     #####################################################################                
     chan1 = pgen.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_pulse_filt_rel, "no", 0)
     pgen.top_element.appendChild(chan1)

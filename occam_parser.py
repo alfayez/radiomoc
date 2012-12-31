@@ -35,7 +35,7 @@ class graph_handler:
         self.fcn_interest = []
         self.init_chans   = []
 
-        self.block_map_dict = ['rfOut':[CLASS_DISCARD],
+        self.block_map_dict = {'rfOut': [CLASS_DISCARD],
                                'channelFilter': [CLASS_FIR],
                                'rfScale': [CLASS_SCALE],
                                'dataSrc':[CLASS_CONST],
@@ -45,7 +45,7 @@ class graph_handler:
                                'rfIn':[CLASS_CONST],
                                'dbpskReceiver':[CLASS_DBPSK_RX],
                                'dataOut':[CLASS_DISCARD]
-                               ]
+                               }
     def __del__(self):
         self.outfile.close()
         self.infile.close()
@@ -318,12 +318,13 @@ class graph_handler:
                 self.top_matrix[proc_out_index][proc_in_index] = 1
     def generate_code(self, mode):
         if   mode == PTOLEMY:
-            
+            print "PTOLEMY Mode"
         elif mode == GNURADIO:
+            print "GNURADIO Mode"
         elif mode == SDF3:
+            print "SDF3 Mode"
         else:
-            print "ERROR in generate_code.  You chose an unsupported
-                code generation mode"
+            print "ERROR in generate_code.  You chose an unsupported code generation mode"
             exit(-1)
         
 if __name__ == "__main__":
