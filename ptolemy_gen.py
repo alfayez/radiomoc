@@ -1158,6 +1158,7 @@ def test_ptolemy():
     name_data_in = "Data In"
     name_tx = "My DBPSK Transmitter"
     name_gauss = "Gaussian Noise"
+    name_add = "Additive Noise Channel"
 
     name_carrier_rel = "carrierCon0"
     name_rcv_rel = "recvconn"
@@ -1166,6 +1167,7 @@ def test_ptolemy():
     name_data_in_rel = "datainO"
     name_tx_rel = "dbpskTxCh"
     name_guass_rel = "guassCh"
+    name_add_rel = "addCh"
 
     node1 = pgen.write_to_ptolemy_file(DIRECT, CLASS_SDF, NAME_SDF, "None", 0)
     pgen.top_element.appendChild(node1)
@@ -1201,9 +1203,9 @@ def test_ptolemy():
 
     ###########3
     ## Guassian Noise
-    node1 = pgen.write_to_ptolemy_file(BLOCK, CLASS_GAUSS, name_gauss, "0.35", 0)
+    node1 = pgen.write_to_ptolemy_file(BLOCK, CLASS_GAUSS, name_gauss, "0.35", 50)
     pgen.top_element.appendChild(node1)
-
+    node1 = pgen.write_to_ptolemy_file(BLOCK, CLASS_ADDSUB, name_add, "None", 0)
     #####################################################################                
     chan1 = pgen.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_pulse_filt_rel, "no", 0)
     pgen.top_element.appendChild(chan1)
@@ -1243,12 +1245,24 @@ def test_ptolemy():
     pgen.top_element.appendChild(chan1)
     [chana, chanb] = pgen.link_in_ptolemy_file(name_tx+".output", name_pulse_filt+".input", name_tx_rel)
     pgen.top_element.appendChild(chana)
+    pgen.top_element.appendChild(chanb)
+    
+    ############################
+    chan1 = pgen.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_pulse_filt, "no", 0)
+    pgen.top_element.appendChild(chan1)
+    [chana, chanb] = pgen.link_in_ptolemy_file(name_pulse_filt+".output", name_add+".plus", name_pulse_filt_rel)
+    pgen.top_element.appendChild(chana)
+    pgen.top_element.appendChild(chanb)
+    chan1 = pgen.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_gauss_rel, "no", 0)
+    pgen.top_element.appendChild(chan1)
+    [chana, chanb] = pgen.link_in_ptolemy_file(name_gauss+".output", name_add+".plus", name_gauss_rel)
+    pgen.top_element.appendChild(chana)
     pgen.top_element.appendChild(chanb)                    
     ############################
     
-    chan1 = pgen.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_pulse_filt_rel, "no", 0)
+    chan1 = pgen.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_add_rel, "no", 0)
     pgen.top_element.appendChild(chan1)
-    [chana, chanb] = pgen.link_in_ptolemy_file(name_pulse_filt+".output", name_rcv+".rfsig", name_pulse_filt_rel)
+    [chana, chanb] = pgen.link_in_ptolemy_file(name_add+".output", name_rcv+".rfsig", name_add_rel)
     pgen.top_element.appendChild(chana)
     pgen.top_element.appendChild(chanb)                
 

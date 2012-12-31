@@ -56,6 +56,7 @@ CLASS_NOT = "ptolemy.actor.lib.logic.LogicalNot"
 CLASS_GAUSS = "ptolemy.actor.lib.Gaussian"
 CLASS_SHARED_PARAM = "ptolemy.actor.parameters.SharedParameter"
 CLASS_DISCARD = "ptolemy.actor.lib.Discard"
+CLASS_ADDSUB = "ptolemy.actor.lib.AddSubtract"
 
 # USER Defined Composite Blocks
 CLASS_DBPSK_RX = "CLASS_DSBPSK_RX"
