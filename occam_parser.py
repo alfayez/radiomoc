@@ -58,7 +58,7 @@ class graph_handler:
                                'carrier'         :[".input"],
                                'dbpskTransmitter':[".carrier", ".datain"],
                                'rfIn'            :[".input"],
-                               'dbpskReceiver'   :[".input"],
+                               'dbpskReceiver'   :[".rfsig"],
                                'dataOut'         :[".input"]
                               }
         self.block_port_dict_output = {'rfOut'   :[".output"],

@@ -395,8 +395,6 @@ PROC main(CHAN BYTE out!)
     rfIn            (rfInToScaleC!,    DRfInC!,         setupC?)
     rfScale         (scaleToRrcFiltC!,  DRfScaleC!,      rfInToScaleC?)
     channelFilter   (rrcFiltToDemodC!,  DRrcFiltC!,      scaleToRrcFiltC?)
-    carrier         (carrierToScaleC!, DCarrierC!,      setup2C?)
-    carrierScale    (scaleToDemodC!,   DCarrierScaleC!, carrierToScaleC?)      
     dbpskReceiver   (demodToDataOutC!,   DModulatorC!,    scaleToDemodC?, rrcFiltToDemodC?)      
     dataOut         (DDataSrcC!,      demodToDataOutC?)
 
