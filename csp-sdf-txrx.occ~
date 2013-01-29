@@ -8,35 +8,18 @@
 
 
 
--- Define the RF Input Block
-PROC rfIn(CHAN INT outC!, CHAN INT DTopC!, CHAN INT inC?)
-  INT symbolTime  :
-  INT samplingRate:
-  INT carrierFreq :
-  INT rcFiltCoeff :  -- provides the name of the file with the coeff rcFilt<int>.dat
-  INT carrierGain :
-  INT rfGain      :
-  
+-- Define the RF Out Block
+PROC rfOut(CHAN INT DTopC!, CHAN INT inC?)
+  INT values :
   SEQ
-    inC  ? symbolTime
-    outC ! symbolTime
+    inC ? values
+    inC ? values
+    inC ? values
+    inC ? values
+    inC ? values
+    inC ? values
     
-    inC  ? samplingRate
-    outC ! samplingRate
-    
-    inC  ? carrierFreq
-    outC ! carrierFreq
-    
-    inC  ? rcFiltCoeff
-    outC ! rcFiltCoeff
-    
-    inC  ? carrierGain
-    outC ! carrierGain
-    
-    inC  ? rfGain
-    outC ! rfGain
-    
-    DTopC ! rfGain
+    DTopC ! values
 :
 -- Define the Raised Root Cosine Channel Filter Block
 PROC channelFilter(CHAN INT outC!, CHAN INT DTopC!, CHAN INT inC?)
@@ -116,7 +99,7 @@ PROC rfScale(CHAN INT outC!, CHAN INT DTopC!, CHAN INT inC?)
     DTopC ! rfGain
 :
 -- Define the Data Source Block
-PROC dataOut(CHAN INT DTopC!, CHAN INT inC?)
+PROC dataSrc(CHAN INT outC!, CHAN INT DTopC!, CHAN INT inC?)
   INT symbolTime  :
   INT samplingRate:
   INT carrierFreq :
@@ -129,21 +112,27 @@ PROC dataOut(CHAN INT DTopC!, CHAN INT inC?)
 
     inC ? symbolTime
     --DParamOC ! symbolTime
+    outC     ! symbolTime
 
     inC ? samplingRate    
     --DParamOC ! samplingRate
+    outC     ! samplingRate
         
     inC ? carrierFreq
     --DParamOC ! carrierFreq
+    outC     ! carrierFreq
     
     inC ? rcFiltCoeff
     --DParamOC ! rcFiltCoeff
+    outC     ! rcFiltCoeff
     
     inC ? carrierGain
     --DParamOC ! carrierGain
+    outC     ! carrierGain
 
     inC ? rfGain
     --DParamOC ! rfGain
+    outC     ! rfGain
     
     DTopC ! rfGain
 :
@@ -227,9 +216,9 @@ PROC carrier(CHAN INT outC!, CHAN INT DTopC!, CHAN INT inC?)
 :
 
 
--- Define the DBPSK Receiver Block
-PROC dbpskReceiver(CHAN INT outC!,      CHAN INT DTopC!,
-                   CHAN INT inCarrierC?,CHAN INT inDataC?)
+-- Define the DBPSK Transmitter Block
+PROC dbpskTransmitter(CHAN INT outC!,      CHAN INT DTopC!,
+                      CHAN INT inCarrierC?,CHAN INT inDataC?)
   INT symbolTime  :
   INT samplingRate:
   INT carrierFreq :
@@ -272,73 +261,73 @@ PROC dbpskReceiver(CHAN INT outC!,      CHAN INT DTopC!,
     
     DTopC      ! rfGain
 :
-PROC outputToScreenParam(CHAN BYTE out!, CHAN INT rxParamC?)
-  INT rxParam :
+PROC DoutputToScreenParam(CHAN BYTE out!, CHAN INT txParamC?)
+  INT txParam :
   SEQ
 
-    rxParamC ? rxParam
-    out.string("*tDBPSK Rx Symbol Time *t= ", 0, out!)
-    out.int(rxParam, 0 ,out)
+    txParamC ? txParam
+    out.string("*tDBPSK Tx Symbol Time *t= ", 0, out!)
+    out.int(txParam, 0 ,out)
     out.string("*n", 0, out!)
     
-    rxParamC ? rxParam    
-    out.string("*tDBPSK Rx Sampling Freq *t= ", 0, out!)
-    out.int(rxParam, 0 ,out)
+    txParamC ? txParam    
+    out.string("*tDBPSK Tx Sampling Freq *t= ", 0, out!)
+    out.int(txParam, 0 ,out)
     out.string("*n", 0, out)
     
-    rxParamC ? rxParam
-    out.string("*tDBPSK Rx Carrier Freq *t= ", 0, out!)
-    out.int(rxParam, 0 ,out)
+    txParamC ? txParam
+    out.string("*tDBPSK Tx Carrier Freq *t= ", 0, out!)
+    out.int(txParam, 0 ,out)
     out.string("*n", 0, out!)
     
-    rxParamC ? rxParam
+    txParamC ? txParam
     out.string("*tDBPSK Raised Cos Filt *t= ", 0, out!)
-    out.int(rxParam, 0 ,out)
+    out.int(txParam, 0 ,out)
     out.string("*n", 0, out!)
     
-    rxParamC ? rxParam
+    txParamC ? txParam
     out.string("*tDBPSK Carrier Gain *t= ", 0, out!)
-    out.int(rxParam, 0 ,out)
+    out.int(txParam, 0 ,out)
     out.string("*n", 0, out!)
     
-    rxParamC ? rxParam
+    txParamC ? txParam
     out.string("*tDBPSK RF Gain *t*t= ", 0, out!)
-    out.int(rxParam, 0 ,out)
+    out.int(txParam, 0 ,out)
     out.string("*n", 0, out!)    
 :
-PROC outputToScreenTop(CHAN BYTE out!, CHAN INT carrierC?, CHAN INT carrierScaleC?, 
+PROC DoutputToScreenTop(CHAN BYTE out!, CHAN INT carrierC?, CHAN INT carrierScaleC?, 
                        CHAN INT dataSrcC?,                 CHAN INT dbpskModC?,      
                        CHAN INT rrcFiltC,                  CHAN INT rfScaleC?,
-                       CHAN INT rfInC?)
-  INT rxParam :
+                       CHAN INT rfOutC?)
+  INT txParam :
   SEQ
 
-    rfInC ? rxParam
-    out.string("*tRF Out*t", 0, out!)
-    out.string("*n", 0, out!)    
-
-    rfScaleC ? rxParam
-    out.string("*tRF Scaling*t", 0, out!)
-    out.string("*n", 0, out!)
-    
-    rrcFiltC ? rxParam
-    out.string("*tChannel Filter*t", 0, out!)
-    out.string("*n", 0, out!)
-    
-    carrierC ? rxParam
+    carrierC ? txParam
     out.string("*tCarrier*t", 0, out!)
     out.string("*n", 0, out!)
     
-    carrierScaleC ? rxParam    
+    carrierScaleC ? txParam    
     out.string("*tCarrier Scaling*t", 0, out!)
     out.string("*n", 0, out)
     
-    dbpskModC ? rxParam
+    dataSrcC ? txParam
+    out.string("*tData Source*t", 0, out!)
+    out.string("*n", 0, out!)
+    
+    dbpskModC ? txParam
     out.string("*tDBPSK Modulator*t", 0, out!)
     out.string("*n", 0, out!)
     
-    dataSrcC ? rxParam
-    out.string("*tData Input*t", 0, out!)
+    rrcFiltC ? txParam
+    out.string("*tChannel Filter*t", 0, out!)
+    out.string("*n", 0, out!)
+    
+    rfScaleC ? txParam
+    out.string("*tRF Scaling*t", 0, out!)
+    out.string("*n", 0, out!)    
+    
+    rfOutC ? txParam
+    out.string("*tRF Out*t", 0, out!)
     out.string("*n", 0, out!)    
 :
 
@@ -367,13 +356,12 @@ PROC parameterGen(CHAN INT paramOC!)
 :
 
 PROC main(CHAN BYTE out!)
-  
-  CHAN INT rfInToScaleC    :
-  CHAN INT scaleToRrcFiltC :
-  CHAN INT rrcFiltToDemodC :
   CHAN INT carrierToScaleC :
-  CHAN INT scaleToDemodC   :
-  CHAN INT demodToDataOutC :
+  CHAN INT scaleToTxC      :
+  CHAN INT dataToTxC       :
+  CHAN INT txToChanFiltC   :
+  CHAN INT filterToScaleC  :  
+  CHAN INT scaleToRfOutC   :
   
   CHAN INT DCarrierC :
   CHAN INT DCarrierScaleC :
@@ -381,23 +369,25 @@ PROC main(CHAN BYTE out!)
   CHAN INT DModulatorC    :
   CHAN INT DRrcFiltC      :
   CHAN INT DRfScaleC      :
-  CHAN INT DRfInC         :
+  CHAN INT DRfOutC        :
 
-  CHAN INT DrxParamC      :
+  CHAN INT DtxParamC      :
   
   CHAN INT setupC         :
   CHAN INT setup2C        :
 
   
   PAR
-    parameterGen    (setupC!)
-    parameterGen    (setup2C!)
-    rfIn            (rfInToScaleC!,    DRfInC!,         setupC?)
-    rfScale         (scaleToRrcFiltC!,  DRfScaleC!,      rfInToScaleC?)
-    channelFilter   (rrcFiltToDemodC!,  DRrcFiltC!,      scaleToRrcFiltC?)
-    dbpskReceiver   (demodToDataOutC!,   DModulatorC!,    scaleToDemodC?, rrcFiltToDemodC?)      
-    dataOut         (DDataSrcC!,      demodToDataOutC?)
+    parameterGen     (setupC!)
+    parameterGen     (setup2C!)
+    carrier          (carrierToScaleC!, DCarrierC!,      setupC?)
+    carrierScale     (scaleToTxC!,      DCarrierScaleC!, carrierToScaleC?)
+    dataSrc          (dataToTxC!,       DDataSrcC!,      setup2C?)
+    dbpskTransmitter (txToChanFiltC!,   DModulatorC!,    scaleToTxC?, dataToTxC?)
+    channelFilter    (filterToScaleC!,  DRrcFiltC!,      txToChanFiltC?)
+    rfScale          (scaleToRfOutC!,   DRfScaleC!,      filterToScaleC?)
+    rfOut            (DRfOutC!,         scaleToRfOutC?)
 
-    --outputToScreenParam(out!, rxParamC?)
-    outputToScreenTop(out!, DCarrierC?, DCarrierScaleC?, DDataSrcC?, DModulatorC?, DRrcFiltC?, DRfScaleC?, DRfInC?)      
+    --outputToScreenParam(out!, txParamC?)
+    DoutputToScreenTop (out!, DCarrierC?, DCarrierScaleC?, DDataSrcC?, DModulatorC?, DRrcFiltC?, DRfScaleC?, DRfOutC?)  
 :
