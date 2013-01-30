@@ -37,62 +37,85 @@ class graph_handler:
         
         self.fcn_interest = []
         self.init_chans   = []
+        # The following parameters should be written as ints for
+        # ptolemy
+        self.int_param_enforce_dict  = {'symbolTime':0, 'samplingRate':0, 'seedValG':0}
+        self.long_param_enforce_dict = {'seedValG':0}
         # PORT_COUNT = used to iterate through connecting ports for
         # blocks with multiple input or output ports
         self.block_map_dict = {'rfOut'            :[CLASS_DISCARD,  0, 0],
                                'channelFilter'    :[CLASS_FIR,      0, 0],
+                               'channelFilter2'   :[CLASS_FIR,      0, 0],
                                'rfScale'          :[CLASS_SCALE,    0, 0],
+                               'rfScale2'         :[CLASS_SCALE,    0, 0],
                                'dataSrc'          :[CLASS_CONST,    0, 0],
                                'carrierScale'     :[CLASS_SCALE,    0, 0],
                                'carrier'          :[CLASS_SINE,     0, 0],
                                'dbpskTransmitter' :[CLASS_DBPSK_TX, 0, 0],
                                'rfIn'             :[CLASS_CONST,    0, 0],
                                'dbpskReceiver'    :[CLASS_DBPSK_RX, 0, 0],
-                               'dataOut'          :[CLASS_DISCARD,  0, 0]
+                               'dataOut'          :[CLASS_DISCARD,  0, 0],
+                               'gauss'            :[CLASS_GAUSS,    0, 0],
+                               'add'              :[CLASS_ADDSUB,   0, 0]
                               }
         self.block_port_dict_input = {'rfOut'    :[".input"],
                                'channelFilter'   :[".input"],
+                               'channelFilter2'  :[".input"],
                                'rfScale'         :[".input"],
+                               'rfScale2'        :[".input"],
                                'dataSrc'         :[".input"],
                                'carrierScale'    :[".input"],
                                'carrier'         :[".input"],
                                'dbpskTransmitter':[".carrier", ".datain"],
                                'rfIn'            :[".input"],
                                'dbpskReceiver'   :[".rfsig"],
-                               'dataOut'         :[".input"]
+                               'dataOut'         :[".input"],
+                               'add'             :[".plus"]
                               }
         self.block_port_dict_output = {'rfOut'   :[".output"],
                                'channelFilter'   :[".output"],
+                               'channelFilter2'  :[".output"],
                                'rfScale'         :[".output"],
+                               'rfScale2'        :[".output"],
                                'dataSrc'         :[".output"],
                                'carrierScale'    :[".output"],
                                'carrier'         :[".output"],
                                'dbpskTransmitter':[".output"],
                                'rfIn'            :[".output"],
                                'dbpskReceiver'   :[".output"],
-                               'dataOut'         :[".output"]
+                               'dataOut'         :[".output"],
+                               'gauss'           :[".output"],
+                               'add'             :[".output"]
                               }
         self.offset_dict = {'rfOut'            :[0],
                              'channelFilter'   :[0],
+                             'channelFilter2'  :[0],
                              'rfScale'         :[0],
-                             'dataSrc'         :[0],
+                             'rfScale2'        :[0],
+                             'dataSrc'         :[70],
                              'carrierScale'    :[50],
                              'carrier'         :[50],
                              'dbpskTransmitter':[0],
                              'rfIn'            :[0],
                              'dbpskReceiver'   :[0],
-                             'dataOut'         :[0]
+                             'dataOut'         :[0],
+                             'gauss'           :[50],
+                             'add'             :[0]
                            }
         self.value_dict = {'rfOut'           :["None"],
                            'channelFilter'   :["None"],
+                           'channelFilter2'  :["None"],
                            'rfScale'         :["None"],
+                           'rfScale2'        :["None"],                           
                            'dataSrc'         :["None"],
                            'carrierScale'    :["None"],
                            'carrier'         :["None"],
                            'dbpskTransmitter':["None"],
                            'rfIn'            :["None"],
                            'dbpskReceiver'   :["None"],
-                           'dataOut'         :["None"]
+                           'dataOut'         :["None"],
+                           'gauss'           :["None"],
+                           'add'             :["None"]
                             }
     def __del__(self):
         self.outfile.close()
@@ -169,7 +192,7 @@ class graph_handler:
                 token_val = tokens[i+1]
         return token_val
     # extract the name of the integer variable
-    def extract_int_var(self, line):
+    def extract_var(self, line):
         tokens = line.split()
         token_val = 0
         len_toks = len(tokens)
@@ -177,12 +200,12 @@ class graph_handler:
             if (tokens[i] == ":="):
                 token_val = tokens[i-1]
         return token_val
-    def extract_int_var2(self, line):
+    def extract_var2(self, line):
         tokens = line.split()
         token_val = ""
         len_toks = len(tokens)
         for i in range(len_toks):
-            if (tokens[i] == "INT"):
+            if ((tokens[i] == "INT") or ((tokens[i] == "REAL32"))):
                 token_val = tokens[i+1]
                 break
         return token_val
@@ -240,7 +263,7 @@ class graph_handler:
                             assign_cond = True
                             break
                         if self.is_assignment(line):
-                            token_name = self.extract_int_var(line)
+                            token_name = self.extract_var(line)
                             token_val  = self.extract_val(line)
                             if ((token_name in self.param_dict) == False):
                                 self.param_list.append(token_name)
@@ -270,7 +293,7 @@ class graph_handler:
                         self.parse_channel_directions(line)
             elif (self.is_channel_declaration(line) and
                 self.is_process(line) == False):
-                token_name = self.extract_int_var2(line)
+                token_name = self.extract_var2(line)
                 if (self.is_debug(token_name) == False):
                     self.chan_dict[token_name] = ["", ""]
                     self.chan_list.append(token_name)                    
@@ -320,7 +343,6 @@ class graph_handler:
         chan_dir   = ""
 
         proc_name  = tokens[0]
-
         # the first token is the function name.  If this is a debug
         # function then ignore it
         if (self.is_debug(proc_name) or self.is_comment(line)):
@@ -373,14 +395,18 @@ class graph_handler:
     def set_param_values(self):
         self.value_dict = {'rfOut'            :["None"],
                            'channelFilter'    :["rc"+self.param_dict["rcFiltCoeff"]+".dat"],
+                           'channelFilter2'   :["rc"+self.param_dict["rcFiltCoeff"]+".dat"],
                            'rfScale'          :["rfGain"],
-                           'dataSrc'          :["0.2"],
+                           'dataSrc'          :["7"],
                            'carrierScale'     :["carrierGain"],
                            'carrier'          :["samplingFreq", "carrierFreq", "carrierPhase"],
                            'dbpskTransmitter' :["samplingRate*symbolTime"],
                            'rfIn'             :["None"],
                            'dbpskReceiver'    :["samplingRate*symbolTime"],
-                           'dataOut'          :["None"]
+                           'dataOut'          :["None"],
+                           'gauss'            :["seedValG", "meanValG", "stdValG"],
+                           'add'              :["None"],
+                           'rfScale2'         :["rfGain2"]
                             }
     def get_port_count(self, block_name, direction):
         if direction == "input":
@@ -404,7 +430,16 @@ class graph_handler:
         for i in range(len_list):
             block_name = self.proc_list[i]
             self.block_map_dict[block_name][INPORT_COUNT]=0
-            self.block_map_dict[block_name][OUTPORT_COUNT]=0            
+            self.block_map_dict[block_name][OUTPORT_COUNT]=0
+    def check_if_int_enforce(self, param_name, param_val):
+        if param_name in self.int_param_enforce_dict:
+            param_val = param_val.replace(".0", "")
+        return param_val
+    def check_if_long_enforce(self, param_name, param_val):
+        if param_name in self.long_param_enforce_dict:
+            param_val = param_val+"L"
+        return param_val    
+
     def generate_code(self, mode):
         if   mode == PTOLEMY:
             print "PTOLEMY Mode"
@@ -412,11 +447,18 @@ class graph_handler:
             model_name = filename
             filename = filename + ".xml"
             pgen = ptolemy_writer(filename, model_name)
+
+            # Choose MoC
+            node1 = pgen.write_to_ptolemy_file(DIRECT, CLASS_SDF, NAME_SDF, "None", 0)
+            pgen.top_element.appendChild(node1)
+                
             # Generate and Instantiate Parameters
             len_list = len(self.param_list)
             for i in range(len_list):
                 param_name = self.param_list[i]
                 param_val  = self.param_dict[param_name]
+                param_val  = self.check_if_int_enforce(param_name, param_val)
+                param_val  = self.check_if_long_enforce(param_name, param_val)
                 node1 = pgen.write_to_ptolemy_file(PARAM, CLASS_PARAMETER, param_name, [param_val], 0)
                 pgen.top_element.appendChild(node1)
             # Generate and Instantiate Blocks
@@ -429,12 +471,14 @@ class graph_handler:
                 node1 = pgen.write_to_ptolemy_file(BLOCK, class_name, block_name, block_value, block_offset)
                 pgen.top_element.appendChild(node1)
             #Generate and Instantiate Connections
-            len_list = len(self.chan_list)
+            len_list  = len(self.chan_list)
+            out_index = 0
+            in_index  = 0
             for i in range(len_list):
                 chan_name      = self.chan_list[i]
                 block_out_name = self.chan_dict[chan_name][OUT_CHAN]
                 block_in_name  = self.chan_dict[chan_name][IN_CHAN]
-                if ((len(block_in_name)>0) and (len(block_out_name)>0)):
+                if ((len(block_in_name)>0) and (len(block_out_name)>0)):                    
                     out_index = self.get_port_count(block_out_name, "output")
                     in_index  = self.get_port_count(block_in_name, "input")
 
@@ -452,10 +496,16 @@ class graph_handler:
                     [chana, chanb] = pgen.link_in_ptolemy_file(outport_name, inport_name, chan_name)
                     pgen.top_element.appendChild(chana)
                     pgen.top_element.appendChild(chanb)
-                    
-                    self.inc_port_count(block_out_name, "output")
-                    self.inc_port_count(block_in_name, "input")
-                    
+
+                    # increment port count except if port count limit
+                    # is reached but there are more connections then
+                    # this port is a multiport allowing multiple connections
+                    out_lim = len(self.block_port_dict_output[block_out_name])
+                    in_lim  = len(self.block_port_dict_input[block_in_name])
+                    if out_lim > (out_index+1):
+                        self.inc_port_count(block_out_name, "output")
+                    if in_lim > (in_index+1):
+                        self.inc_port_count(block_in_name, "input")
             self.reset_port_count()
             pgen.write_to_xmlfile()
 
@@ -468,9 +518,9 @@ class graph_handler:
             exit(-1)
         
 if __name__ == "__main__":
-
+    infile_name_list = ["csp-sdf-rx.occ", "csp-sdf-tx.occ", "csp-sdf-sim.occ"]
     # the input occam program which we will be processing
-    infile_name = 'csp-sdf-rx.occ'
+    infile_name = infile_name_list[2]
     # specifies processes of interest in the occam program
     fcn_list    = ["parameterGen", "main"]
     

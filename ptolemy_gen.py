@@ -204,11 +204,15 @@ class ptolemy_writer:
                 loc_str = self.ptolemy_location_update(BLOCK, offset)
                 node1 = self.write_element(ENT, name, class_str, "None")
                 node2 = self.write_element(PROP, "resetOnEachRun", CLASS_SHARED_PARAM, "false")
-                node3 = self.write_element(PROP, "standardDeviation", CLASS_PORT_PARAM, value[0])
-                node4 = self.write_element(PROP, NAME_LOCATION, CLASS_LOCATION, loc_str)
+                node3 = self.write_element(PROP, "seed", CLASS_SHARED_PARAM, value[0])
+                node4 = self.write_element(PROP, "mean", CLASS_PORT_PARAM, value[1])
+                node5 = self.write_element(PROP, "standardDeviation", CLASS_PORT_PARAM, value[2])
+                node6 = self.write_element(PROP, NAME_LOCATION, CLASS_LOCATION, loc_str)
                 node1.appendChild(node2)
                 node1.appendChild(node3)
                 node1.appendChild(node4)
+                node1.appendChild(node5)
+                node1.appendChild(node6)                
             elif class_str is CLASS_SCALE:
                 loc_str = self.ptolemy_location_update(BLOCK, offset)
                 node1 = self.write_element(ENT, name, class_str, "None")
@@ -405,15 +409,6 @@ class ptolemy_writer:
                 #####################################################################
                 ## DELAY
                 #####################################################################
-                node1 = self.write_to_ptolemy_file(BLOCK, CLASS_BOOL_ANY, name_bool_any, ["None"], 100)
-                node0.appendChild(node1)
-
-                
-                chan1 = self.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_rel_bool_any, ["no"], 0)
-                node0.appendChild(chan1)
-                [chana, chanb] = self.link_in_ptolemy_file(name_bool_any+".output", name_delay+".input", name_rel_bool_any)
-                node0.appendChild(chana)
-                node0.appendChild(chanb)
                 node1 = self.write_to_ptolemy_file(BLOCK, CLASS_DELAY, name_delay, ["{false}"], 100)
                 node0.appendChild(node1)
                 chan1 = self.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_rel_delay, ["no"], 0)
@@ -429,17 +424,27 @@ class ptolemy_writer:
                 node0.appendChild(chana)
                 node0.appendChild(chanb)
 
+                
                 chan1 = self.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_rel_dbpsk_choice, ["yes"], 0)
                 node0.appendChild(chan1)
-                [chana, chanb] = self.link_in_ptolemy_file(name_dbpsk_choice+".output", name_outport, name_rel_dbpsk_choice)
+                [chana, chanb] = self.link_in_ptolemy_file(name_dbpsk_choice+".output", name_bool_any+".input", name_rel_dbpsk_choice)
                 node0.appendChild(chana)
                 node0.appendChild(chanb)
                 
                 chan1 = self.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_rel_dbpsk_choice, ["no"], 0)
                 node0.appendChild(chan1)
-                [chana, chanb] = self.link_in_ptolemy_file("None", name_bool_any+".input", name_rel_dbpsk_choice)
+                [chana, chanb] = self.link_in_ptolemy_file("None", name_delay+".input", name_rel_dbpsk_choice)
                 #node0.appendChild(chana)
                 node0.appendChild(chanb)                
+
+                node1 = self.write_to_ptolemy_file(BLOCK, CLASS_BOOL_ANY, name_bool_any, ["None"], 0)
+                node0.appendChild(node1)
+
+                chan1 = self.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_rel_bool_any, ["no"], 0)
+                node0.appendChild(chan1)
+                [chana, chanb] = self.link_in_ptolemy_file(name_bool_any+".output", name_outport, name_rel_bool_any)
+                node0.appendChild(chana)
+                node0.appendChild(chanb)
 
                 loc_str = self.ptolemy_location_update(BLOCK, offset)
                 node1 = self.write_element(PORT, name_outport, CLASS_NAMED_IO_PORT, "None")
@@ -583,7 +588,8 @@ class ptolemy_writer:
                 #####################################################################
                 node1 = self.write_to_ptolemy_file(BLOCK,
                                                    CLASS_EXPRESSION,
-                                                   name_exp3, ["input", "%", "1"], 0)
+                                                   name_exp3,
+                                                   ["input", "&amp;", "1"], 0)
                 node0.appendChild(node1)
                 
                 chan1 = self.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_rel_exp2, ["no"], 0)
@@ -873,7 +879,6 @@ class ptolemy_writer:
                 ## REPEAT 
                 #####################################################################
                 node1 = self.write_to_ptolemy_file(BLOCK, CLASS_REPEAT, name_repeat, value, 0)
-                print "REPEAT VALUE= ", value
                 node0.appendChild(node1)
                 chan1 = self.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_rel_diff_enc, ["no"], 0)
                 node0.appendChild(chan1)
@@ -973,7 +978,6 @@ class ptolemy_writer:
                 #####################################################################
                 value_temp = "repeat("+value[0]+", 0)"
                 node1 = self.write_to_ptolemy_file(BLOCK, CLASS_DELAY, name_delay, [value_temp], 100)
-                print "DELAY= ", value_temp
                 node0.appendChild(node1)
                 chan1 = self.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_rel_delay, ["no"], 0)
                 node0.appendChild(chan1)
@@ -1004,7 +1008,7 @@ class ptolemy_writer:
                 #####################################################################
                 ## FIR Filter
                 #####################################################################
-                node1 = self.write_to_ptolemy_file(BLOCK, CLASS_FIR, name_fir, ["rc1.dat"], 0)
+                node1 = self.write_to_ptolemy_file(BLOCK, CLASS_FIR, name_fir, ["rc1.0.dat"], 0)
                 node0.appendChild(node1)
 
                 #####################################################################                
@@ -1204,12 +1208,12 @@ def test_ptolemy():
     #####################################################################
     ## Pulse Shaping Filter
     #####################################################################
-    node1 = pgen.write_to_ptolemy_file(BLOCK, CLASS_FIR, name_pulse_filt, ["rc1.dat"], 0)
+    node1 = pgen.write_to_ptolemy_file(BLOCK, CLASS_FIR, name_pulse_filt, ["rc1.0.dat"], 0)
     pgen.top_element.appendChild(node1)
 
     ############
     ## Guassian Noise
-    node1 = pgen.write_to_ptolemy_file(BLOCK, CLASS_GAUSS, name_gauss, ["0.35"], 50)
+    node1 = pgen.write_to_ptolemy_file(BLOCK, CLASS_GAUSS, name_gauss, ["0", "1.3", "0.35"], 50)
     pgen.top_element.appendChild(node1)
     node1 = pgen.write_to_ptolemy_file(BLOCK, CLASS_ADDSUB, name_add, ["None"], 0)
     pgen.top_element.appendChild(node1)
