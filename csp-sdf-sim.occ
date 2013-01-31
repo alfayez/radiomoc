@@ -10,13 +10,15 @@
 
 -- Define the RF Out Block
 PROC rfOut(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
-  REAL32 symbolTime  :
-  REAL32 samplingRate:
-  REAL32 carrierFreq :
-  REAL32 rcFiltCoeff :  -- provides the name of the file with the coeff rcFilt<int>.dat
-  REAL32 carrierGain :
-  REAL32 rfGain      :
+  REAL32 symbolTime   :
+  REAL32 samplingRate :
+  REAL32 carrierFreq  :
+  REAL32 carrierPhase :
+  REAL32 rcFiltCoeff  :  -- provides the name of the file with the coeff rcFilt<int>.dat
+  REAL32 carrierGain  :
+  REAL32 rfGain       :
   REAL32 rfGain2      :
+  REAL32 gaussGain    :
   
   REAL32 seedValG    :
   REAL32 meanValG    :
@@ -30,6 +32,8 @@ PROC rfOut(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
     inC  ? carrierGain
     inC  ? rfGain
     inC  ? rfGain2
+    inC  ? carrierPhase
+    inC  ? gaussGain
     inC  ? seedValG
     inC  ? meanValG
     inC  ? stdValG
@@ -41,6 +45,8 @@ PROC rfOut(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
     outC ! carrierGain
     outC ! rfGain
     outC ! rfGain2
+    outC ! carrierPhase
+    outC ! gaussGain
     outC ! seedValG
     outC ! meanValG
     outC ! stdValG
@@ -56,6 +62,8 @@ PROC channelFilter(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
   REAL32 carrierGain :
   REAL32 rfGain      :
   REAL32 rfGain2     :
+  REAL32 carrierPhase :
+  REAL32 gaussGain    :
   
   REAL32 seedValG    :
   REAL32 meanValG    :
@@ -71,6 +79,8 @@ PROC channelFilter(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
     inC  ? carrierGain
     inC  ? rfGain
     inC  ? rfGain2    
+    inC  ? carrierPhase
+    inC  ? gaussGain    
     inC  ? seedValG
     inC  ? meanValG
     inC  ? stdValG
@@ -82,6 +92,8 @@ PROC channelFilter(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
     outC ! carrierGain
     outC ! rfGain
     outC ! rfGain2
+    outC ! carrierPhase
+    outC ! gaussGain    
     outC ! seedValG
     outC ! meanValG
     outC ! stdValG
@@ -98,7 +110,9 @@ PROC rfScale(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
   REAL32 carrierGain :
   REAL32 rfGain      :
   REAL32 rfGain2     :
-  
+  REAL32 carrierPhase :
+  REAL32 gaussGain    :  
+
   REAL32 seedValG    :
   REAL32 meanValG    :
   REAL32 stdValG     :
@@ -113,6 +127,8 @@ PROC rfScale(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
     inC  ? carrierGain
     inC  ? rfGain
     inC  ? rfGain2
+    inC  ? carrierPhase
+    inC  ? gaussGain    
     inC  ? seedValG
     inC  ? meanValG
     inC  ? stdValG
@@ -124,6 +140,8 @@ PROC rfScale(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
     outC ! carrierGain
     outC ! rfGain
     outC ! rfGain2
+    outC ! carrierPhase
+    outC ! gaussGain
     outC ! seedValG
     outC ! meanValG
     outC ! stdValG
@@ -140,6 +158,8 @@ PROC rfScale2(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
   REAL32 carrierGain :
   REAL32 rfGain      :
   REAL32 rfGain2     :
+  REAL32 carrierPhase : 
+  REAL32 gaussGain    :
   
   REAL32 seedValG    :
   REAL32 meanValG    :
@@ -154,6 +174,8 @@ PROC rfScale2(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
     inC  ? carrierGain
     inC  ? rfGain
     inC  ? rfGain2
+    inC  ? carrierPhase
+    inC  ? gaussGain    
     inC  ? seedValG
     inC  ? meanValG
     inC  ? stdValG
@@ -165,6 +187,8 @@ PROC rfScale2(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
     outC ! carrierGain
     outC ! rfGain
     outC ! rfGain2
+    outC ! carrierPhase
+    outC ! gaussGain    
     outC ! seedValG
     outC ! meanValG
     outC ! stdValG
@@ -182,6 +206,8 @@ PROC dataSrc(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
   REAL32 carrierGain :
   REAL32 rfGain      :
   REAL32 rfGain2     :
+  REAL32 carrierPhase :
+  REAL32 gaussGain    :
   
   REAL32 seedValG    :
   REAL32 meanValG    :
@@ -196,6 +222,8 @@ PROC dataSrc(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
     inC  ? carrierGain
     inC  ? rfGain
     inC  ? rfGain2
+    inC  ? carrierPhase
+    inC  ? gaussGain    
     inC  ? seedValG
     inC  ? meanValG
     inC  ? stdValG
@@ -207,6 +235,8 @@ PROC dataSrc(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
     outC ! carrierGain
     outC ! rfGain
     outC ! rfGain2
+    outC ! carrierPhase
+    outC ! gaussGain    
     outC ! seedValG
     outC ! meanValG
     outC ! stdValG
@@ -223,6 +253,8 @@ PROC carrierScale(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
   REAL32 carrierGain :
   REAL32 rfGain      :
   REAL32 rfGain2     :
+  REAL32 carrierPhase :
+  REAL32 gaussGain    :
   
   REAL32 seedValG    :
   REAL32 meanValG    :
@@ -237,6 +269,8 @@ PROC carrierScale(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
     inC  ? carrierGain
     inC  ? rfGain
     inC  ? rfGain2
+    inC  ? carrierPhase
+    inC  ? gaussGain    
     inC  ? seedValG
     inC  ? meanValG
     inC  ? stdValG
@@ -248,6 +282,8 @@ PROC carrierScale(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
     outC ! carrierGain
     outC ! rfGain
     outC ! rfGain2    
+    outC ! carrierPhase
+    outC ! gaussGain    
     outC ! seedValG
     outC ! meanValG
     outC ! stdValG
@@ -264,7 +300,9 @@ PROC carrier(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
   REAL32 carrierGain :
   REAL32 rfGain      :
   REAL32 rfGain2     :
-
+  REAL32 carrierPhase :
+  REAL32 gaussGain    :
+  
   REAL32 seedValG    :
   REAL32 meanValG    :
   REAL32 stdValG     :
@@ -277,6 +315,8 @@ PROC carrier(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
     inC  ? carrierGain
     inC  ? rfGain
     inC  ? rfGain2
+    inC  ? carrierPhase
+    inC  ? gaussGain    
     inC  ? seedValG
     inC  ? meanValG
     inC  ? stdValG
@@ -288,6 +328,8 @@ PROC carrier(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
     outC ! carrierGain
     outC ! rfGain
     outC ! rfGain2    
+    outC ! carrierPhase
+    outC ! gaussGain    
     outC ! seedValG
     outC ! meanValG
     outC ! stdValG
@@ -304,6 +346,8 @@ PROC dbpskReceiver(CHAN REAL32 outC!,      CHAN REAL32 DTopC!,
   REAL32 carrierGain :
   REAL32 rfGain      :
   REAL32 rfGain2      :
+  REAL32 carrierPhase :
+  REAL32 gaussGain    :
   
   REAL32 seedValG    :
   REAL32 meanValG    :
@@ -318,6 +362,8 @@ PROC dbpskReceiver(CHAN REAL32 outC!,      CHAN REAL32 DTopC!,
     inDataC    ? carrierGain
     inDataC    ? rfGain
     inDataC    ? rfGain2
+    inDataC    ? carrierPhase
+    inDataC    ? gaussGain    
     inDataC    ? seedValG
     inDataC    ? meanValG
     inDataC    ? stdValG
@@ -329,6 +375,8 @@ PROC dbpskReceiver(CHAN REAL32 outC!,      CHAN REAL32 DTopC!,
     outC       ! carrierGain
     outC       ! rfGain
     outC       ! rfGain2
+    outC       ! carrierPhase
+    outC       ! gaussGain    
     outC       ! seedValG
     outC       ! meanValG
     outC       ! stdValG
@@ -344,6 +392,8 @@ PROC rfIn(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
   REAL32 carrierGain :
   REAL32 rfGain      :
   REAL32 rfGain2     :
+  REAL32 carrierPhase :
+  REAL32 gaussGain    :
   
   REAL32 seedValG    :
   REAL32 meanValG    :
@@ -356,6 +406,7 @@ PROC rfIn(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
     inC  ? carrierGain
     inC  ? rfGain
     inC  ? rfGain2
+    inC  ? carrierPhase
     inC  ? seedValG
     inC  ? meanValG
     inC  ? stdValG
@@ -367,6 +418,8 @@ PROC rfIn(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
     outC ! carrierGain
     outC ! rfGain
     outC ! rfGain2    
+    outC ! carrierPhase
+    outC ! gaussGain    
     outC ! seedValG
     outC ! meanValG
     outC ! stdValG
@@ -382,6 +435,8 @@ PROC dataOut(CHAN REAL32 DTopC!, CHAN REAL32 inC?)
   REAL32 carrierGain :
   REAL32 rfGain      :
   REAL32 rfGain2     :
+  REAL32 carrierPhase :
+  REAL32 gaussGain    :
   
   REAL32 seedValG    :
   REAL32 meanValG    :
@@ -396,6 +451,8 @@ PROC dataOut(CHAN REAL32 DTopC!, CHAN REAL32 inC?)
     inC ? carrierGain
     inC ? rfGain
     inC ? rfGain2    
+    inC ? carrierPhase
+    inC ? gaussGain    
     inC ? seedValG
     inC ? meanValG
     inC ? stdValG
@@ -411,7 +468,9 @@ PROC channelFilter2(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
   REAL32 carrierGain :
   REAL32 rfGain      :
   REAL32 rfGain2     :
-
+  REAL32 carrierPhase :
+  REAL32 gaussGain    :
+  
   REAL32 seedValG    :
   REAL32 meanValG    :
   REAL32 stdValG     :
@@ -424,11 +483,11 @@ PROC channelFilter2(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
     inC  ? carrierGain
     inC  ? rfGain
     inC  ? rfGain2    
+    inC  ? carrierPhase
+    inC  ? gaussGain    
     inC  ? seedValG
     inC  ? meanValG
     inC  ? stdValG
-    
-    DTopC ! rfGain
     
     outC ! symbolTime
     outC ! samplingRate
@@ -437,9 +496,13 @@ PROC channelFilter2(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
     outC ! carrierGain
     outC ! rfGain
     outC ! rfGain2
+    outC ! carrierPhase
+    outC ! gaussGain    
     outC ! seedValG
     outC ! meanValG
-    outC ! stdValG    
+    outC ! stdValG
+    
+    DTopC ! rfGain
 :
 
 -- Define the DBPSK Transmitter Block
@@ -452,6 +515,8 @@ PROC dbpskTransmitter(CHAN REAL32 outC!,      CHAN REAL32 DTopC!,
   REAL32 carrierGain :
   REAL32 rfGain      :
   REAL32 rfGain2     :
+  REAL32 carrierPhase :
+  REAL32 gaussGain    :
   
   REAL32 seedValG    :
   REAL32 meanValG    :
@@ -473,6 +538,10 @@ PROC dbpskTransmitter(CHAN REAL32 outC!,      CHAN REAL32 DTopC!,
     inDataC    ? rfGain
     inCarrierC ? rfGain2
     inDataC    ? rfGain2   
+    inCarrierC ? carrierPhase
+    inDataC    ? carrierPhase    
+    inCarrierC ? gaussGain    
+    inDataC    ? gaussGain
     inCarrierC ? seedValG
     inDataC    ? seedValG
     inCarrierC ? meanValG
@@ -487,6 +556,8 @@ PROC dbpskTransmitter(CHAN REAL32 outC!,      CHAN REAL32 DTopC!,
     outC       ! carrierGain
     outC       ! rfGain
     outC       ! rfGain2    
+    outC       ! carrierPhase
+    outC       ! gaussGain    
     outC       ! seedValG
     outC       ! meanValG
     outC       ! stdValG    
@@ -503,7 +574,9 @@ PROC gauss(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
   REAL32 carrierGain :
   REAL32 rfGain      :
   REAL32 rfGain2     :
-
+  REAL32 carrierPhase :
+  REAL32 gaussGain    :
+  
   REAL32 seedValG    :
   REAL32 meanValG    :
   REAL32 stdValG     :
@@ -517,6 +590,8 @@ PROC gauss(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
     inC  ? carrierGain
     inC  ? rfGain
     inC  ? rfGain2    
+    inC  ? carrierPhase
+    inC  ? gaussGain    
     inC  ? seedValG
     inC  ? meanValG
     inC  ? stdValG
@@ -528,6 +603,54 @@ PROC gauss(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
     outC ! carrierGain
     outC ! rfGain
     outC ! rfGain2
+    outC ! carrierPhase
+    outC ! gaussGain    
+    outC ! seedValG
+    outC ! meanValG
+    outC ! stdValG    
+    
+    DTopC ! rfGain    
+:
+-- Define the RF Scaling Block
+PROC gaussScale(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
+  REAL32 symbolTime  :
+  REAL32 samplingRate:
+  REAL32 carrierFreq :
+  REAL32 rcFiltCoeff :  -- provides the name of the file with the coeff rcFilt<int>.dat
+  REAL32 carrierGain :
+  REAL32 rfGain      :
+  REAL32 rfGain2     :
+  REAL32 carrierPhase :
+  REAL32 gaussGain    :
+  
+  REAL32 seedValG    :
+  REAL32 meanValG    :
+  REAL32 stdValG     :
+  SEQ
+    -- We're rcv/fw radio configuration parameters through the channel
+
+    inC  ? symbolTime
+    inC  ? samplingRate    
+    inC  ? carrierFreq
+    inC  ? rcFiltCoeff
+    inC  ? carrierGain
+    inC  ? rfGain
+    inC  ? rfGain2    
+    inC  ? carrierPhase
+    inC  ? gaussGain    
+    inC  ? seedValG
+    inC  ? meanValG
+    inC  ? stdValG
+    
+    outC ! symbolTime         
+    outC ! samplingRate
+    outC ! carrierFreq
+    outC ! rcFiltCoeff
+    outC ! carrierGain
+    outC ! rfGain
+    outC ! rfGain2
+    outC ! carrierPhase
+    outC ! gaussGain    
     outC ! seedValG
     outC ! meanValG
     outC ! stdValG    
@@ -543,6 +666,8 @@ PROC add(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?, CHAN REAL32 in
   REAL32 carrierGain :
   REAL32 rfGain      :
   REAL32 rfGain2     :
+  REAL32 carrierPhase :
+  REAL32 gaussGain    :
   
   REAL32 seedValG    :
   REAL32 meanValG    :
@@ -564,6 +689,10 @@ PROC add(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?, CHAN REAL32 in
     in2C ? rfGain
     inC  ? rfGain2
     in2C ? rfGain2    
+    inC  ? carrierPhase
+    in2C ? carrierPhase
+    inC  ? gaussGain
+    in2C ? gaussGain    
     inC  ? seedValG
     in2C ? seedValG
     inC  ? meanValG
@@ -579,6 +708,8 @@ PROC add(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?, CHAN REAL32 in
     outC     ! carrierGain
     outC     ! rfGain
     outC     ! rfGain2    
+    outC     ! carrierPhase
+    outC     ! gaussGain    
     outC     ! seedValG
     outC     ! meanValG
     outC     ! stdValG    
@@ -622,8 +753,8 @@ PROC add(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?, CHAN REAL32 in
 PROC DoutputToScreenTop(CHAN BYTE out!, CHAN REAL32 carrierC?, CHAN REAL32 carrierScaleC?, 
                        CHAN REAL32 dataSrcC?,                  CHAN REAL32 dbpskModC?,      
                        CHAN REAL32 rrcFiltC,                   CHAN REAL32 rfScaleC?,
-                       CHAN REAL32 gaussC?,                    CHAN REAL32 addC?, 
-                       CHAN REAL32 rfScale2C?,                 CHAN REAL32 rrcFilt2C?, CHAN REAL32 demodulatorC?,  
+                       CHAN REAL32 gaussC?,                    CHAN REAL32 gaussScaleC?, CHAN REAL32 addC?, 
+                       CHAN REAL32 rfScale2C?,                 CHAN REAL32 rrcFilt2C?,   CHAN REAL32 demodulatorC?,  
                        CHAN REAL32 dataC?) 
   
   REAL32 txParam :
@@ -657,6 +788,10 @@ PROC DoutputToScreenTop(CHAN BYTE out!, CHAN REAL32 carrierC?, CHAN REAL32 carri
     out.string("*tGauss*t", 0, out!)
     out.string("*n", 0, out!)    
 
+    gaussScaleC ? txParam
+    out.string("*tGauss Scale*t", 0, out!)
+    out.string("*n", 0, out!)    
+
     addC ? txParam
     out.string("*tAdditive Channel*t", 0, out!)
     out.string("*n", 0, out!)    
@@ -686,6 +821,8 @@ PROC parameterGen(CHAN REAL32 paramOC!)
   REAL32 carrierGain  :
   REAL32 rfGain       :
   REAL32 rfGain2       :
+  REAL32 carrierPhase :
+  REAL32 gaussGain    :
   
   REAL32 seedValG     :
   REAL32 meanValG     :
@@ -698,18 +835,21 @@ PROC parameterGen(CHAN REAL32 paramOC!)
     carrierGain  := 1.0
     rfGain       := 1.0
     rfGain2      := 0.9
-    
+    carrierPhase := 0.0  
+    gaussGain    := 0.3
     seedValG     := 0.0
     meanValG     := 0.0
     stdValG      := 0.40
-    
+  
     paramOC ! symbolTime
     paramOC ! samplingRate
     paramOC ! carrierFreq
     paramOC ! rcFiltCoeff
     paramOC ! carrierGain
     paramOC ! rfGain
-    paramOC ! rfGain2    
+    paramOC ! rfGain2
+    paramOC ! carrierPhase
+    paramOC ! gaussGain
     paramOC ! seedValG
     paramOC ! meanValG
     paramOC ! stdValG
@@ -728,21 +868,22 @@ PROC main(CHAN BYTE out!)
   CHAN REAL32 scaleToRrcFiltC :
   CHAN REAL32 rrcFiltToDemodC :
   CHAN REAL32 carrierToScaleC :
-  --CHAN REAL32 scaleToDemodC   :
   CHAN REAL32 demodToDataOutC :   
   CHAN REAL32 addToRfScale2C  :  
+  CHAN REAL32 gaussToScaleC   :
   
-  CHAN REAL32 gaussToAddC    :
+  CHAN REAL32 gaussScaleToAddC    :
   CHAN REAL32 rfOutToAddC    :
   CHAN REAL32 DCarrierC      :
   CHAN REAL32 DCarrierScaleC :
   CHAN REAL32 DDataSrcC      :
   CHAN REAL32 DModulatorC    :
-  CHAN REAL32 DDemodulatorC   :
+  CHAN REAL32 DDemodulatorC  :
   CHAN REAL32 DRrcFiltC      :
   CHAN REAL32 DRfScaleC      :
   CHAN REAL32 DRfOutC        :
-
+  CHAN REAL32 DGaussScaleC   :
+  
   CHAN REAL32 DRfInC         :
   CHAN REAL32 DRfScale2C     :
   CHAN REAL32 DRrcFilt2C     :
@@ -766,13 +907,14 @@ PROC main(CHAN BYTE out!)
     channelFilter    (filterToScaleC!,  DRrcFiltC!,      txToChanFiltC?)
     rfScale          (scaleToAddC!,     DRfScaleC!,      filterToScaleC?)
 
-    gauss            (gaussToAddC!,     DGaussC!,        setup3C?)
-    add              (addToRfScale2C!,  DAddC!,          scaleToAddC?, gaussToAddC?)
+    gauss            (gaussToScaleC!,     DGaussC!,        setup3C?)
+    gaussScale       (gaussScaleToAddC!, DGaussScaleC!,    gaussToScaleC?)
+    add              (addToRfScale2C!,    DAddC!,          scaleToAddC?, gaussScaleToAddC?)
 
     rfScale2         (scaleToRrcFiltC!, DRfScale2C!,     addToRfScale2C?)
     channelFilter2   (rrcFiltToDemodC!, DRrcFilt2C!,     scaleToRrcFiltC?)
     dbpskReceiver    (demodToDataOutC!, DDemodulatorC!,  rrcFiltToDemodC?)      
     dataOut          (DDataC!,          demodToDataOutC?)
 
-    DoutputToScreenTop (out!, DCarrierC?, DCarrierScaleC?, DDataSrcC?, DModulatorC?, DRrcFiltC?, DRfScaleC?, DGaussC?, DAddC?, DRfScale2C?, DRrcFilt2C?, DDemodulatorC?, DDataC?)  
+    DoutputToScreenTop (out!, DCarrierC?, DCarrierScaleC?, DDataSrcC?, DModulatorC?, DRrcFiltC?, DRfScaleC?, DGaussC?, DGaussScaleC?, DAddC?, DRfScale2C?, DRrcFilt2C?, DDemodulatorC?, DDataC?)  
 :

@@ -5,6 +5,8 @@
   REAL32 carrierGain  :
   REAL32 rfGain       :
   REAL32 rfGain2       :
+  REAL32 carrierPhase :
+  REAL32 gaussGain    :
   
   REAL32 seedValG     :
   REAL32 meanValG     :
@@ -17,18 +19,21 @@
     carrierGain  := 1.0
     rfGain       := 1.0
     rfGain2      := 0.9
-    
+    carrierPhase := 0.0  
+    gaussGain    := 0.3
     seedValG     := 0.0
     meanValG     := 0.0
     stdValG      := 0.40
-    
+  
     paramOC ! symbolTime
     paramOC ! samplingRate
     paramOC ! carrierFreq
     paramOC ! rcFiltCoeff
     paramOC ! carrierGain
     paramOC ! rfGain
-    paramOC ! rfGain2    
+    paramOC ! rfGain2
+    paramOC ! carrierPhase
+    paramOC ! gaussGain
     paramOC ! seedValG
     paramOC ! meanValG
     paramOC ! stdValG

@@ -216,12 +216,14 @@ class ptolemy_writer:
             elif class_str is CLASS_SCALE:
                 loc_str = self.ptolemy_location_update(BLOCK, offset)
                 node1 = self.write_element(ENT, name, class_str, "None")
-                node2 = self.write_element(PROP, NAME_ICON, CLASS_ATTR_ICON, "None")
-                node3 = self.write_element(PROP, NAME_ATTR, CLASS_STR_ATTR, "factor")
-                node4 = self.write_element(PROP, NAME_LOCATION, CLASS_LOCATION, loc_str)
+                node2 = self.write_element(PROP, "factor", CLASS_PARAMETER, value[0])
+                node3 = self.write_element(PROP, NAME_ICON, CLASS_ATTR_ICON, "None")
+                node4 = self.write_element(PROP, NAME_ATTR, CLASS_STR_ATTR, "factor")
+                node5 = self.write_element(PROP, NAME_LOCATION, CLASS_LOCATION, loc_str)
                 node1.appendChild(node2)
-                node2.appendChild(node3)
-                node1.appendChild(node4)
+                node1.appendChild(node3)
+                node3.appendChild(node4)
+                node1.appendChild(node5)
                 
             elif class_str is CLASS_SINE:
                 loc_str = self.ptolemy_location_update(BLOCK, offset)
@@ -302,6 +304,16 @@ class ptolemy_writer:
                 node1 = self.write_element(ENT, name, class_str, "None")
                 node2 = self.write_element(PROP, NAME_LOCATION, CLASS_LOCATION, loc_str)
                 node1.appendChild(node2)
+            elif class_str is CLASS_ANYTHING_DOUBLE:
+                loc_str = self.ptolemy_location_update(BLOCK, offset)
+                node1 = self.write_element(ENT, name, class_str, "None")
+                node2 = self.write_element(PROP, NAME_LOCATION, CLASS_LOCATION, loc_str)
+                node1.appendChild(node2)
+            elif class_str is CLASS_BOOL_ANY:
+                loc_str = self.ptolemy_location_update(BLOCK, offset)
+                node1 = self.write_element(ENT, name, class_str, "None")
+                node2 = self.write_element(PROP, NAME_LOCATION, CLASS_LOCATION, loc_str)
+                node1.appendChild(node2)
             elif class_str is CLASS_CONST:
                 loc_str = self.ptolemy_location_update(BLOCK, offset)
                 node1 = self.write_element(ENT, name, class_str, "None")
@@ -341,6 +353,56 @@ class ptolemy_writer:
                 node1.appendChild(node4)
                 
             # User Defined Composite Blocks
+            elif class_str is CLASS_USER_OUTPUT:
+                name_bool_any        = NAME_BOOL_ANY
+                name_seq_plot        = NAME_SEQ_PLOT
+                name_rel_seq         = "seqplotCh"
+                name_user_view       = "User Viewer"
+                name_inport          = "input"
+                name_rel_inport      = "inputCh"
+
+                # save the current location in the flowgraph so we can
+                # go back to it after we're done building the current
+                # composite actor                
+                orig_loc_str = self.ptolemy_location_update(BLOCK, offset)
+                orig_loc = self.current_location(BLOCK)
+                self.set_location(BLOCK, BLOCK_ORIG)
+                
+                # Instantiate the container composite actor
+                node0 = self.write_element(ENT, name, CLASS_COMP_ACT, "None")
+
+                # set location the composite actor
+                node1 = self.write_element(PROP, NAME_LOCATION, CLASS_LOCATION, orig_loc_str)
+                node0.appendChild(node1)
+
+                # create ports for the composite actor
+                node1 = self.write_element(PORT, name_inport, CLASS_NAMED_IO_PORT, "None")
+                node2 = self.write_element(PROP, "input", "None", "None")
+                node0.appendChild(node1)
+                node1.appendChild(node2)
+                
+                node1 = self.write_to_ptolemy_file(BLOCK, CLASS_BOOL_ANY, name_bool_any, ["None"], 0)
+                node0.appendChild(node1)
+                
+                node2 = self.write_to_ptolemy_file(BLOCK, CLASS_SEQ_PLOT, name_seq_plot, ["None"], 0)
+                node0.appendChild(node2)
+
+
+                chan1 = self.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_rel_inport, ["no"], 0)
+                node0.appendChild(chan1)
+                [chana, chanb] = self.link_in_ptolemy_file(name_inport, name_bool_any+".input", name_rel_inport)
+                node0.appendChild(chana)
+                node0.appendChild(chanb)
+
+                chan1 = self.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_rel_seq, ["no"], 0)
+                node0.appendChild(chan1)
+                [chana, chanb] = self.link_in_ptolemy_file(name_bool_any+".output", name_seq_plot+".input", name_rel_seq)
+                node0.appendChild(chana)
+                node0.appendChild(chanb)                
+
+                self.set_location(BLOCK, orig_loc)
+                
+                return node0
             elif class_str is CLASS_DIFF_ENC:
                 name_inport = "input"
                 name_outport = "output"
@@ -818,15 +880,15 @@ class ptolemy_writer:
 
                 return node0                
             elif class_str is CLASS_DBPSK_TX:
-                name_inport1 = "carrier"
-                name_inport2 = "datain"
+                name_inport1 = "datain"
+                name_inport2 = "carrier"                
                 name_outport = "output"
                 name_diff_enc = "Differential Encoder"
                 name_repeat = "Repeat Block"
                 name_dbpsk_mod = "DBPSK Modulator"
                 
-                name_rel_inport1 = "carrierCh"
-                name_rel_inport2 = "datainCh"
+                name_rel_inport1 = "datainCh"
+                name_rel_inport2 = "carrierCh"
                 name_rel_diff_enc = "diffencCh"
                 name_rel_repeat = "repeatCh"
                 name_rel_dbpsk_mod = "dbpskModCh"
