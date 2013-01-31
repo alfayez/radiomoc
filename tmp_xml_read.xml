@@ -27,7 +27,7 @@
     <property name="_icon" class="ptolemy.vergil.icon.ValueIcon">
       <property name="_color" class="ptolemy.actor.gui.ColorAttribute" value="{0.0, 0.0, 1.0, 1.0}"/>
     </property><property name="_location" class="ptolemy.kernel.util.Location" value="{1, 90}"/>
-  </property><property name="rfGain2" class="ptolemy.data.expr.Parameter" value="0.9">
+  </property><property name="rfGain2" class="ptolemy.data.expr.Parameter" value="1.1">
     <property name="_icon" class="ptolemy.vergil.icon.ValueIcon">
       <property name="_color" class="ptolemy.actor.gui.ColorAttribute" value="{0.0, 0.0, 1.0, 1.0}"/>
     </property><property name="_location" class="ptolemy.kernel.util.Location" value="{1, 105}"/>
@@ -132,7 +132,7 @@
       </port><relation name="carrierCh" class="ptolemy.actor.TypedIORelation">
         <property name="width" class="ptolemy.data.expr.Parameter" value="-1"/><vertex name="carrierCh" value="{100, 300}"/>
       </relation><entity name="Invert" class="ptolemy.actor.lib.Const">
-        <property name="value" class="ptolemy.data.expr.Parameter"/><property name="_icon" class="ptolemy.vergil.icon.BoxedValueIcon">
+        <property name="value" class="ptolemy.data.expr.Parameter" value="-1"/><property name="_icon" class="ptolemy.vergil.icon.BoxedValueIcon">
           <property name="attributeName" class="ptolemy.kernel.util.StringAttribute" value="value"/><property name="displayWidth" class="ptolemy.data.expr.Parameter" value="60"/>
         </property><property name="_location" class="ptolemy.kernel.util.Location" value="{200, 400}"/>
       </entity><relation name="invertCh" class="ptolemy.actor.TypedIORelation"/><link port="Invert.output" relation="invertCh"/><link port="Mixer.multiply" relation="invertCh"/><entity name="Mixer" class="ptolemy.actor.lib.MultiplyDivide">
@@ -200,8 +200,8 @@
       <property name="input"/>
     </port><entity name="BoolToAnything" class="ptolemy.actor.lib.conversions.BooleanToAnything">
       <property name="_location" class="ptolemy.kernel.util.Location" value="{200, 200}"/>
-    </entity><entity name="Sequence Plotter" class="ptolemy.actor.lib.gui.SequencePlotter">
-      <property name="_windowProperties" class="ptolemy.actor.gui.WindowPropertiesAttribute"/><property name="_plotSize" class="ptolemy.actor.gui.SizeAttribute"/><property name="_location" class="ptolemy.kernel.util.Location" value="{400, 200}"/>
-    </entity><relation name="inputCh" class="ptolemy.actor.TypedIORelation"/><link port="input" relation="inputCh"/><link port="BoolToAnything.input" relation="inputCh"/><relation name="seqplotCh" class="ptolemy.actor.TypedIORelation"/><link port="BoolToAnything.output" relation="seqplotCh"/><link port="Sequence Plotter.input" relation="seqplotCh"/>
+    </entity><entity name="Display" class="ptolemy.actor.lib.gui.Display">
+      <property name="_windowProperties" class="ptolemy.actor.gui.WindowPropertiesAttribute"/><property name="_location" class="ptolemy.kernel.util.Location" value="{400, 200}"/>
+    </entity><relation name="inputCh" class="ptolemy.actor.TypedIORelation"/><link port="input" relation="inputCh"/><link port="BoolToAnything.input" relation="inputCh"/><relation name="displayCh" class="ptolemy.actor.TypedIORelation"/><link port="BoolToAnything.output" relation="displayCh"/><link port="Display.input" relation="displayCh"/>
   </entity><relation name="scaleToTxC" class="ptolemy.actor.TypedIORelation"/><link port="carrierScale.output" relation="scaleToTxC"/><link port="dbpskTransmitter.carrier" relation="scaleToTxC"/><relation name="dataToTxC" class="ptolemy.actor.TypedIORelation"/><link port="dataSrc.output" relation="dataToTxC"/><link port="dbpskTransmitter.datain" relation="dataToTxC"/><relation name="txToChanFiltC" class="ptolemy.actor.TypedIORelation"/><link port="dbpskTransmitter.output" relation="txToChanFiltC"/><link port="channelFilter.input" relation="txToChanFiltC"/><relation name="filterToScaleC" class="ptolemy.actor.TypedIORelation"/><link port="channelFilter.output" relation="filterToScaleC"/><link port="rfScale.input" relation="filterToScaleC"/><relation name="scaleToAddC" class="ptolemy.actor.TypedIORelation"/><link port="rfScale.output" relation="scaleToAddC"/><link port="add.plus" relation="scaleToAddC"/><relation name="scaleToRrcFiltC" class="ptolemy.actor.TypedIORelation"/><link port="rfScale2.output" relation="scaleToRrcFiltC"/><link port="channelFilter2.input" relation="scaleToRrcFiltC"/><relation name="rrcFiltToDemodC" class="ptolemy.actor.TypedIORelation"/><link port="channelFilter2.output" relation="rrcFiltToDemodC"/><link port="dbpskReceiver.rfsig" relation="rrcFiltToDemodC"/><relation name="carrierToScaleC" class="ptolemy.actor.TypedIORelation"/><link port="carrier.output" relation="carrierToScaleC"/><link port="carrierScale.input" relation="carrierToScaleC"/><relation name="demodToDataOutC" class="ptolemy.actor.TypedIORelation"/><link port="dbpskReceiver.output" relation="demodToDataOutC"/><link port="dataOut.input" relation="demodToDataOutC"/><relation name="addToRfScale2C" class="ptolemy.actor.TypedIORelation"/><link port="add.output" relation="addToRfScale2C"/><link port="rfScale2.input" relation="addToRfScale2C"/><relation name="gaussToScaleC" class="ptolemy.actor.TypedIORelation"/><link port="gauss.output" relation="gaussToScaleC"/><link port="gaussScale.input" relation="gaussToScaleC"/><relation name="gaussScaleToAddC" class="ptolemy.actor.TypedIORelation"/><link port="gaussScale.output" relation="gaussScaleToAddC"/><link port="add.plus" relation="gaussScaleToAddC"/>
 </entity>

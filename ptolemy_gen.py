@@ -342,6 +342,15 @@ class ptolemy_writer:
                 node1 = self.write_element(ENT, name, class_str, "None")
                 node2 = self.write_element(PROP, NAME_LOCATION, CLASS_LOCATION, loc_str)                
                 node1.appendChild(node2)                
+            elif class_str is CLASS_DISPLAY:
+                loc_str = self.ptolemy_location_update(BLOCK, offset)
+                node1 = self.write_element(ENT, name, class_str, "None")
+                node2 = self.write_element(PROP, NAME_WIN_PROP, CLASS_WIN_PROP, "None")
+                #node3 = self.write_element(PROP, NAME_PLOT_SIZE, CLASS_SIZE_ATTR, "None")    
+                node3 = self.write_element(PROP, NAME_LOCATION, CLASS_LOCATION, loc_str)
+                node1.appendChild(node2)
+                node1.appendChild(node3)
+                #node1.appendChild(node4)
             elif class_str is CLASS_SEQ_PLOT:
                 loc_str = self.ptolemy_location_update(BLOCK, offset)
                 node1 = self.write_element(ENT, name, class_str, "None")
@@ -355,8 +364,10 @@ class ptolemy_writer:
             # User Defined Composite Blocks
             elif class_str is CLASS_USER_OUTPUT:
                 name_bool_any        = NAME_BOOL_ANY
-                name_seq_plot        = NAME_SEQ_PLOT
-                name_rel_seq         = "seqplotCh"
+                #name_seq_plot        = NAME_SEQ_PLOT
+                name_display         = NAME_DISPLAY
+                #name_rel_seq         = "seqplotCh"
+                name_rel_display     = "displayCh"
                 name_user_view       = "User Viewer"
                 name_inport          = "input"
                 name_rel_inport      = "inputCh"
@@ -384,7 +395,7 @@ class ptolemy_writer:
                 node1 = self.write_to_ptolemy_file(BLOCK, CLASS_BOOL_ANY, name_bool_any, ["None"], 0)
                 node0.appendChild(node1)
                 
-                node2 = self.write_to_ptolemy_file(BLOCK, CLASS_SEQ_PLOT, name_seq_plot, ["None"], 0)
+                node2 = self.write_to_ptolemy_file(BLOCK, CLASS_DISPLAY, name_display, ["None"], 0)
                 node0.appendChild(node2)
 
 
@@ -394,9 +405,9 @@ class ptolemy_writer:
                 node0.appendChild(chana)
                 node0.appendChild(chanb)
 
-                chan1 = self.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_rel_seq, ["no"], 0)
+                chan1 = self.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_rel_display, ["no"], 0)
                 node0.appendChild(chan1)
-                [chana, chanb] = self.link_in_ptolemy_file(name_bool_any+".output", name_seq_plot+".input", name_rel_seq)
+                [chana, chanb] = self.link_in_ptolemy_file(name_bool_any+".output", name_display+".input", name_rel_display)
                 node0.appendChild(chana)
                 node0.appendChild(chanb)                
 
@@ -823,7 +834,7 @@ class ptolemy_writer:
                 chan1 = self.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_rel_inport2, ["yes"], 100)
                 node0.appendChild(chan1)
 
-                node1 = self.write_to_ptolemy_file(BLOCK, CLASS_CONST, name_invert, ["None"], 200)
+                node1 = self.write_to_ptolemy_file(BLOCK, CLASS_CONST, name_invert, ["-1"], 200)
                 node0.appendChild(node1)
 
                 chan1 = self.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_rel_invert, ["no"], 0)

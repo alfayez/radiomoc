@@ -474,7 +474,6 @@ class graph_handler:
                 class_name   = self.block_map_dict[block_name][PTOLEMY]
                 block_offset = self.offset_dict[block_name][PTOLEMY]
                 block_value  = self.value_dict[block_name]
-                print "Block name= ", block_name, " Block value= ", block_value
                 node1 = pgen.write_to_ptolemy_file(BLOCK, class_name, block_name, block_value, block_offset)
                 pgen.top_element.appendChild(node1)
             #Generate and Instantiate Connections
