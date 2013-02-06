@@ -506,8 +506,7 @@ PROC channelFilter2(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
 :
 
 -- Define the DBPSK Transmitter Block
-PROC dbpskTransmitter(CHAN REAL32 outC!,      CHAN REAL32 DTopC!,
-                      CHAN REAL32 inCarrierC?,CHAN REAL32 inDataC?)
+PROC dbpskTransmitter(CHAN REAL32 outC!,      CHAN REAL32 DTopC!, CHAN REAL32 inDataC?)
   REAL32 symbolTime  :
   REAL32 samplingRate:
   REAL32 carrierFreq :
@@ -524,29 +523,17 @@ PROC dbpskTransmitter(CHAN REAL32 outC!,      CHAN REAL32 DTopC!,
   SEQ
     -- We're rcv/fw radio configuration parameters through the channel
 
-    inCarrierC ? symbolTime
     inDataC    ? symbolTime
-    inCarrierC ? samplingRate
     inDataC    ? samplingRate
-    inCarrierC ? carrierFreq
     inDataC    ? carrierFreq
-    inCarrierC ? rcFiltCoeff
     inDataC    ? rcFiltCoeff
-    inCarrierC ? carrierGain
     inDataC    ? carrierGain
-    inCarrierC ? rfGain
     inDataC    ? rfGain
-    inCarrierC ? rfGain2
     inDataC    ? rfGain2   
-    inCarrierC ? carrierPhase
     inDataC    ? carrierPhase    
-    inCarrierC ? gaussGain    
     inDataC    ? gaussGain
-    inCarrierC ? seedValG
     inDataC    ? seedValG
-    inCarrierC ? meanValG
     inDataC    ? meanValG
-    inCarrierC ? stdValG    
     inDataC    ? stdValG
 
     outC       ! symbolTime
@@ -750,7 +737,7 @@ PROC add(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?, CHAN REAL32 in
 --    out.int(txParam, 0 ,out)
 --    out.string("*n", 0, out!)    
 --:
-PROC DoutputToScreenTop(CHAN BYTE out!, CHAN REAL32 carrierC?, CHAN REAL32 carrierScaleC?, 
+PROC DoutputToScreenTop(CHAN BYTE out!,
                        CHAN REAL32 dataSrcC?,                  CHAN REAL32 dbpskModC?,      
                        CHAN REAL32 rrcFiltC,                   CHAN REAL32 rfScaleC?,
                        CHAN REAL32 gaussC?,                    CHAN REAL32 gaussScaleC?, CHAN REAL32 addC?, 
@@ -760,14 +747,6 @@ PROC DoutputToScreenTop(CHAN BYTE out!, CHAN REAL32 carrierC?, CHAN REAL32 carri
   REAL32 txParam :
   SEQ
 
-    carrierC ? txParam
-    out.string("*tCarrier*t", 0, out!)
-    out.string("*n", 0, out!)
-    
-    carrierScaleC ? txParam    
-    out.string("*tCarrier Scaling*t", 0, out!)
-    out.string("*n", 0, out)
-    
     dataSrcC ? txParam
     out.string("*tData Source*t", 0, out!)
     out.string("*n", 0, out!)
@@ -898,12 +877,9 @@ PROC main(CHAN BYTE out!)
   
   PAR
     parameterGen     (setupC!)
-    parameterGen     (setup2C!)
     parameterGen     (setup3C!)
-    carrier          (carrierToScaleC!, DCarrierC!,      setupC?)
-    carrierScale     (scaleToTxC!,      DCarrierScaleC!, carrierToScaleC?)
-    dataSrc          (dataToTxC!,       DDataSrcC!,      setup2C?)
-    dbpskTransmitter (txToChanFiltC!,   DModulatorC!,    scaleToTxC?, dataToTxC?)
+    dataSrc          (dataToTxC!,       DDataSrcC!,      setupC?)
+    dbpskTransmitter (txToChanFiltC!,   DModulatorC!,    dataToTxC?)
     channelFilter    (filterToScaleC!,  DRrcFiltC!,      txToChanFiltC?)
     rfScale          (scaleToAddC!,     DRfScaleC!,      filterToScaleC?)
 
@@ -916,5 +892,5 @@ PROC main(CHAN BYTE out!)
     dbpskReceiver    (demodToDataOutC!, DDemodulatorC!,  rrcFiltToDemodC?)      
     dataOut          (DDataC!,          demodToDataOutC?)
 
-    DoutputToScreenTop (out!, DCarrierC?, DCarrierScaleC?, DDataSrcC?, DModulatorC?, DRrcFiltC?, DRfScaleC?, DGaussC?, DGaussScaleC?, DAddC?, DRfScale2C?, DRrcFilt2C?, DDemodulatorC?, DDataC?)  
+    DoutputToScreenTop (out!, DDataSrcC?, DModulatorC?, DRrcFiltC?, DRfScaleC?, DGaussC?, DGaussScaleC?, DAddC?, DRfScale2C?, DRrcFilt2C?, DDemodulatorC?, DDataC?)  
 :

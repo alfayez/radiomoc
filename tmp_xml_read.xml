@@ -127,20 +127,20 @@
     </entity><relation name="diffencCh" class="ptolemy.actor.TypedIORelation"/><link port="Differential Encoder.output" relation="diffencCh"/><link port="Repeat Block.input" relation="diffencCh"/><entity name="DBPSK Modulator" class="ptolemy.actor.TypedCompositeActor">
       <property name="_location" class="ptolemy.kernel.util.Location" value="{600, 200}"/><port name="modin" class="ptolemy.actor.TypedIOPort">
         <property name="input"/>
-      </port><relation name="modinCh" class="ptolemy.actor.TypedIORelation"/><port name="carrier" class="ptolemy.actor.TypedIOPort">
-        <property name="input"/>
-      </port><relation name="carrierCh" class="ptolemy.actor.TypedIORelation">
-        <property name="width" class="ptolemy.data.expr.Parameter" value="-1"/><vertex name="carrierCh" value="{100, 300}"/>
-      </relation><entity name="Invert" class="ptolemy.actor.lib.Const">
-        <property name="value" class="ptolemy.data.expr.Parameter" value="-1"/><property name="_icon" class="ptolemy.vergil.icon.BoxedValueIcon">
-          <property name="attributeName" class="ptolemy.kernel.util.StringAttribute" value="value"/><property name="displayWidth" class="ptolemy.data.expr.Parameter" value="60"/>
-        </property><property name="_location" class="ptolemy.kernel.util.Location" value="{200, 400}"/>
-      </entity><relation name="invertCh" class="ptolemy.actor.TypedIORelation"/><link port="Invert.output" relation="invertCh"/><link port="Mixer.multiply" relation="invertCh"/><entity name="Mixer" class="ptolemy.actor.lib.MultiplyDivide">
-        <property name="_location" class="ptolemy.kernel.util.Location" value="{400, 300}"/>
-      </entity><link port="carrier" relation="carrierCh"/><link port="Mixer.multiply" relation="carrierCh"/><entity name="Multiplexer" class="ptolemy.actor.lib.Multiplexor">
-        <property name="_location" class="ptolemy.kernel.util.Location" value="{600, 200}"/>
-      </entity><relation name="modinCh" class="ptolemy.actor.TypedIORelation"/><link port="modin" relation="modinCh"/><link port="Multiplexer.select" relation="modinCh"/><relation name="muxCh" class="ptolemy.actor.TypedIORelation"/><link port="Multiplexer.output" relation="muxCh"/><link port="output" relation="muxCh"/><relation name="carrierCh" class="ptolemy.actor.TypedIORelation"/><link port="Multiplexer.input" relation="carrierCh"/><relation name="mixerCh" class="ptolemy.actor.TypedIORelation"/><link port="Mixer.output" relation="mixerCh"/><link port="Multiplexer.input" relation="mixerCh"/><port name="output" class="ptolemy.actor.TypedIOPort">
-        <property name="output"/><property name="_location" class="ptolemy.kernel.util.Location" value="{800, 200}"/>
+      </port><relation name="modinCh" class="ptolemy.actor.TypedIORelation"/><entity name="delay" class="ptolemy.domains.sdf.lib.SampleDelay">
+        <property name="initialOutputs" class="ptolemy.data.expr.Parameter" value="{false}"/><property name="_icon" class="ptolemy.vergil.icon.BoxedValueIcon">
+          <property name="attributeName" class="ptolemy.kernel.util.StringAttribute" value="initialOutputs"/>
+        </property><property name="_location" class="ptolemy.kernel.util.Location" value="{200, 300}"/>
+      </entity><entity name="Differential Modulator" class="ptolemy.actor.lib.logic.LogicFunction">
+        <property name="function" class="ptolemy.kernel.util.StringAttribute" value="xor">
+          <property name="style" class="ptolemy.actor.gui.style.ChoiceStyle">
+            <property name="and" class="ptolemy.kernel.util.StringAttribute" value="and"/><property name="or" class="ptolemy.kernel.util.StringAttribute" value="or"/><property name="xor" class="ptolemy.kernel.util.StringAttribute" value="xor"/><property name="nand" class="ptolemy.kernel.util.StringAttribute" value="nand"/><property name="nor" class="ptolemy.kernel.util.StringAttribute" value="nor"/><property name="xnor" class="ptolemy.kernel.util.StringAttribute" value="xnor"/>
+          </property>
+        </property><property name="_icon" class="ptolemy.vergil.icon.AttributeValueIcon">
+          <property name="attributeName" class="ptolemy.kernel.util.StringAttribute" value="function"/>
+        </property><property name="_location" class="ptolemy.kernel.util.Location" value="{400, 200}"/>
+      </entity><relation name="modinCh" class="ptolemy.actor.TypedIORelation"/><link port="modin" relation="modinCh"/><link port="Differential Modulator.input" relation="modinCh"/><relation name="delayCh" class="ptolemy.actor.TypedIORelation"/><link port="delay.output" relation="delayCh"/><link port="Differential Modulator.input" relation="delayCh"/><relation name="modCh" class="ptolemy.actor.TypedIORelation"/><link port="Differential Modulator.output" relation="modCh"/><link port="output" relation="modCh"/><relation name="modCh" class="ptolemy.actor.TypedIORelation"/><link port="delay.input" relation="modCh"/><port name="output" class="ptolemy.actor.TypedIOPort">
+        <property name="output"/><property name="_location" class="ptolemy.kernel.util.Location" value="{600, 200}"/>
       </port>
     </entity><relation name="repeatCh" class="ptolemy.actor.TypedIORelation"/><link port="Repeat Block.output" relation="repeatCh"/><link port="DBPSK Modulator.modin" relation="repeatCh"/><relation name="dbpskModCh" class="ptolemy.actor.TypedIORelation"/><link port="DBPSK Modulator.output" relation="dbpskModCh"/><link port="output" relation="dbpskModCh"/><relation name="carrierCh" class="ptolemy.actor.TypedIORelation"/><link port="carrier" relation="carrierCh"/><link port="DBPSK Modulator.carrier" relation="carrierCh"/><port name="output" class="ptolemy.actor.TypedIOPort">
       <property name="output"/><property name="_location" class="ptolemy.kernel.util.Location" value="{800, 200}"/>

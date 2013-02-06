@@ -23,6 +23,7 @@ NAME_ANYTHING_DOUBLE = "AnythingToDouble"
 NAME_SEQ_PLOT = "Sequence Plotter"
 NAME_BOOL_ANY = "BoolToAnything"
 NAME_DISPLAY = "Display"
+
 # Ptolemy Classes
 CLASS_COMP_ACT  = "ptolemy.actor.TypedCompositeActor"
 CLASS_PARAMETER = "ptolemy.data.expr.Parameter"
@@ -61,9 +62,11 @@ CLASS_SHARED_PARAM = "ptolemy.actor.parameters.SharedParameter"
 CLASS_DISCARD = "ptolemy.actor.lib.Discard"
 CLASS_ADDSUB = "ptolemy.actor.lib.AddSubtract"
 CLASS_ANYTHING_DOUBLE = "ptolemy.actor.lib.conversions.AnythingToDouble"
-CLASS_BOOL_ANY = "ptolemy.actor.lib.conversions.BooleanToAnything"
 CLASS_DISPLAY = "ptolemy.actor.lib.gui.Display"
 CLASS_LOGIC = "ptolemy.actor.lib.logic.LogicFunction"
+CLASS_DOWNSAMPLE = "ptolemy.domains.sdf.lib.DownSample"
+CLASS_UPSAMPLE = "ptolemy.domains.sdf.lib.UpSample"
+
 # USER Defined Composite Blocks
 CLASS_DBPSK_RX = "CLASS_DSBPSK_RX"
 CLASS_DBPSK_TX = "CLASS_DSBPSK_TX"
@@ -72,6 +75,7 @@ CLASS_DIFF_ENC = "CLASS_DIFF_ENC"
 CLASS_DBPSK_CHOICE = "CLASS_DBPSK_CHOICE"
 CLASS_DATA_BITSTREAM = "CLASS_DATA_BITSTREAM"
 CLASS_USER_OUTPUT = "CLASS_USER_OUTPUT"
+
 # Ptolemy Parameters
 VAL_COLOR_PARAMETER = "{0.0, 0.0, 1.0, 1.0}"
 VAL_WIN_PROP = "{bounds={175, 249, 808, 527}, maximized=true}"
