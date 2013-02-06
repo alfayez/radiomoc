@@ -212,7 +212,39 @@ class ptolemy_writer:
                 node1.appendChild(node3)
                 node1.appendChild(node4)
                 node1.appendChild(node5)
-                node1.appendChild(node6)                
+                node1.appendChild(node6)
+            elif class_str is CLASS_LOGIC:
+                loc_str   = self.ptolemy_location_update(BLOCK, offset)
+                name_and  = "and"
+                name_or   = "or"
+                name_xor  = "xor"
+                name_nand = "nand"
+                name_nor  = "nor"
+                name_xnor = "xnor"
+                name_function = "function"
+                node1 = self.write_element(ENT, name, class_str, "None")
+                node2 = self.write_element(PROP, "function", CLASS_STR_ATTR, value[0])
+                node3 = self.write_element(PROP, "style", CLASS_CHOICE_STYLE, "None")
+                node4 = self.write_element(PROP, name_and, CLASS_STR_ATTR, name_and)
+                node5 = self.write_element(PROP, name_or, CLASS_STR_ATTR, name_or)
+                node6 = self.write_element(PROP, name_xor, CLASS_STR_ATTR, name_xor)
+                node7 = self.write_element(PROP, name_nand, CLASS_STR_ATTR, name_nand)
+                node8 = self.write_element(PROP, name_nor, CLASS_STR_ATTR, name_nor)
+                node9 = self.write_element(PROP, name_xnor, CLASS_STR_ATTR, name_xnor)
+                node10 = self.write_element(PROP, NAME_ICON, CLASS_ATTR_ICON, "None")
+                node11 = self.write_element(PROP, NAME_ATTR, CLASS_STR_ATTR, name_function)
+                node12 = self.write_element(PROP, NAME_LOCATION, CLASS_LOCATION, loc_str)
+                node1.appendChild(node2)
+                node2.appendChild(node3)
+                node3.appendChild(node4)
+                node3.appendChild(node5)
+                node3.appendChild(node6)
+                node3.appendChild(node7)
+                node3.appendChild(node8)
+                node3.appendChild(node9)                
+                node1.appendChild(node10)
+                node10.appendChild(node11)
+                node1.appendChild(node12)
             elif class_str is CLASS_SCALE:
                 loc_str = self.ptolemy_location_update(BLOCK, offset)
                 node1 = self.write_element(ENT, name, class_str, "None")

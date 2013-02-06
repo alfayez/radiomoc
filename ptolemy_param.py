@@ -63,6 +63,7 @@ CLASS_ADDSUB = "ptolemy.actor.lib.AddSubtract"
 CLASS_ANYTHING_DOUBLE = "ptolemy.actor.lib.conversions.AnythingToDouble"
 CLASS_BOOL_ANY = "ptolemy.actor.lib.conversions.BooleanToAnything"
 CLASS_DISPLAY = "ptolemy.actor.lib.gui.Display"
+CLASS_LOGIC = "ptolemy.actor.lib.logic.LogicFunction"
 # USER Defined Composite Blocks
 CLASS_DBPSK_RX = "CLASS_DSBPSK_RX"
 CLASS_DBPSK_TX = "CLASS_DSBPSK_TX"
