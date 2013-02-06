@@ -43,9 +43,9 @@ class graph_handler:
         self.long_param_enforce_dict = {'seedValG':0}
         # PORT_COUNT = used to iterate through connecting ports for
         # blocks with multiple input or output ports
-        self.block_map_dict = {'rfOut'            :[CLASS_USER_OUTPUT,  0, 0],
-                               'channelFilter'    :[CLASS_FIR,      0, 0],
-                               'channelFilter2'   :[CLASS_FIR,      0, 0],
+        self.block_map_dict = {'rfOut'            :[CLASS_USER_OUTPUT, 0, 0],
+                               'channelFilter'    :[CLASS_USER_FIR,    0, 0],
+                               'channelFilter2'   :[CLASS_USER_FIR,    0, 0],
                                'rfScale'          :[CLASS_SCALE,    0, 0],
                                'rfScale2'         :[CLASS_SCALE,    0, 0],
                                'dataSrc'          :[CLASS_CONST,    0, 0],
@@ -67,7 +67,7 @@ class graph_handler:
                                'dataSrc'         :[".input"],
                                'carrierScale'    :[".input"],
                                'carrier'         :[".input"],
-                               'dbpskTransmitter':[".carrier", ".datain"],
+                               'dbpskTransmitter':[".datain"],
                                'rfIn'            :[".input"],
                                'dbpskReceiver'   :[".rfsig"],
                                'dataOut'         :[".input"],
@@ -95,7 +95,7 @@ class graph_handler:
                              'channelFilter2'  :[0],
                              'rfScale'         :[0],
                              'rfScale2'        :[0],
-                             'dataSrc'         :[-70],
+                             'dataSrc'         :[0],
                              'carrierScale'    :[50],
                              'carrier'         :[50],
                              'dbpskTransmitter':[0],
@@ -399,15 +399,15 @@ class graph_handler:
                 self.top_matrix[proc_out_index][proc_in_index] = 1
     def set_param_values(self):
         self.value_dict = {'rfOut'            :["None"],
-                           'channelFilter'    :["rc"+self.param_dict["rcFiltCoeff"]+".dat"],
-                           'channelFilter2'   :["rc"+self.param_dict["rcFiltCoeff"]+".dat"],
+                           'channelFilter'    :["rc"+self.param_dict["rcFiltCoeff"]+".dat", "samplingRate2/samplingRate", "1"],
+                           'channelFilter2'   :["rc"+self.param_dict["rcFiltCoeff"]+".dat", "1", "samplingRate2/samplingRate"],
                            'rfScale'          :["rfGain"],
                            'dataSrc'          :["7"],
                            'carrierScale'     :["carrierGain"],
                            'carrier'          :["samplingRate", "carrierFreq", "carrierPhase"],
                            'dbpskTransmitter' :["samplingRate*symbolTime"],
                            'rfIn'             :["None"],
-                           'dbpskReceiver'    :["samplingRate*symbolTime"],
+                           'dbpskReceiver'    :["recvThresh"],
                            'dataOut'          :["None"],
                            'gauss'            :["seedValG", "meanValG", "stdValG"],
                            'gaussScale'       :["gaussGain"],
@@ -548,7 +548,7 @@ if __name__ == "__main__":
     top_handler.print_chan_list()
     top_handler.print_proc_dict()
     top_handler.print_top_matrix()
-    test_ptolemy()
+    #test_ptolemy()
     top_handler.generate_code(PTOLEMY)
 
     #outfile.close()

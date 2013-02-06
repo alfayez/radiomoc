@@ -12,6 +12,7 @@
 PROC rfOut(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
   REAL32 symbolTime   :
   REAL32 samplingRate :
+  REAL32 samplingRate2:  
   REAL32 carrierFreq  :
   REAL32 carrierPhase :
   REAL32 rcFiltCoeff  :  -- provides the name of the file with the coeff rcFilt<int>.dat
@@ -19,6 +20,7 @@ PROC rfOut(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
   REAL32 rfGain       :
   REAL32 rfGain2      :
   REAL32 gaussGain    :
+  REAL32 recvThresh   :
   
   REAL32 seedValG    :
   REAL32 meanValG    :
@@ -27,6 +29,7 @@ PROC rfOut(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
   SEQ
     inC  ? symbolTime
     inC  ? samplingRate
+    inC  ? samplingRate2
     inC  ? carrierFreq
     inC  ? rcFiltCoeff
     inC  ? carrierGain
@@ -34,12 +37,14 @@ PROC rfOut(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
     inC  ? rfGain2
     inC  ? carrierPhase
     inC  ? gaussGain
+    inC  ? recvThresh
     inC  ? seedValG
     inC  ? meanValG
     inC  ? stdValG
     
     outC ! symbolTime
     outC ! samplingRate
+    outC ! samplingRate2
     outC ! carrierFreq
     outC ! rcFiltCoeff
     outC ! carrierGain
@@ -47,6 +52,7 @@ PROC rfOut(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
     outC ! rfGain2
     outC ! carrierPhase
     outC ! gaussGain
+    outC ! recvThresh
     outC ! seedValG
     outC ! meanValG
     outC ! stdValG
@@ -57,6 +63,7 @@ PROC rfOut(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
 PROC channelFilter(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
   REAL32 symbolTime  :
   REAL32 samplingRate:
+  REAL32 samplingRate2:  
   REAL32 carrierFreq :
   REAL32 rcFiltCoeff :  -- provides the name of the file with the coeff rcFilt<int>.dat
   REAL32 carrierGain :
@@ -64,6 +71,7 @@ PROC channelFilter(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
   REAL32 rfGain2     :
   REAL32 carrierPhase :
   REAL32 gaussGain    :
+  REAL32 recvThresh   :
   
   REAL32 seedValG    :
   REAL32 meanValG    :
@@ -74,6 +82,7 @@ PROC channelFilter(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
 
     inC  ? symbolTime
     inC  ? samplingRate
+    inC  ? samplingRate2    
     inC  ? carrierFreq
     inC  ? rcFiltCoeff
     inC  ? carrierGain
@@ -81,12 +90,14 @@ PROC channelFilter(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
     inC  ? rfGain2    
     inC  ? carrierPhase
     inC  ? gaussGain    
+    inC  ? recvThresh
     inC  ? seedValG
     inC  ? meanValG
     inC  ? stdValG
     
     outC ! symbolTime
     outC ! samplingRate
+    outC ! samplingRate2
     outC ! carrierFreq
     outC ! rcFiltCoeff
     outC ! carrierGain
@@ -94,6 +105,7 @@ PROC channelFilter(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
     outC ! rfGain2
     outC ! carrierPhase
     outC ! gaussGain    
+    outC ! recvThresh
     outC ! seedValG
     outC ! meanValG
     outC ! stdValG
@@ -105,6 +117,7 @@ PROC channelFilter(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
 PROC rfScale(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
   REAL32 symbolTime  :
   REAL32 samplingRate:
+  REAL32 samplingRate2:  
   REAL32 carrierFreq :
   REAL32 rcFiltCoeff :  -- provides the name of the file with the coeff rcFilt<int>.dat
   REAL32 carrierGain :
@@ -112,7 +125,8 @@ PROC rfScale(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
   REAL32 rfGain2     :
   REAL32 carrierPhase :
   REAL32 gaussGain    :  
-
+  REAL32 recvThresh   :
+  
   REAL32 seedValG    :
   REAL32 meanValG    :
   REAL32 stdValG     :
@@ -122,6 +136,7 @@ PROC rfScale(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
 
     inC  ? symbolTime
     inC  ? samplingRate
+    inC  ? samplingRate2
     inC  ? carrierFreq
     inC  ? rcFiltCoeff
     inC  ? carrierGain
@@ -129,12 +144,14 @@ PROC rfScale(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
     inC  ? rfGain2
     inC  ? carrierPhase
     inC  ? gaussGain    
+    inC  ? recvThresh
     inC  ? seedValG
     inC  ? meanValG
     inC  ? stdValG
     
     outC ! symbolTime
     outC ! samplingRate
+    outC ! samplingRate2
     outC ! carrierFreq
     outC ! rcFiltCoeff
     outC ! carrierGain
@@ -142,6 +159,7 @@ PROC rfScale(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
     outC ! rfGain2
     outC ! carrierPhase
     outC ! gaussGain
+    outC ! recvThresh
     outC ! seedValG
     outC ! meanValG
     outC ! stdValG
@@ -153,6 +171,7 @@ PROC rfScale(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
 PROC rfScale2(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
   REAL32 symbolTime  :
   REAL32 samplingRate:
+  REAL32 samplingRate2:  
   REAL32 carrierFreq :
   REAL32 rcFiltCoeff :  -- provides the name of the file with the coeff rcFilt<int>.dat
   REAL32 carrierGain :
@@ -160,6 +179,7 @@ PROC rfScale2(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
   REAL32 rfGain2     :
   REAL32 carrierPhase : 
   REAL32 gaussGain    :
+  REAL32 recvThresh   :
   
   REAL32 seedValG    :
   REAL32 meanValG    :
@@ -169,6 +189,7 @@ PROC rfScale2(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
     -- We're rcv/fw radio configuration parameters through the channel
     inC  ? symbolTime
     inC  ? samplingRate
+    inC  ? samplingRate2
     inC  ? carrierFreq
     inC  ? rcFiltCoeff
     inC  ? carrierGain
@@ -176,12 +197,14 @@ PROC rfScale2(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
     inC  ? rfGain2
     inC  ? carrierPhase
     inC  ? gaussGain    
+    inC  ? recvThresh
     inC  ? seedValG
     inC  ? meanValG
     inC  ? stdValG
     
     outC ! symbolTime
     outC ! samplingRate
+    outC ! samplingRate2
     outC ! carrierFreq
     outC ! rcFiltCoeff
     outC ! carrierGain
@@ -189,6 +212,7 @@ PROC rfScale2(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
     outC ! rfGain2
     outC ! carrierPhase
     outC ! gaussGain    
+    outC ! recvThresh
     outC ! seedValG
     outC ! meanValG
     outC ! stdValG
@@ -201,6 +225,7 @@ PROC rfScale2(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
 PROC dataSrc(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
   REAL32 symbolTime  :
   REAL32 samplingRate:
+  REAL32 samplingRate2:  
   REAL32 carrierFreq :
   REAL32 rcFiltCoeff :  -- provides the name of the file with the coeff rcFilt<int>.dat
   REAL32 carrierGain :
@@ -208,6 +233,7 @@ PROC dataSrc(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
   REAL32 rfGain2     :
   REAL32 carrierPhase :
   REAL32 gaussGain    :
+  REAL32 recvThresh   :
   
   REAL32 seedValG    :
   REAL32 meanValG    :
@@ -217,6 +243,7 @@ PROC dataSrc(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
     -- We're rcv/fw radio configuration parameters through the channel   
     inC  ? symbolTime
     inC  ? samplingRate
+    inC  ? samplingRate2
     inC  ? carrierFreq
     inC  ? rcFiltCoeff
     inC  ? carrierGain
@@ -224,12 +251,14 @@ PROC dataSrc(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
     inC  ? rfGain2
     inC  ? carrierPhase
     inC  ? gaussGain    
+    inC  ? recvThresh
     inC  ? seedValG
     inC  ? meanValG
     inC  ? stdValG
     
     outC ! symbolTime
     outC ! samplingRate
+    outC ! samplingRate2
     outC ! carrierFreq
     outC ! rcFiltCoeff
     outC ! carrierGain
@@ -237,6 +266,7 @@ PROC dataSrc(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
     outC ! rfGain2
     outC ! carrierPhase
     outC ! gaussGain    
+    outC ! recvThresh
     outC ! seedValG
     outC ! meanValG
     outC ! stdValG
@@ -248,6 +278,7 @@ PROC dataSrc(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
 PROC carrierScale(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
   REAL32 symbolTime  :
   REAL32 samplingRate:
+  REAL32 samplingRate2:  
   REAL32 carrierFreq :
   REAL32 rcFiltCoeff :  -- provides the name of the file with the coeff rcFilt<int>.dat
   REAL32 carrierGain :
@@ -255,6 +286,7 @@ PROC carrierScale(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
   REAL32 rfGain2     :
   REAL32 carrierPhase :
   REAL32 gaussGain    :
+  REAL32 recvThresh   :
   
   REAL32 seedValG    :
   REAL32 meanValG    :
@@ -264,6 +296,7 @@ PROC carrierScale(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
     -- We're rcv/fw radio configuration parameters through the channel    
     inC  ? symbolTime
     inC  ? samplingRate
+    inC  ? samplingRate2
     inC  ? carrierFreq
     inC  ? rcFiltCoeff
     inC  ? carrierGain
@@ -271,12 +304,14 @@ PROC carrierScale(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
     inC  ? rfGain2
     inC  ? carrierPhase
     inC  ? gaussGain    
+    inC  ? recvThresh
     inC  ? seedValG
     inC  ? meanValG
     inC  ? stdValG
     
     outC ! symbolTime
     outC ! samplingRate
+    outC ! samplingRate2    
     outC ! carrierFreq
     outC ! rcFiltCoeff
     outC ! carrierGain
@@ -284,6 +319,7 @@ PROC carrierScale(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
     outC ! rfGain2    
     outC ! carrierPhase
     outC ! gaussGain    
+    outC ! recvThresh
     outC ! seedValG
     outC ! meanValG
     outC ! stdValG
@@ -295,6 +331,7 @@ PROC carrierScale(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
 PROC carrier(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
   REAL32 symbolTime  :
   REAL32 samplingRate:
+  REAL32 samplingRate2:  
   REAL32 carrierFreq :
   REAL32 rcFiltCoeff :  -- provides the name of the file with the coeff rcFilt<int>.dat
   REAL32 carrierGain :
@@ -302,6 +339,7 @@ PROC carrier(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
   REAL32 rfGain2     :
   REAL32 carrierPhase :
   REAL32 gaussGain    :
+  REAL32 recvThresh   :
   
   REAL32 seedValG    :
   REAL32 meanValG    :
@@ -310,6 +348,7 @@ PROC carrier(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
     -- We're rcv/fw radio configuration parameters through the channel   
     inC  ? symbolTime
     inC  ? samplingRate
+    inC  ? samplingRate2
     inC  ? carrierFreq
     inC  ? rcFiltCoeff
     inC  ? carrierGain
@@ -317,12 +356,14 @@ PROC carrier(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
     inC  ? rfGain2
     inC  ? carrierPhase
     inC  ? gaussGain    
+    inC  ? recvThresh
     inC  ? seedValG
     inC  ? meanValG
     inC  ? stdValG
     
     outC ! symbolTime
     outC ! samplingRate
+    outC ! samplingRate2
     outC ! carrierFreq
     outC ! rcFiltCoeff
     outC ! carrierGain
@@ -330,6 +371,7 @@ PROC carrier(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
     outC ! rfGain2    
     outC ! carrierPhase
     outC ! gaussGain    
+    outC ! recvThresh
     outC ! seedValG
     outC ! meanValG
     outC ! stdValG
@@ -341,6 +383,7 @@ PROC dbpskReceiver(CHAN REAL32 outC!,      CHAN REAL32 DTopC!,
                    CHAN REAL32 inDataC?)
   REAL32 symbolTime  :
   REAL32 samplingRate:
+  REAL32 samplingRate2:  
   REAL32 carrierFreq :
   REAL32 rcFiltCoeff :  -- provides the name of the file with the coeff rcFilt<int>.dat
   REAL32 carrierGain :
@@ -348,6 +391,7 @@ PROC dbpskReceiver(CHAN REAL32 outC!,      CHAN REAL32 DTopC!,
   REAL32 rfGain2      :
   REAL32 carrierPhase :
   REAL32 gaussGain    :
+  REAL32 recvThresh   :
   
   REAL32 seedValG    :
   REAL32 meanValG    :
@@ -357,6 +401,7 @@ PROC dbpskReceiver(CHAN REAL32 outC!,      CHAN REAL32 DTopC!,
 
     inDataC    ? symbolTime
     inDataC    ? samplingRate
+    inDataC    ? samplingRate2    
     inDataC    ? carrierFreq
     inDataC    ? rcFiltCoeff
     inDataC    ? carrierGain
@@ -364,12 +409,14 @@ PROC dbpskReceiver(CHAN REAL32 outC!,      CHAN REAL32 DTopC!,
     inDataC    ? rfGain2
     inDataC    ? carrierPhase
     inDataC    ? gaussGain    
+    inDataC    ? recvThresh
     inDataC    ? seedValG
     inDataC    ? meanValG
     inDataC    ? stdValG
     
     outC       ! symbolTime
     outC       ! samplingRate
+    outC       ! samplingRate2
     outC       ! carrierFreq
     outC       ! rcFiltCoeff
     outC       ! carrierGain
@@ -377,6 +424,7 @@ PROC dbpskReceiver(CHAN REAL32 outC!,      CHAN REAL32 DTopC!,
     outC       ! rfGain2
     outC       ! carrierPhase
     outC       ! gaussGain    
+    outC       ! recvThresh
     outC       ! seedValG
     outC       ! meanValG
     outC       ! stdValG
@@ -387,6 +435,7 @@ PROC dbpskReceiver(CHAN REAL32 outC!,      CHAN REAL32 DTopC!,
 PROC rfIn(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
   REAL32 symbolTime  :
   REAL32 samplingRate:
+  REAL32 samplingRate2:  
   REAL32 carrierFreq :
   REAL32 rcFiltCoeff :  -- provides the name of the file with the coeff rcFilt<int>.dat
   REAL32 carrierGain :
@@ -394,6 +443,7 @@ PROC rfIn(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
   REAL32 rfGain2     :
   REAL32 carrierPhase :
   REAL32 gaussGain    :
+  REAL32 recvThresh   :
   
   REAL32 seedValG    :
   REAL32 meanValG    :
@@ -401,18 +451,21 @@ PROC rfIn(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
   SEQ
     inC  ? symbolTime
     inC  ? samplingRate
+    inC  ? samplingRate2
     inC  ? carrierFreq
     inC  ? rcFiltCoeff
     inC  ? carrierGain
     inC  ? rfGain
     inC  ? rfGain2
     inC  ? carrierPhase
+    inC  ? recvThresh
     inC  ? seedValG
     inC  ? meanValG
     inC  ? stdValG
     
     outC ! symbolTime
     outC ! samplingRate
+    outC ! samplingRate2
     outC ! carrierFreq
     outC ! rcFiltCoeff
     outC ! carrierGain
@@ -420,6 +473,7 @@ PROC rfIn(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
     outC ! rfGain2    
     outC ! carrierPhase
     outC ! gaussGain    
+    outC ! recvThresh
     outC ! seedValG
     outC ! meanValG
     outC ! stdValG
@@ -430,6 +484,7 @@ PROC rfIn(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
 PROC dataOut(CHAN REAL32 DTopC!, CHAN REAL32 inC?)
   REAL32 symbolTime  :
   REAL32 samplingRate:
+  REAL32 samplingRate2:  
   REAL32 carrierFreq :
   REAL32 rcFiltCoeff :  -- provides the name of the file with the coeff rcFilt<int>.dat
   REAL32 carrierGain :
@@ -437,6 +492,7 @@ PROC dataOut(CHAN REAL32 DTopC!, CHAN REAL32 inC?)
   REAL32 rfGain2     :
   REAL32 carrierPhase :
   REAL32 gaussGain    :
+  REAL32 recvThresh   :
   
   REAL32 seedValG    :
   REAL32 meanValG    :
@@ -446,6 +502,7 @@ PROC dataOut(CHAN REAL32 DTopC!, CHAN REAL32 inC?)
 
     inC ? symbolTime
     inC ? samplingRate    
+    inC ? samplingRate2
     inC ? carrierFreq
     inC ? rcFiltCoeff
     inC ? carrierGain
@@ -453,6 +510,7 @@ PROC dataOut(CHAN REAL32 DTopC!, CHAN REAL32 inC?)
     inC ? rfGain2    
     inC ? carrierPhase
     inC ? gaussGain    
+    inC ? recvThresh
     inC ? seedValG
     inC ? meanValG
     inC ? stdValG
@@ -463,6 +521,7 @@ PROC dataOut(CHAN REAL32 DTopC!, CHAN REAL32 inC?)
 PROC channelFilter2(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
   REAL32 symbolTime  :
   REAL32 samplingRate:
+  REAL32 samplingRate2:  
   REAL32 carrierFreq :
   REAL32 rcFiltCoeff :  -- provides the name of the file with the coeff rcFilt<int>.dat
   REAL32 carrierGain :
@@ -470,6 +529,7 @@ PROC channelFilter2(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
   REAL32 rfGain2     :
   REAL32 carrierPhase :
   REAL32 gaussGain    :
+  REAL32 recvThresh   :
   
   REAL32 seedValG    :
   REAL32 meanValG    :
@@ -478,6 +538,7 @@ PROC channelFilter2(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
     -- We're rcv/fw radio configuration parameters through the channel  
     inC  ? symbolTime
     inC  ? samplingRate
+    inC  ? samplingRate2
     inC  ? carrierFreq
     inC  ? rcFiltCoeff
     inC  ? carrierGain
@@ -485,12 +546,14 @@ PROC channelFilter2(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
     inC  ? rfGain2    
     inC  ? carrierPhase
     inC  ? gaussGain    
+    inC  ? recvThresh
     inC  ? seedValG
     inC  ? meanValG
     inC  ? stdValG
     
     outC ! symbolTime
     outC ! samplingRate
+    outC ! samplingRate2
     outC ! carrierFreq
     outC ! rcFiltCoeff
     outC ! carrierGain
@@ -498,6 +561,7 @@ PROC channelFilter2(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
     outC ! rfGain2
     outC ! carrierPhase
     outC ! gaussGain    
+    outC ! recvThresh
     outC ! seedValG
     outC ! meanValG
     outC ! stdValG
@@ -509,6 +573,7 @@ PROC channelFilter2(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
 PROC dbpskTransmitter(CHAN REAL32 outC!,      CHAN REAL32 DTopC!, CHAN REAL32 inDataC?)
   REAL32 symbolTime  :
   REAL32 samplingRate:
+  REAL32 samplingRate2:  
   REAL32 carrierFreq :
   REAL32 rcFiltCoeff :  -- provides the name of the file with the coeff rcFilt<int>.dat
   REAL32 carrierGain :
@@ -516,6 +581,7 @@ PROC dbpskTransmitter(CHAN REAL32 outC!,      CHAN REAL32 DTopC!, CHAN REAL32 in
   REAL32 rfGain2     :
   REAL32 carrierPhase :
   REAL32 gaussGain    :
+  REAL32 recvThresh   :
   
   REAL32 seedValG    :
   REAL32 meanValG    :
@@ -525,6 +591,7 @@ PROC dbpskTransmitter(CHAN REAL32 outC!,      CHAN REAL32 DTopC!, CHAN REAL32 in
 
     inDataC    ? symbolTime
     inDataC    ? samplingRate
+    inDataC    ? samplingRate2
     inDataC    ? carrierFreq
     inDataC    ? rcFiltCoeff
     inDataC    ? carrierGain
@@ -532,12 +599,14 @@ PROC dbpskTransmitter(CHAN REAL32 outC!,      CHAN REAL32 DTopC!, CHAN REAL32 in
     inDataC    ? rfGain2   
     inDataC    ? carrierPhase    
     inDataC    ? gaussGain
+    inDataC    ? recvThresh
     inDataC    ? seedValG
     inDataC    ? meanValG
     inDataC    ? stdValG
 
     outC       ! symbolTime
     outC       ! samplingRate
+    outC       ! samplingRate2
     outC       ! carrierFreq
     outC       ! rcFiltCoeff
     outC       ! carrierGain
@@ -545,6 +614,7 @@ PROC dbpskTransmitter(CHAN REAL32 outC!,      CHAN REAL32 DTopC!, CHAN REAL32 in
     outC       ! rfGain2    
     outC       ! carrierPhase
     outC       ! gaussGain    
+    outC       ! recvThresh
     outC       ! seedValG
     outC       ! meanValG
     outC       ! stdValG    
@@ -554,24 +624,27 @@ PROC dbpskTransmitter(CHAN REAL32 outC!,      CHAN REAL32 DTopC!, CHAN REAL32 in
 
 -- Define the RF Scaling Block
 PROC gauss(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
-  REAL32 symbolTime  :
-  REAL32 samplingRate:
-  REAL32 carrierFreq :
-  REAL32 rcFiltCoeff :  -- provides the name of the file with the coeff rcFilt<int>.dat
-  REAL32 carrierGain :
-  REAL32 rfGain      :
-  REAL32 rfGain2     :
+  REAL32 symbolTime   :
+  REAL32 samplingRate :
+  REAL32 samplingRate2:  
+  REAL32 carrierFreq  :
+  REAL32 rcFiltCoeff  :  -- provides the name of the file with the coeff rcFilt<int>.dat
+  REAL32 carrierGain  :
+  REAL32 rfGain       :
+  REAL32 rfGain2      :
   REAL32 carrierPhase :
   REAL32 gaussGain    :
+  REAL32 recvThresh   :
   
-  REAL32 seedValG    :
-  REAL32 meanValG    :
-  REAL32 stdValG     :
+  REAL32 seedValG     :
+  REAL32 meanValG     :
+  REAL32 stdValG      :
   SEQ
     -- We're rcv/fw radio configuration parameters through the channel
 
     inC  ? symbolTime
     inC  ? samplingRate    
+    inC  ? samplingRate2
     inC  ? carrierFreq
     inC  ? rcFiltCoeff
     inC  ? carrierGain
@@ -579,12 +652,14 @@ PROC gauss(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
     inC  ? rfGain2    
     inC  ? carrierPhase
     inC  ? gaussGain    
+    inC  ? recvThresh
     inC  ? seedValG
     inC  ? meanValG
     inC  ? stdValG
     
-    outC ! symbolTime         
+    outC ! symbolTime
     outC ! samplingRate
+    outC ! samplingRate2
     outC ! carrierFreq
     outC ! rcFiltCoeff
     outC ! carrierGain
@@ -592,6 +667,7 @@ PROC gauss(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
     outC ! rfGain2
     outC ! carrierPhase
     outC ! gaussGain    
+    outC ! recvThresh
     outC ! seedValG
     outC ! meanValG
     outC ! stdValG    
@@ -602,6 +678,7 @@ PROC gauss(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
 PROC gaussScale(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
   REAL32 symbolTime  :
   REAL32 samplingRate:
+  REAL32 samplingRate2:  
   REAL32 carrierFreq :
   REAL32 rcFiltCoeff :  -- provides the name of the file with the coeff rcFilt<int>.dat
   REAL32 carrierGain :
@@ -609,6 +686,7 @@ PROC gaussScale(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
   REAL32 rfGain2     :
   REAL32 carrierPhase :
   REAL32 gaussGain    :
+  REAL32 recvThresh   :
   
   REAL32 seedValG    :
   REAL32 meanValG    :
@@ -618,19 +696,22 @@ PROC gaussScale(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
 
     inC  ? symbolTime
     inC  ? samplingRate    
+    inC  ? samplingRate2
     inC  ? carrierFreq
     inC  ? rcFiltCoeff
     inC  ? carrierGain
     inC  ? rfGain
     inC  ? rfGain2    
     inC  ? carrierPhase
-    inC  ? gaussGain    
+    inC  ? gaussGain 
+    inC  ? recvThresh    
     inC  ? seedValG
     inC  ? meanValG
     inC  ? stdValG
     
     outC ! symbolTime         
     outC ! samplingRate
+    outC ! samplingRate2
     outC ! carrierFreq
     outC ! rcFiltCoeff
     outC ! carrierGain
@@ -638,6 +719,7 @@ PROC gaussScale(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
     outC ! rfGain2
     outC ! carrierPhase
     outC ! gaussGain    
+    outC ! recvThresh
     outC ! seedValG
     outC ! meanValG
     outC ! stdValG    
@@ -648,6 +730,7 @@ PROC gaussScale(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
 PROC add(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?, CHAN REAL32 in2C?)
   REAL32 symbolTime  :
   REAL32 samplingRate:
+  REAL32 samplingRate2:  
   REAL32 carrierFreq :
   REAL32 rcFiltCoeff :  -- provides the name of the file with the coeff rcFilt<int>.dat
   REAL32 carrierGain :
@@ -655,6 +738,7 @@ PROC add(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?, CHAN REAL32 in
   REAL32 rfGain2     :
   REAL32 carrierPhase :
   REAL32 gaussGain    :
+  REAL32 recvThresh   :
   
   REAL32 seedValG    :
   REAL32 meanValG    :
@@ -666,6 +750,8 @@ PROC add(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?, CHAN REAL32 in
     in2C ? symbolTime
     inC  ? samplingRate    
     in2C ? samplingRate    
+    inC  ? samplingRate2
+    in2C ? samplingRate2    
     inC  ? carrierFreq
     in2C ? carrierFreq
     inC  ? rcFiltCoeff
@@ -680,6 +766,8 @@ PROC add(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?, CHAN REAL32 in
     in2C ? carrierPhase
     inC  ? gaussGain
     in2C ? gaussGain    
+    inC  ? recvThresh
+    in2C ? recvThresh    
     inC  ? seedValG
     in2C ? seedValG
     inC  ? meanValG
@@ -690,6 +778,7 @@ PROC add(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?, CHAN REAL32 in
     
     outC     ! symbolTime
     outC     ! samplingRate
+    outC     ! samplingRate2
     outC     ! carrierFreq    
     outC     ! rcFiltCoeff
     outC     ! carrierGain
@@ -697,6 +786,7 @@ PROC add(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?, CHAN REAL32 in
     outC     ! rfGain2    
     outC     ! carrierPhase
     outC     ! gaussGain    
+    outC     ! recvThresh
     outC     ! seedValG
     outC     ! meanValG
     outC     ! stdValG    
@@ -795,6 +885,7 @@ PROC DoutputToScreenTop(CHAN BYTE out!,
 PROC parameterGen(CHAN REAL32 paramOC!)
   REAL32 symbolTime   :
   REAL32 samplingRate :
+  REAL32 samplingRate2:  
   REAL32 carrierFreq  :
   REAL32 rcFiltCoeff  :
   REAL32 carrierGain  :
@@ -802,26 +893,31 @@ PROC parameterGen(CHAN REAL32 paramOC!)
   REAL32 rfGain2       :
   REAL32 carrierPhase :
   REAL32 gaussGain    :
+  REAL32 recvThresh   :
   
   REAL32 seedValG     :
   REAL32 meanValG     :
   REAL32 stdValG      :
   SEQ
-    symbolTime   := 2.0
-    samplingRate := 400.0
-    carrierFreq  := 4.0
-    rcFiltCoeff  := 1.0
-    carrierGain  := 1.0
-    rfGain       := 1.0
-    rfGain2      := 1.1
-    carrierPhase := 0.0  
-    gaussGain    := 0.3
-    seedValG     := 0.0
-    meanValG     := 0.0
-    stdValG      := 0.40
+    symbolTime    := 2.0
+    samplingRate  := 16000
+    samplingRate2 := 256000
+    carrierFreq   := 4.0
+    rcFiltCoeff   := 1.0
+    carrierGain   := 1.0
+    rfGain        := 30.0
+    rfGain2       := 1.0
+    carrierPhase  := 0.0  
+    gaussGain     := 0.3
+    recvThresh    := 0.3
+
+    seedValG      := 0.0
+    meanValG      := 0.0
+    stdValG       := 0.40
   
     paramOC ! symbolTime
     paramOC ! samplingRate
+    paramOC ! samplingRate2
     paramOC ! carrierFreq
     paramOC ! rcFiltCoeff
     paramOC ! carrierGain
@@ -829,6 +925,8 @@ PROC parameterGen(CHAN REAL32 paramOC!)
     paramOC ! rfGain2
     paramOC ! carrierPhase
     paramOC ! gaussGain
+    paramOC ! recvThresh
+    
     paramOC ! seedValG
     paramOC ! meanValG
     paramOC ! stdValG

@@ -415,6 +415,97 @@ class ptolemy_writer:
                 node1.appendChild(node4)
                 
             # User Defined Composite Blocks
+            elif class_str is CLASS_USER_FIR:
+                name_inport = "input"
+                name_outport = "output"
+                name_fir = name
+                name_upsample = "upsample"
+                name_downsample = "downsample"
+
+                name_rel_fir = "firCh"
+                name_rel_upsample = "upCh"
+                name_rel_downsample = "downCh"
+                name_rel_inport = "inCh"
+                name_rel_outport = "outCh"
+                
+                # save the current location in the flowgraph so we can
+                # go back to it after we're done building the current
+                # composite actor                
+                orig_loc_str = self.ptolemy_location_update(BLOCK, offset)
+                orig_loc = self.current_location(BLOCK)
+                self.set_location(BLOCK, BLOCK_ORIG)
+
+                # Instantiate the container composite actor
+                node0 = self.write_element(ENT, name, CLASS_COMP_ACT, "None")
+
+                # set location the composite actor
+                node1 = self.write_element(PROP, NAME_LOCATION, CLASS_LOCATION, orig_loc_str)
+                node0.appendChild(node1)
+
+                # create ports for the composite actor
+                node1 = self.write_element(PORT, name_inport, CLASS_NAMED_IO_PORT, "None")
+                node2 = self.write_element(PROP, "input", "None", "None")
+                node0.appendChild(node1)
+                node1.appendChild(node2)
+
+                # Check if the requested interpolation rate is greater
+                # than 1
+                if value[1] != "1":
+                    node1 = self.write_to_ptolemy_file(BLOCK, CLASS_UPSAMPLE, name_upsample, [value[1]], 0)                
+                    node0.appendChild(node1)
+                    name_block_out = name_upsample
+                else:
+                    name_block_out = name_fir
+                    
+                node1 = self.write_to_ptolemy_file(BLOCK, CLASS_FIR, name, [value[0]], 0)                
+                node0.appendChild(node1)
+
+                chan1 = self.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_rel_inport, ["no"], 0)
+                node0.appendChild(chan1)
+                [chana, chanb] = self.link_in_ptolemy_file(name_inport, name_block_out+".input", name_rel_inport)
+                node0.appendChild(chana)
+                node0.appendChild(chanb)
+
+                if name_block_out == name_upsample:
+                    chan1 = self.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_rel_upsample, ["no"], 0)
+                    node0.appendChild(chan1)
+                    [chana, chanb] = self.link_in_ptolemy_file(name_upsample+".output", name_fir+".input", name_rel_upsample)
+                    node0.appendChild(chana)
+                    node0.appendChild(chanb)                    
+                # Check if the requested decimation rate is greater than 1
+                if value[2] != "1":
+                    node1 = self.write_to_ptolemy_file(BLOCK, CLASS_DOWNSAMPLE, name_downsample, [value[2]], 0)                
+                    node0.appendChild(node1)
+
+                    chan1 = self.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_rel_fir, ["no"], 0)
+                    node0.appendChild(chan1)
+                    [chana, chanb] = self.link_in_ptolemy_file(name_fir+".output", name_downsample+".input", name_rel_fir)
+                    node0.appendChild(chana)
+                    node0.appendChild(chanb)
+
+                    chan1 = self.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_rel_downsample, ["no"], 0)
+                    node0.appendChild(chan1)
+                    [chana, chanb] = self.link_in_ptolemy_file(name_downsample+".output", name_outport, name_rel_downsample)
+                    node0.appendChild(chana)
+                    node0.appendChild(chanb)
+                else:
+                    chan1 = self.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_rel_fir, ["no"], 0)
+                    node0.appendChild(chan1)
+                    [chana, chanb] = self.link_in_ptolemy_file(name_fir+".output", name_outport, name_rel_fir)
+                    node0.appendChild(chana)
+                    node0.appendChild(chanb)
+
+                loc_str = self.ptolemy_location_update(BLOCK, offset)
+                node1 = self.write_element(PORT, name_outport, CLASS_NAMED_IO_PORT, "None")
+                node2 = self.write_element(PROP, "output", "None", "None")
+                node3 = self.write_element(PROP, NAME_LOCATION, CLASS_LOCATION, loc_str)                
+                node0.appendChild(node1)
+                node1.appendChild(node2)
+                node1.appendChild(node3)
+
+                self.set_location(BLOCK, orig_loc)
+                
+                return node0                
             elif class_str is CLASS_USER_OUTPUT:
                 name_bool_any        = NAME_BOOL_ANY
                 #name_seq_plot        = NAME_SEQ_PLOT
@@ -480,9 +571,6 @@ class ptolemy_writer:
                 name_delay = "SampleDelay"
                 name_rel_delay = "delayCh"
 
-                name_bool_any = "Boolean To Anything"
-                name_rel_bool_any = "booltoanythingCh"
-                
                 # save the current location in the flowgraph so we can
                 # go back to it after we're done building the current
                 # composite actor                
@@ -553,24 +641,23 @@ class ptolemy_writer:
                 
                 chan1 = self.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_rel_dbpsk_choice, ["yes"], 0)
                 node0.appendChild(chan1)
-                [chana, chanb] = self.link_in_ptolemy_file(name_dbpsk_choice+".output", name_bool_any+".input", name_rel_dbpsk_choice)
+                [chana, chanb] = self.link_in_ptolemy_file(name_dbpsk_choice+".output", name_outport, name_rel_dbpsk_choice)
                 node0.appendChild(chana)
                 node0.appendChild(chanb)
                 
                 chan1 = self.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_rel_dbpsk_choice, ["no"], 0)
                 node0.appendChild(chan1)
                 [chana, chanb] = self.link_in_ptolemy_file("None", name_delay+".input", name_rel_dbpsk_choice)
-                #node0.appendChild(chana)
                 node0.appendChild(chanb)                
 
-                node1 = self.write_to_ptolemy_file(BLOCK, CLASS_BOOL_ANY, name_bool_any, ["None"], 0)
-                node0.appendChild(node1)
+                #node1 = self.write_to_ptolemy_file(BLOCK, CLASS_BOOL_ANY, name_bool_any, ["None"], 0)
+                #node0.appendChild(node1)
 
-                chan1 = self.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_rel_bool_any, ["no"], 0)
-                node0.appendChild(chan1)
-                [chana, chanb] = self.link_in_ptolemy_file(name_bool_any+".output", name_outport, name_rel_bool_any)
-                node0.appendChild(chana)
-                node0.appendChild(chanb)
+                #chan1 = self.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_rel_bool_any, ["no"], 0)
+                #node0.appendChild(chan1)
+                #[chana, chanb] = self.link_in_ptolemy_file(name_bool_any+".output", name_outport, name_rel_bool_any)
+                #node0.appendChild(chana)
+                #node0.appendChild(chanb)
 
                 loc_str = self.ptolemy_location_update(BLOCK, offset)
                 node1 = self.write_element(PORT, name_outport, CLASS_NAMED_IO_PORT, "None")
@@ -885,26 +972,29 @@ class ptolemy_writer:
                 node1 = self.write_to_ptolemy_file(BLOCK, CLASS_LOGIC, name_mod, ["xor"], 0)
                 node0.appendChild(node1)
 
-                # connect the inport port the XOR block
-                chan1 = self.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_rel_inport1, "no", 0)
-                node0.appendChild(chan1)
-                [chana, chanb] = self.link_in_ptolemy_file(name_inport1, name_mod+".input", name_rel_inport1)
-                node0.appendChild(chana)
-                node0.appendChild(chanb)
-                # connect the delay block the XOR block
-                chan1 = self.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_rel_delay, "no", 0)
-                node0.appendChild(chan1)
-                [chana, chanb] = self.link_in_ptolemy_file(name_delay+".output", name_mod+".input", name_rel_delay)
-                node0.appendChild(chana)
-                node0.appendChild(chanb)
                 # connect the XOR block to the output port while
                 # creating a diamond relation for the feedback loop
                 # into the delay block
-                chan1 = self.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_rel_mod, "yes", 0)
+                chan1 = self.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_rel_mod, ["yes"], 200)
                 node0.appendChild(chan1)
                 [chana, chanb] = self.link_in_ptolemy_file(name_mod+".output", name_outport, name_rel_mod)
                 node0.appendChild(chana)
                 node0.appendChild(chanb)
+                
+                # connect the inport port the XOR block
+                chan1 = self.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_rel_inport1, ["no"], 0)
+                node0.appendChild(chan1)
+                [chana, chanb] = self.link_in_ptolemy_file(name_inport1, name_mod+".input", name_rel_inport1)
+                node0.appendChild(chana)
+                node0.appendChild(chanb)
+
+                # connect the delay block the XOR block
+                chan1 = self.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_rel_delay, ["no"], 0)
+                node0.appendChild(chan1)
+                [chana, chanb] = self.link_in_ptolemy_file(name_delay+".output", name_mod+".input", name_rel_delay)
+                node0.appendChild(chana)
+                node0.appendChild(chanb)
+
                 # connect the feedback loop from the logic output port
                 # to the delay block
                 chan1 = self.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_rel_mod, ["no"], 0)
@@ -912,18 +1002,6 @@ class ptolemy_writer:
                 [chana, chanb] = self.link_in_ptolemy_file("None", name_delay+".input", name_rel_mod)
                 node0.appendChild(chanb)
                 
-                #chan1 = self.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_rel_inport2, "yes", 0)
-                #node0.appendChild(chan1)
-                #[chana, chanb] = self.link_in_ptolemy_file(name_inport2, name_mixer+".multiply", name_rel_inport2)
-                #node0.appendChild(chana)
-                #node0.appendChild(chanb)
-                
-                #chan1 = self.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_rel_inport2, ["no"], 0)
-                #node0.appendChild(chan1)
-                #[chana, chanb] = self.link_in_ptolemy_file("None", name_mux+".input", name_rel_inport2)
-                #node0.appendChild(chanb)
-
-
                 loc_str = self.ptolemy_location_update(BLOCK, offset)
                 node1 = self.write_element(PORT, name_outport, CLASS_NAMED_IO_PORT, "None")
                 node2 = self.write_element(PROP, "output", "None", "None")
@@ -937,17 +1015,15 @@ class ptolemy_writer:
                 return node0                
             elif class_str is CLASS_DBPSK_TX:
                 name_inport1 = "datain"
-                name_inport2 = "carrier"                
                 name_outport = "output"
                 name_diff_enc = "Differential Encoder"
-                name_repeat = "Repeat Block"
                 name_dbpsk_mod = "DBPSK Modulator"
+                name_bool_any  = "Bool to Any"
                 
                 name_rel_inport1 = "datainCh"
-                name_rel_inport2 = "carrierCh"
                 name_rel_diff_enc = "diffencCh"
-                name_rel_repeat = "repeatCh"
                 name_rel_dbpsk_mod = "dbpskModCh"
+                name_rel_bool_any  = "boolAnyCh"
                 
                 # save the current location in the flowgraph so we can
                 # go back to it after we're done building the current
@@ -977,11 +1053,6 @@ class ptolemy_writer:
                 chan1 = self.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_rel_inport1, ["no"], 0)
                 node0.appendChild(chan1)
 
-                node1 = self.write_element(PORT, name_inport2, CLASS_NAMED_IO_PORT, "None")
-                node2 = self.write_element(PROP, "input", "None", "None")
-                node0.appendChild(node1)
-                node1.appendChild(node2)
-
                 #####################################################################
                 ## DIFFERENTIAL ENCODER
                 #####################################################################
@@ -993,40 +1064,124 @@ class ptolemy_writer:
                 node0.appendChild(chana)
                 node0.appendChild(chanb)
 
-                #####################################################################
-                ## REPEAT 
-                #####################################################################
-                node1 = self.write_to_ptolemy_file(BLOCK, CLASS_REPEAT, name_repeat, value, 0)
-                node0.appendChild(node1)
-                chan1 = self.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_rel_diff_enc, ["no"], 0)
-                node0.appendChild(chan1)
-                [chana, chanb] = self.link_in_ptolemy_file(name_diff_enc+".output", name_repeat+".input", name_rel_diff_enc)
-                node0.appendChild(chana)
-                node0.appendChild(chanb)
 
                 #####################################################################
                 ## DBPSK Modulator
                 #####################################################################
                 node1 = self.write_to_ptolemy_file(BLOCK, CLASS_DBPSK_MOD, name_dbpsk_mod, ["None"], 0)
                 node0.appendChild(node1)
-                chan1 = self.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_rel_repeat, ["no"], 0)
+                chan1 = self.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_rel_diff_enc, ["no"], 0)
                 node0.appendChild(chan1)
-                [chana, chanb] = self.link_in_ptolemy_file(name_repeat+".output", name_dbpsk_mod+".modin", name_rel_repeat)
+                [chana, chanb] = self.link_in_ptolemy_file(name_diff_enc+".output", name_dbpsk_mod+".modin", name_rel_diff_enc)
                 node0.appendChild(chana)
                 node0.appendChild(chanb)
 
                 chan1 = self.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_rel_dbpsk_mod, ["no"], 0)
                 node0.appendChild(chan1)
-                [chana, chanb] = self.link_in_ptolemy_file(name_dbpsk_mod+".output", name_outport, name_rel_dbpsk_mod)
+                [chana, chanb] = self.link_in_ptolemy_file(name_dbpsk_mod+".output", name_bool_any+".input", name_rel_dbpsk_mod)
                 node0.appendChild(chana)
                 node0.appendChild(chanb)
 
-                chan1 = self.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_rel_inport2, ["no"], 0)
-                node0.appendChild(chan1)
-                [chana, chanb] = self.link_in_ptolemy_file(name_inport2, name_dbpsk_mod+".carrier", name_rel_inport2)
-                node0.appendChild(chana)
-                node0.appendChild(chanb)                                
                 #####################################################################
+                ## Bool to Any Block - Allows output data to be 1's
+                ## and 0's instead of true and false
+                #####################################################################
+                node1 = self.write_to_ptolemy_file(BLOCK, CLASS_BOOL_ANY, name_bool_any, ["None"], 0)
+                node0.appendChild(node1)
+                chan1 = self.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_rel_bool_any, ["no"], 0)
+                node0.appendChild(chan1)
+                [chana, chanb] = self.link_in_ptolemy_file(name_bool_any+".output", name_outport, name_rel_bool_any)
+                node0.appendChild(chana)
+                node0.appendChild(chanb)
+
+                #####################################################################
+                
+                loc_str = self.ptolemy_location_update(BLOCK, offset)
+                node1 = self.write_element(PORT, name_outport, CLASS_NAMED_IO_PORT, "None")
+                node2 = self.write_element(PROP, "output", "None", "None")
+                node3 = self.write_element(PROP, NAME_LOCATION, CLASS_LOCATION, loc_str)                
+                node0.appendChild(node1)
+                node1.appendChild(node2)
+                node1.appendChild(node3)
+
+                self.set_location(BLOCK, orig_loc)
+
+                return node0
+            elif class_str is CLASS_DBPSK_MOD:
+                name_inport1 = "modin"
+                name_outport = "output"
+                name_delay   = "delay"
+                name_mod     = "Differential Modulator"
+                
+                name_rel_inport1 = "modinCh"
+                name_rel_delay   = "delayCh"
+                name_rel_mod     = "modCh"
+                
+                # save the current location in the flowgraph so we can
+                # go back to it after we're done building the current
+                # composite actor                
+                orig_loc_str = self.ptolemy_location_update(BLOCK, offset)
+                orig_loc = self.current_location(BLOCK)
+                self.set_location(BLOCK, BLOCK_ORIG)
+                
+                ############################
+                ### Instantiate Blocks   ###
+                ############################
+
+                # Instantiate the container composite actor
+                node0 = self.write_element(ENT, name, CLASS_COMP_ACT, "None")
+                # set location the composite actor
+                node1 = self.write_element(PROP, NAME_LOCATION, CLASS_LOCATION, orig_loc_str)
+                node0.appendChild(node1)
+
+                #####################################################################
+                ## INPUT Port
+                #####################################################################
+                # create ports for the composite actor
+                node1 = self.write_element(PORT, name_inport1, CLASS_NAMED_IO_PORT, "None")
+                node2 = self.write_element(PROP, "input", "None", "None")
+                node0.appendChild(node1)
+                node1.appendChild(node2)
+                chan1 = self.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_rel_inport1, ["no"], 0)
+                node0.appendChild(chan1)
+
+                # Create Delay Block used as part of the differential modulator
+                node1 = self.write_to_ptolemy_file(BLOCK, CLASS_DELAY, name_delay, ["{false}"], 100)
+                node0.appendChild(node1)
+                # Create the XOR block which is used to perform the
+                # differential BPSK modulation
+                node1 = self.write_to_ptolemy_file(BLOCK, CLASS_LOGIC, name_mod, ["xor"], 0)
+                node0.appendChild(node1)
+
+                # connect the XOR block to the output port while
+                # creating a diamond relation for the feedback loop
+                # into the delay block
+                chan1 = self.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_rel_mod, ["yes"], 200)
+                node0.appendChild(chan1)
+                [chana, chanb] = self.link_in_ptolemy_file(name_mod+".output", name_outport, name_rel_mod)
+                node0.appendChild(chana)
+                node0.appendChild(chanb)
+                
+                # connect the inport port the XOR block
+                chan1 = self.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_rel_inport1, ["no"], 0)
+                node0.appendChild(chan1)
+                [chana, chanb] = self.link_in_ptolemy_file(name_inport1, name_mod+".input", name_rel_inport1)
+                node0.appendChild(chana)
+                node0.appendChild(chanb)
+
+                # connect the delay block the XOR block
+                chan1 = self.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_rel_delay, ["no"], 0)
+                node0.appendChild(chan1)
+                [chana, chanb] = self.link_in_ptolemy_file(name_delay+".output", name_mod+".input", name_rel_delay)
+                node0.appendChild(chana)
+                node0.appendChild(chanb)
+
+                # connect the feedback loop from the logic output port
+                # to the delay block
+                chan1 = self.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_rel_mod, ["no"], 0)
+                node0.appendChild(chan1)
+                [chana, chanb] = self.link_in_ptolemy_file("None", name_delay+".input", name_rel_mod)
+                node0.appendChild(chanb)
                 
                 loc_str = self.ptolemy_location_update(BLOCK, offset)
                 node1 = self.write_element(PORT, name_outport, CLASS_NAMED_IO_PORT, "None")
@@ -1041,26 +1196,15 @@ class ptolemy_writer:
                 return node0                
             elif class_str is CLASS_DBPSK_RX:
 
-                name_inport1 = "rfsig"
-                name_inport2 = "rfsig"
-                name_outport = "output"
-                
-                name_mult  = name+" Multiply Here"
-                name_delay = name+" SDF Feedback Delay"
-                name_fir   = name+" Low Pass Filter"
-                name_chop  = name+" Downsample Unit"
-                name_comp  = name+" Comparator Unit"
-                name_const = name+" Thrshold Value"
+                name_inport  = "rfsig"
+                name_outport = "output"              
+                name_demod   = "DBPSK Demodulator"
+                name_dec     = "DBPSK Differential Decoder"
 
                 name_rel_inport = "inportChanO"
-                name_rel_multdiv = "multdivChanO"
-                name_rel_fir = "lpFirO"
-                name_rel_const = "constChanO"
-                name_rel_comp0 = "compChan0O"
-                name_rel_comp1 = "compChan1O"                
-                name_rel_chop = "chopChanO"                
-                name_rel_delay = "delayChanO"
-                name_rel_outport = "outportChanO"
+                name_rel_delay  = "delayChanO"
+                name_rel_demod  = "demodCh"
+                name_rel_dec    = "decodeCh"
     
                 # save the current location in the flowgraph so we can
                 # go back to it after we're done building the current
@@ -1083,99 +1227,34 @@ class ptolemy_writer:
                 ## INPUT Port
                 #####################################################################
                 # create ports for the composite actor
-                node1 = self.write_element(PORT, name_inport1, CLASS_NAMED_IO_PORT, "None")
+                node1 = self.write_element(PORT, name_inport, CLASS_NAMED_IO_PORT, "None")
                 node2 = self.write_element(PROP, "input", "None", "None")
                 node0.appendChild(node1)
                 node1.appendChild(node2)
 
-                chan1 = self.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_rel_inport, ["yes"], 0)
-                node0.appendChild(chan1)
-
                 #####################################################################
-                ## DELAY
+                ## DBPSK Demodulator
                 #####################################################################
-                value_temp = "repeat("+value[0]+", 0)"
-                node1 = self.write_to_ptolemy_file(BLOCK, CLASS_DELAY, name_delay, [value_temp], 100)
+                node1 = self.write_to_ptolemy_file(BLOCK, CLASS_DBPSK_DEMOD, name_demod, [value[0]], 0)
                 node0.appendChild(node1)
-                chan1 = self.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_rel_delay, ["no"], 0)
-                node0.appendChild(chan1)
-                #######################################################################
-
-                #node1 = self.write_to_ptolemy_file(DIRECT, CLASS_SDF, NAME_SDF, "None", 0)
-                #node0.appendChild(node1)
-
-                #####################################################################
-                ## MULT
-                #####################################################################
-                node1 = self.write_to_ptolemy_file(BLOCK, CLASS_MULTDIV, name_mult, ["None"], 0)
-                node0.appendChild(node1)
-
-                [chana, chanb] = self.link_in_ptolemy_file(name_delay+".output", name_mult+".multiply", name_rel_delay)
-                node0.appendChild(chana)
-                node0.appendChild(chanb)
-                #####################################################################
-                
+                # connect the inport to the demodulator block
                 chan1 = self.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_rel_inport, ["no"], 0)
                 node0.appendChild(chan1)
-                [chana, chanb] = self.link_in_ptolemy_file(name_inport1, name_mult+".multiply", name_rel_inport)
+                [chana, chanb] = self.link_in_ptolemy_file(name_inport, name_demod+".input", name_rel_inport)
                 node0.appendChild(chana)
                 node0.appendChild(chanb)
-                [chana, chanb] = self.link_in_ptolemy_file("None", name_delay+".input", name_rel_inport)
-                node0.appendChild(chanb)                
 
                 #####################################################################
-                ## FIR Filter
+                ## Differential Decoder
                 #####################################################################
-                node1 = self.write_to_ptolemy_file(BLOCK, CLASS_FIR, name_fir, ["rc1.0.dat"], 0)
+                node1 = self.write_to_ptolemy_file(BLOCK, CLASS_DIFF_DEC, name_dec, ["None"], 0)
                 node0.appendChild(node1)
-
-                #####################################################################                
-                chan1 = self.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_rel_fir, ["no"], 0)
+                # connect the demodulator to the differential decoder block
+                chan1 = self.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_rel_demod, ["no"], 0)
                 node0.appendChild(chan1)
-                [chana, chanb] = self.link_in_ptolemy_file(name_mult+".output", name_fir+".input", name_rel_fir)
+                [chana, chanb] = self.link_in_ptolemy_file(name_demod+".output", name_dec+".input", name_rel_demod)
                 node0.appendChild(chana)
                 node0.appendChild(chanb)                
-
-                #####################################################################
-                ## CHOP
-                #####################################################################
-                node1 = self.write_to_ptolemy_file(BLOCK, CLASS_CHOP, name_chop, value, 0)
-                node0.appendChild(node1)
-
-                #####################################################################
-                chan1 = self.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_rel_chop, ["no"], 0)
-                node0.appendChild(chan1)
-                [chana, chanb] = self.link_in_ptolemy_file(name_fir+".output", name_chop+".input", name_rel_chop)
-                node0.appendChild(chana)
-                node0.appendChild(chanb)                
-
-                #####################################################################
-                ## CONST
-                #####################################################################
-                node1 = self.write_to_ptolemy_file(BLOCK, CLASS_CONST, name_const, ["0.2"], 100)
-                node0.appendChild(node1)
-
-                #####################################################################
-                chan1 = self.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_rel_const, ["no"], 0)
-                node0.appendChild(chan1)
-                [chana, chanb] = self.link_in_ptolemy_file(name_const+".output", name_comp+".right", name_rel_const)
-                node0.appendChild(chana)
-                node0.appendChild(chanb)                
-
-                #####################################################################
-                ## COMPARISON
-                #####################################################################
-                node1 = self.write_to_ptolemy_file(BLOCK, CLASS_COMP, name_comp, ["None"], 0)
-                node0.appendChild(node1)
-                #####################################################################
-                chan1 = self.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_rel_comp0, ["no"], 0)
-                node0.appendChild(chan1)
-                [chana, chanb] = self.link_in_ptolemy_file(name_chop+".output", name_comp+".left", name_rel_comp0)
-                node0.appendChild(chana)
-                node0.appendChild(chanb)                
-
-
-                
                 #####################################################################
                 ## OUTPUT Port
                 #####################################################################
@@ -1190,16 +1269,193 @@ class ptolemy_writer:
                 node1.appendChild(node2)
                 node1.appendChild(node3)
                 #####################################################################
-                chan1 = self.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_rel_outport, ["no"], 0)
+                chan1 = self.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_rel_dec, ["no"], 0)
                 node0.appendChild(chan1)
-                [chana, chanb] = self.link_in_ptolemy_file(name_comp+".output", name_outport, name_rel_outport)
+                [chana, chanb] = self.link_in_ptolemy_file(name_dec+".output", name_outport, name_rel_dec)
                 node0.appendChild(chana)
                 node0.appendChild(chanb)                                
 
                 self.set_location(BLOCK, orig_loc)
 
                 return node0
+            elif class_str is CLASS_DBPSK_DEMOD:
+                name_inport  = "input"
+                name_outport = "output"
+                name_delay   = "delay"
+                name_demod   = "Differential Demodulator"
+                name_thresh  = "Receiver Threshold"
+                name_comp    = "Comparator"
                 
+                name_rel_inport  = "modinCh"
+                name_rel_delay   = "delayCh"
+                name_rel_demod   = "demodCh"
+                name_rel_thresh  = "threshCh"
+                name_rel_comp    = "compCh"
+                
+                # save the current location in the flowgraph so we can
+                # go back to it after we're done building the current
+                # composite actor                
+                orig_loc_str = self.ptolemy_location_update(BLOCK, offset)
+                orig_loc = self.current_location(BLOCK)
+                self.set_location(BLOCK, BLOCK_ORIG)
+                
+                ############################
+                ### Instantiate Blocks   ###
+                ############################
+
+                # Instantiate the container composite actor
+                node0 = self.write_element(ENT, name, CLASS_COMP_ACT, "None")
+                # set location the composite actor
+                node1 = self.write_element(PROP, NAME_LOCATION, CLASS_LOCATION, orig_loc_str)
+                node0.appendChild(node1)
+
+                #####################################################################
+                ## INPUT Port
+                #####################################################################
+                # create ports for the composite actor
+                node1 = self.write_element(PORT, name_inport, CLASS_NAMED_IO_PORT, "None")
+                node2 = self.write_element(PROP, "input", "None", "None")
+                node0.appendChild(node1)
+                node1.appendChild(node2)
+                chan1 = self.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_rel_inport, ["no"], 0)
+                node0.appendChild(chan1)
+
+                # Create Receiver Threshold 
+                node1 = self.write_to_ptolemy_file(BLOCK, CLASS_CONST, name_thresh, [value[0]], 100)
+                node0.appendChild(node1)
+                # Create the comparator block
+                node1 = self.write_to_ptolemy_file(BLOCK, CLASS_COMP, name_comp, ["&gt;"], 0)
+                node0.appendChild(node1)
+                # connect the comparator and the receiver threshold components
+                chan1 = self.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_rel_inport, ["no"], 0)
+                node0.appendChild(chan1)
+                [chana, chanb] = self.link_in_ptolemy_file(name_inport, name_comp+".left", name_rel_inport)
+                node0.appendChild(chana)
+                node0.appendChild(chanb)
+                chan1 = self.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_rel_thresh, ["no"], 0)
+                node0.appendChild(chan1)
+                [chana, chanb] = self.link_in_ptolemy_file(name_thresh+".output", name_comp+".right", name_rel_thresh)
+                node0.appendChild(chana)
+                node0.appendChild(chanb)
+                # Create the diamond relationship needed to connect
+                # the comparator to both the delay and XOR blocks
+                chan1 = self.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_rel_comp, ["yes"], 0)
+                node0.appendChild(chan1)
+                
+                # Create the Delay Block
+                node1 = self.write_to_ptolemy_file(BLOCK, CLASS_DELAY, name_delay, ["{false}"], 100)
+                node0.appendChild(node1)
+                
+                # Create the XOR block which is used to perform the
+                # differential BPSK demodulation
+                node1 = self.write_to_ptolemy_file(BLOCK, CLASS_LOGIC, name_demod, ["xor"], 0)
+                node0.appendChild(node1)
+
+                # connect the comparator  and delay blocks to the XOR
+                chan1 = self.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_rel_comp, ["no"], 0)
+                node0.appendChild(chan1)
+                [chana, chanb] = self.link_in_ptolemy_file(name_comp+".output", name_demod+".input", name_rel_comp)
+                node0.appendChild(chana)
+                node0.appendChild(chanb)
+                [chana, chanb] = self.link_in_ptolemy_file("None", name_delay+".input", name_rel_comp)
+                node0.appendChild(chanb)
+                chan1 = self.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_rel_delay, ["no"], 0)
+                node0.appendChild(chan1)
+                [chana, chanb] = self.link_in_ptolemy_file(name_delay+".output", name_demod+".input", name_rel_delay)
+                node0.appendChild(chana)
+                node0.appendChild(chanb)                
+                # connect the XOR block 
+                chan1 = self.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_rel_demod, ["no"], 0)
+                node0.appendChild(chan1)
+                [chana, chanb] = self.link_in_ptolemy_file(name_demod+".output", name_outport, name_rel_demod)
+                node0.appendChild(chana)
+                node0.appendChild(chanb)
+
+                loc_str = self.ptolemy_location_update(BLOCK, offset)
+                node1 = self.write_element(PORT, name_outport, CLASS_NAMED_IO_PORT, "None")
+                node2 = self.write_element(PROP, "output", "None", "None")
+                node3 = self.write_element(PROP, NAME_LOCATION, CLASS_LOCATION, loc_str)                
+                node0.appendChild(node1)
+                node1.appendChild(node2)
+                node1.appendChild(node3)
+
+                self.set_location(BLOCK, orig_loc)
+
+                return node0                                
+            elif class_str is CLASS_DIFF_DEC:
+                name_inport  = "input"
+                name_outport = "output"
+                name_delay   = "delay"
+                name_dec     = "Differential Modulator"
+                
+                name_rel_inport  = "modinCh"
+                name_rel_delay   = "delayCh"
+                name_rel_dec     = "decCh"
+                
+                # save the current location in the flowgraph so we can
+                # go back to it after we're done building the current
+                # composite actor                
+                orig_loc_str = self.ptolemy_location_update(BLOCK, offset)
+                orig_loc = self.current_location(BLOCK)
+                self.set_location(BLOCK, BLOCK_ORIG)
+                
+                ############################
+                ### Instantiate Blocks   ###
+                ############################
+
+                # Instantiate the container composite actor
+                node0 = self.write_element(ENT, name, CLASS_COMP_ACT, "None")
+                # set location the composite actor
+                node1 = self.write_element(PROP, NAME_LOCATION, CLASS_LOCATION, orig_loc_str)
+                node0.appendChild(node1)
+
+                #####################################################################
+                ## INPUT Port
+                #####################################################################
+                # create ports for the composite actor
+                node1 = self.write_element(PORT, name_inport, CLASS_NAMED_IO_PORT, "None")
+                node2 = self.write_element(PROP, "input", "None", "None")
+                node0.appendChild(node1)
+                node1.appendChild(node2)
+                chan1 = self.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_rel_inport, ["yes"], 0)
+                node0.appendChild(chan1)
+
+                # Create Delay Block used as part of the differential modulator
+                node1 = self.write_to_ptolemy_file(BLOCK, CLASS_DELAY, name_delay, ["{false}"], 100)
+                node0.appendChild(node1)
+                # Create the XOR block 
+                node1 = self.write_to_ptolemy_file(BLOCK, CLASS_LOGIC, name_dec, ["xnor"], 0)
+                node0.appendChild(node1)
+                [chana, chanb] = self.link_in_ptolemy_file(name_inport, name_dec+".input", name_rel_inport)
+                node0.appendChild(chana)
+                node0.appendChild(chanb)
+                [chana, chanb] = self.link_in_ptolemy_file("None", name_delay+".input", name_rel_inport)
+                node0.appendChild(chanb)
+                # connect the Delay Block to the XNOR block
+                chan1 = self.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_rel_delay, ["no"], 0)
+                node0.appendChild(chan1)
+                [chana, chanb] = self.link_in_ptolemy_file(name_delay+".output", name_dec+".input", name_rel_delay)
+                node0.appendChild(chana)
+                node0.appendChild(chanb)
+                
+                # connect the XNOR block to the output port
+                chan1 = self.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_rel_dec, ["no"], 0)
+                node0.appendChild(chan1)
+                [chana, chanb] = self.link_in_ptolemy_file(name_dec+".output", name_outport, name_rel_dec)
+                node0.appendChild(chana)
+                node0.appendChild(chanb)
+
+                loc_str = self.ptolemy_location_update(BLOCK, offset)
+                node1 = self.write_element(PORT, name_outport, CLASS_NAMED_IO_PORT, "None")
+                node2 = self.write_element(PROP, "output", "None", "None")
+                node3 = self.write_element(PROP, NAME_LOCATION, CLASS_LOCATION, loc_str)                
+                node0.appendChild(node1)
+                node1.appendChild(node2)
+                node1.appendChild(node3)
+
+                self.set_location(BLOCK, orig_loc)
+
+                return node0                
             else:
                print "ERROR: Found in write_to_ptolemy_file method. Unknown Block Class = ", class_str
                exit(-1)

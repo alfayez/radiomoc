@@ -1,5 +1,6 @@
   REAL32 symbolTime   :
   REAL32 samplingRate :
+  REAL32 samplingRate2:  
   REAL32 carrierFreq  :
   REAL32 rcFiltCoeff  :
   REAL32 carrierGain  :
@@ -7,26 +8,31 @@
   REAL32 rfGain2       :
   REAL32 carrierPhase :
   REAL32 gaussGain    :
+  REAL32 recvThresh   :
   
   REAL32 seedValG     :
   REAL32 meanValG     :
   REAL32 stdValG      :
   SEQ
-    symbolTime   := 2.0
-    samplingRate := 400.0
-    carrierFreq  := 4.0
-    rcFiltCoeff  := 1.0
-    carrierGain  := 1.0
-    rfGain       := 1.0
-    rfGain2      := 1.1
-    carrierPhase := 0.0  
-    gaussGain    := 0.3
-    seedValG     := 0.0
-    meanValG     := 0.0
-    stdValG      := 0.40
+    symbolTime    := 2.0
+    samplingRate  := 16000
+    samplingRate2 := 256000
+    carrierFreq   := 4.0
+    rcFiltCoeff   := 1.0
+    carrierGain   := 1.0
+    rfGain        := 30.0
+    rfGain2       := 1.0
+    carrierPhase  := 0.0  
+    gaussGain     := 0.3
+    recvThresh    := 0.3
+
+    seedValG      := 0.0
+    meanValG      := 0.0
+    stdValG       := 0.40
   
     paramOC ! symbolTime
     paramOC ! samplingRate
+    paramOC ! samplingRate2
     paramOC ! carrierFreq
     paramOC ! rcFiltCoeff
     paramOC ! carrierGain
@@ -34,6 +40,8 @@
     paramOC ! rfGain2
     paramOC ! carrierPhase
     paramOC ! gaussGain
+    paramOC ! recvThresh
+    
     paramOC ! seedValG
     paramOC ! meanValG
     paramOC ! stdValG
