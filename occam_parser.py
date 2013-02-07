@@ -39,7 +39,7 @@ class graph_handler:
         self.init_chans   = []
         # The following parameters should be written as ints for
         # ptolemy
-        self.int_param_enforce_dict  = {'symbolTime':0, 'samplingRate':0, 'seedValG':0}
+        self.int_param_enforce_dict  = {'symbolTime':0, 'samplingRate':0, 'seedValG':0, 'samplingRate':0, 'samplingRate2':0}
         self.long_param_enforce_dict = {'seedValG':0}
         # PORT_COUNT = used to iterate through connecting ports for
         # blocks with multiple input or output ports

@@ -458,6 +458,7 @@ PROC rfIn(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
     inC  ? rfGain
     inC  ? rfGain2
     inC  ? carrierPhase
+    inC  ? gaussGain    
     inC  ? recvThresh
     inC  ? seedValG
     inC  ? meanValG
@@ -900,8 +901,8 @@ PROC parameterGen(CHAN REAL32 paramOC!)
   REAL32 stdValG      :
   SEQ
     symbolTime    := 2.0
-    samplingRate  := 16000
-    samplingRate2 := 256000
+    samplingRate  := 16000.0
+    samplingRate2 := 256000.0
     carrierFreq   := 4.0
     rcFiltCoeff   := 1.0
     carrierGain   := 1.0
