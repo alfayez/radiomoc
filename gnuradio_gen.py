@@ -6,7 +6,7 @@ import numpy as np
 #from xml.dom.minidom import parse, parseString, Document,
 #getDOMImplementation
 from xml.dom import EMPTY_NAMESPACE, XML_NAMESPACE
-from ptolemy_param import *
+from gnuradio_param import *
 import pxdom
 
 class gnuradio_writer:
@@ -18,19 +18,12 @@ class gnuradio_writer:
 
         self.impl = pxdom.getDOMImplementation('')
 
-        self.doctype = self.impl.createDocumentType("entity", None, None)
-        self.doc = self.impl.createDocument(EMPTY_NAMESPACE, 'entity',self.doctype)
+        self.doctype = self.impl.createDocumentType(FLOW, None, None)
+        self.doc = self.impl.createDocument(EMPTY_NAMESPACE, FLOW,self.doctype)
         self.top_element = self.doc.documentElement
 
-        init_node0 = self.write_element(PROP, NAME_WIN_PROP, CLASS_WIN_PROP, VAL_WIN_PROP)
-        init_node1 = self.write_element(PROP, NAME_VERG_SIZE, CLASS_SIZE_ATTR, VAL_VERG_SIZE_ATTR)
-        init_node2 = self.write_element(PROP, NAME_VERG_ZOOM, CLASS_EXP_PARAM, VAL_VERG_ZOOM)
-        init_node3 = self.write_element(PROP, NAME_VERG_CENTER, CLASS_EXP_PARAM, VAL_VERG_CENTER)
-
+        init_node0 = self.write_to_gnuradio_file(BLOCK, CLASS_OPTIONS, NONE, ["4096, 4096"], "None")
         self.top_element.appendChild(init_node0)        
-        self.top_element.appendChild(init_node1)
-        self.top_element.appendChild(init_node2)
-        self.top_element.appendChild(init_node3)        
         
         self.param_loc = copy.deepcopy(PARAM_ORIG)
         self.block_loc = copy.deepcopy(BLOCK_ORIG)
@@ -39,9 +32,6 @@ class gnuradio_writer:
         self.outfile.close()
         
     def write_element(self, tag_str, name_str, class_str, value_str):
-
-        #print "tag_str= ", tag_str, " name_str= ", name_str,
-        #"value_str= ", value_str, "class_str= ", class_str, "\n"
         node = self.doc.createElement(tag_str)
 
         if (name_str != "None"):        
@@ -58,17 +48,6 @@ class gnuradio_writer:
         ser.writeToURI(self.doc, 'tmp_xml_read.xml')
         
         infile_temp = file ('tmp_xml_read.xml', 'r')
-
-        line = infile_temp.readline()
-        self.outfile.write(XML_HEADER1)
-        self.outfile.write("\n")
-        self.outfile.write(XML_HEADER2)
-
-        line = infile_temp.readline()
-        mod_model_name = "<entity name=\""+self.model_name+"\" class=\"ptolemy.actor.TypedCompositeActor\">\n"
-        self.outfile.write(mod_model_name)
-        
-        line = infile_temp.readline()
         line = infile_temp.readline()
         i = 0
         while line:
@@ -137,12 +116,102 @@ class gnuradio_writer:
         loc_str = "{" + str(x_axis_temp) + ", " + str(y_axis_temp) + "}"
        
         return copy.deepcopy(loc_str)
-
-    def write_to_ptolemy_file(self, type_str, class_str, name, value, offset):
+    #def write_element(self, tag_str, name_str, class_str, value_str):
+    def write_to_gnuradio_file(self, type_str, class_str, name, value, offset):
         if type_str is PARAM:
             print "param"
         elif type_str is BLOCK:
-            print "block"
+            if class_str is CLASS_OPTIONS:
+                node1 = self.write_element(BLOCK, NONE, NONE, NONE)
+                node2 = self.write_element(KEY,   class_str, NONE, NONE)
+                node1.appendChild(node2)
+
+                node2 = self.write_element(PARAM, NONE, NONE, NONE)                
+                node3 = self.write_element(KEY,   "id", NONE, NONE)
+                node4 = self.write_element(VALUE, "top_block", NONE, NONE)                
+                node1.appendChild(node2)
+                node1.appendChild(node3)
+                node1.appendChild(node4)
+                node2 = self.write_element(PARAM, NONE, NONE, NONE)                
+                node3 = self.write_element(KEY,   "enabled", NONE, NONE)
+                node4 = self.write_element(VALUE, "true", NONE, NONE)                
+                node1.appendChild(node2)
+                node1.appendChild(node3)
+                node1.appendChild(node4)
+                node2 = self.write_element(PARAM, NONE, NONE, NONE)                
+                node3 = self.write_element(KEY,   "title", NONE, NONE)
+                node4 = self.write_element(VALUE, "", NONE, NONE)                
+                node1.appendChild(node2)
+                node1.appendChild(node3)
+                node1.appendChild(node4)
+                node2 = self.write_element(PARAM, NONE, NONE, NONE)                
+                node3 = self.write_element(KEY,   "author", NONE, NONE)
+                node4 = self.write_element(VALUE, "", NONE, NONE)                
+                node1.appendChild(node2)
+                node1.appendChild(node3)
+                node1.appendChild(node4)
+                node2 = self.write_element(PARAM, NONE, NONE, NONE)                
+                node3 = self.write_element(KEY,   "description", NONE, NONE)
+                node4 = self.write_element(VALUE, "", NONE, NONE)                
+                node1.appendChild(node2)
+                node1.appendChild(node3)
+                node1.appendChild(node4)                
+                node2 = self.write_element(PARAM, NONE, NONE, NONE)                
+                node3 = self.write_element(KEY,   "window_size", NONE, NONE)
+                node4 = self.write_element(VALUE, value[0], NONE, NONE)                
+                node1.appendChild(node2)
+                node1.appendChild(node3)
+                node1.appendChild(node4)
+                node2 = self.write_element(PARAM, NONE, NONE, NONE)                
+                node3 = self.write_element(KEY,   "generate_options", NONE, NONE)
+                node4 = self.write_element(VALUE, "wx_gui", NONE, NONE)                
+                node1.appendChild(node2)
+                node1.appendChild(node3)
+                node1.appendChild(node4)
+                node2 = self.write_element(PARAM, NONE, NONE, NONE)                
+                node3 = self.write_element(KEY,   "category", NONE, NONE)
+                node4 = self.write_element(VALUE, "Custom", NONE, NONE)                
+                node1.appendChild(node2)
+                node1.appendChild(node3)
+                node1.appendChild(node4)
+                node2 = self.write_element(PARAM, NONE, NONE, NONE)                
+                node3 = self.write_element(KEY,   "run_options", NONE, NONE)
+                node4 = self.write_element(VALUE, "prompt", NONE, NONE)                
+                node1.appendChild(node2)
+                node1.appendChild(node3)
+                node1.appendChild(node4)
+                node2 = self.write_element(PARAM, NONE, NONE, NONE)                
+                node3 = self.write_element(KEY,   "run", NONE, NONE)
+                node4 = self.write_element(VALUE, "True", NONE, NONE)                
+                node1.appendChild(node2)
+                node1.appendChild(node3)
+                node1.appendChild(node4)
+                node2 = self.write_element(PARAM, NONE, NONE, NONE)                
+                node3 = self.write_element(KEY,   "max_nouts", NONE, NONE)
+                node4 = self.write_element(VALUE, "0", NONE, NONE)                
+                node1.appendChild(node2)
+                node1.appendChild(node3)
+                node1.appendChild(node4)
+                node2 = self.write_element(PARAM, NONE, NONE, NONE)                
+                node3 = self.write_element(KEY,   "realtime_scheduling", NONE, NONE)
+                node4 = self.write_element(VALUE, "", NONE, NONE)                
+                node1.appendChild(node2)
+                node1.appendChild(node3)
+                node1.appendChild(node4)
+                node2 = self.write_element(PARAM, NONE, NONE, NONE)                
+                node3 = self.write_element(KEY,   "coordinate", NONE, NONE)
+                node4 = self.write_element(VALUE, "(10, 10)", NONE, NONE)                
+                node1.appendChild(node2)
+                node1.appendChild(node3)
+                node1.appendChild(node4)
+                node2 = self.write_element(PARAM, NONE, NONE, NONE)                
+                node3 = self.write_element(KEY,   "rotation", NONE, NONE)
+                node4 = self.write_element(VALUE, "0", NONE, NONE)                
+                node1.appendChild(node2)
+                node1.appendChild(node3)
+                node1.appendChild(node4)                
+            else:
+                print "ERROR: Found in write_to_gnuradio BLOCK method. Parameter passed is incompatible= ",  class_str
         elif type_str is CH:
             print "channel"            
         elif type_str is DIRECT:
@@ -150,7 +219,7 @@ class gnuradio_writer:
         elif type_str is PORT:
             print "port"            
         else:
-            print "ERROR: Found in write_to_ptolemy method. Parameter passed is incompatible= ",  type_str
+            print "ERROR: Found in write_to_gnuradio method. Parameter passed is incompatible= ",  type_str
             exit(-1)            
         return node1
     def link_in_gnuradio_file(self, out_unit, in_unit, name_relation):
@@ -170,43 +239,11 @@ class gnuradio_writer:
 
         return [node1, node2]
 
-if __name__ == "__main__":
+def test_gnuradio():
     print "Hello!"
-    filename   = "xml-tmp.xml"
+    filename   = "xml-tmp.grc"
     model_name = "xml-tmp"
-    pgen = ptolemy_writer(filename, model_name)
-    pgen.write_element("property", "_createBy", "ptolemy.kernel.attributes.VersionAttribute", "8.0.1_20101021")
+    pgen = gnuradio_writer(filename, model_name)
 
-    node1 = pgen.write_to_ptolemy_file(PARAM, CLASS_PARAMETER, "period_time", ["4000"], 0)
-    node2 = pgen.write_to_ptolemy_file(PARAM, CLASS_PARAMETER, "carrier_freq", ["4.0"], 0)
-    node3 = pgen.write_to_ptolemy_file(PARAM, CLASS_PARAMETER, "carrier_phase", ["0"], 0)
-    node4 = pgen.write_to_ptolemy_file(PARAM, CLASS_PARAMETER, "sampling_freq", ["400"], 0)
-    node5 = pgen.write_to_ptolemy_file(PARAM, CLASS_PARAMETER, "symbol_time", ["2"], 0)
-    pgen.top_element.appendChild(node1)
-    pgen.top_element.appendChild(node2)
-    pgen.top_element.appendChild(node3)
-    pgen.top_element.appendChild(node4)
-    pgen.top_element.appendChild(node5)
-
-
-    name_carrier_scale = "Carrier Scale" 
-    name_carrier = "Tx Carrier"
-    name_rcv = "My DBPSK Receiver"
-    name_seq_plot = "Data In Monitor"
-    name_pulse_filt = "Pulse Shaping Filter"
-    name_data_in = "Data In"
-    name_tx = "My DBPSK Transmitter"
-    name_gauss = "Gaussian Noise"
-    name_add = "Additive Noise Channel"
-
-    name_carrier_rel = "carrierCon0"
-    name_rcv_rel = "recvconn"
-    name_pulse_filt_rel = "pulseFiltO"
-    name_carrier_scale_rel = "carrscaleO"
-    name_data_in_rel = "datainO"
-    name_tx_rel = "dbpskTxCh"
-    name_gauss_rel = "guassCh"
-    name_add_rel = "addCh"
-    
     pgen.write_to_xmlfile()
 

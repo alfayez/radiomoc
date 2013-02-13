@@ -4,7 +4,8 @@ import sys, string, types, os, copy
 import getopt
 import numpy as np
 
-from ptolemy_gen import *
+from ptolemy_gen  import *
+from gnuradio_gen import *
 '''
 Checks if the token specifies an OCCAM process
 it basically checks if the token starts with
@@ -445,84 +446,93 @@ class graph_handler:
         if param_name in self.long_param_enforce_dict:
             param_val = param_val+"L"
         return param_val    
-
+    def write_to_file(self, pgen, type_str, class_str, name, value, offset, mode):
+        if mode is PTOLEMY:
+            return pgen.write_to_ptolemy_file(type_str, class_str, name, value, offset)
+        elif mode is GNURADIO:
+            return pgen.write_to_gnuradio_file(type_str, class_str, name, value, offset)
+    def link_in_file(self, pgen, out_unit, in_unit, name_relation, mode):
+        if mode is PTOLEMY:
+            return pgen.link_in_ptolemy_file(out_unit, in_unit, name_relation)
+        elif mode is GNURADIO:
+            return pgen.link_in_gnuradio_file(out_unit, in_unit, name_relation)
     def generate_code(self, mode):
-        if   mode == PTOLEMY:
-            print "PTOLEMY Mode"
-            filename = self.get_filename(infile_name)
-            model_name = filename
+        
+        print "Mode = ", mode
+        filename = self.get_filename(infile_name)
+        model_name = filename
+
+        if mode is PTOLEMY:
             filename = filename + ".xml"
             pgen = ptolemy_writer(filename, model_name)
-
-            # Choose MoC
-            node1 = pgen.write_to_ptolemy_file(DIRECT, CLASS_SDF, NAME_SDF, "None", 0)
-            pgen.top_element.appendChild(node1)
-                
-            # Generate and Instantiate Parameters
-            len_list = len(self.param_list)
-            for i in range(len_list):
-                param_name = self.param_list[i]
-                param_val  = self.param_dict[param_name]
-                param_val  = self.check_if_int_enforce(param_name, param_val)
-                param_val  = self.check_if_long_enforce(param_name, param_val)
-                node1 = pgen.write_to_ptolemy_file(PARAM, CLASS_PARAMETER, param_name, [param_val], 0)
-                pgen.top_element.appendChild(node1)
-            # Generate and Instantiate Blocks
-            len_list = len(self.proc_list)
-            for i in range(len_list):
-                block_name   = self.proc_list[i]
-                class_name   = self.block_map_dict[block_name][PTOLEMY]
-                block_offset = self.offset_dict[block_name][PTOLEMY]
-                block_value  = self.value_dict[block_name]
-                node1 = pgen.write_to_ptolemy_file(BLOCK, class_name, block_name, block_value, block_offset)
-                pgen.top_element.appendChild(node1)
-            #Generate and Instantiate Connections
-            len_list  = len(self.chan_list)
-            out_index = 0
-            in_index  = 0
-            for i in range(len_list):
-                chan_name      = self.chan_list[i]
-                block_out_name = self.chan_dict[chan_name][OUT_CHAN]
-                block_in_name  = self.chan_dict[chan_name][IN_CHAN]
-                if ((len(block_in_name)>0) and (len(block_out_name)>0)):                    
-                    out_index = self.get_port_count(block_out_name, "output")
-                    in_index  = self.get_port_count(block_in_name, "input")
-
-                    chan1 = pgen.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, chan_name, "no", 0)
-                    pgen.top_element.appendChild(chan1)
-
-                    # this allows connections into blocks with
-                    # multiple input ports or non-default port names.
-                    # Each time a block name appears an index is
-                    # iterated which allows us to access the name of
-                    # the next physical port in the block
-                    outport_name = block_out_name+self.block_port_dict_output[block_out_name][out_index]
-                    inport_name  = block_in_name+self.block_port_dict_input[block_in_name][in_index]
-
-                    [chana, chanb] = pgen.link_in_ptolemy_file(outport_name, inport_name, chan_name)
-                    pgen.top_element.appendChild(chana)
-                    pgen.top_element.appendChild(chanb)
-
-                    # increment port count except if port count limit
-                    # is reached but there are more connections then
-                    # this port is a multiport allowing multiple connections
-                    out_lim = len(self.block_port_dict_output[block_out_name])
-                    in_lim  = len(self.block_port_dict_input[block_in_name])
-                    if out_lim > (out_index+1):
-                        self.inc_port_count(block_out_name, "output")
-                    if in_lim > (in_index+1):
-                        self.inc_port_count(block_in_name, "input")
-            self.reset_port_count()
-            pgen.write_to_xmlfile()
-
-        elif mode == GNURADIO:
-            print "GNURADIO Mode"
-        elif mode == SDF3:
-            print "SDF3 Mode"
+        elif mode is GNURADIO:
+            filename = filename + ".grc"
+            pgen = gnuradio_writer(filename, model_name)
         else:
-            print "ERROR in generate_code.  You chose an unsupported code generation mode"
-            exit(-1)
-        
+            print "ERROR in generate_code: UNKNOW code generation mode= ", mode
+
+
+        # Choose MoC
+        node1 = self.write_to_file(pgen, DIRECT, CLASS_SDF, NAME_SDF, "None", 0, mode)
+        pgen.top_element.appendChild(node1)
+
+        # Generate and Instantiate Parameters
+        len_list = len(self.param_list)
+        for i in range(len_list):
+            param_name = self.param_list[i]
+            param_val  = self.param_dict[param_name]
+            param_val  = self.check_if_int_enforce(param_name, param_val)
+            param_val  = self.check_if_long_enforce(param_name, param_val)
+            node1      = self.write_to_file(pgen, PARAM, CLASS_PARAMETER, param_name, [param_val], 0, mode)
+            pgen.top_element.appendChild(node1)
+        # Generate and Instantiate Blocks
+        len_list = len(self.proc_list)
+        for i in range(len_list):
+            block_name   = self.proc_list[i]
+            class_name   = self.block_map_dict[block_name][mode]
+            block_offset = self.offset_dict[block_name][mode]
+            block_value  = self.value_dict[block_name]
+            node1 = self.write_to_file(pgen, BLOCK, class_name, block_name, block_value, block_offset, mode)
+            pgen.top_element.appendChild(node1)
+        #Generate and Instantiate Connections
+        len_list  = len(self.chan_list)
+        out_index = 0
+        in_index  = 0
+        for i in range(len_list):
+            chan_name      = self.chan_list[i]
+            block_out_name = self.chan_dict[chan_name][OUT_CHAN]
+            block_in_name  = self.chan_dict[chan_name][IN_CHAN]
+            if ((len(block_in_name)>0) and (len(block_out_name)>0)):                    
+                out_index = self.get_port_count(block_out_name, "output")
+                in_index  = self.get_port_count(block_in_name, "input")
+
+                chan1 = self.write_to_file(pgen, CH, CLASS_NAMED_IO_RELATION, chan_name, "no", 0, mode)
+                pgen.top_element.appendChild(chan1)
+
+                # this allows connections into blocks with
+                # multiple input ports or non-default port names.
+                # Each time a block name appears an index is
+                # iterated which allows us to access the name of
+                # the next physical port in the block
+                outport_name = block_out_name+self.block_port_dict_output[block_out_name][out_index]
+                inport_name  = block_in_name+self.block_port_dict_input[block_in_name][in_index]
+
+                [chana, chanb] = self.link_in_file(pgen, outport_name, inport_name, chan_name, mode)
+                pgen.top_element.appendChild(chana)
+                pgen.top_element.appendChild(chanb)
+
+                # increment port count except if port count limit
+                # is reached but there are more connections then
+                # this port is a multiport allowing multiple connections
+                out_lim = len(self.block_port_dict_output[block_out_name])
+                in_lim  = len(self.block_port_dict_input[block_in_name])
+                if out_lim > (out_index+1):
+                    self.inc_port_count(block_out_name, "output")
+                if in_lim > (in_index+1):
+                    self.inc_port_count(block_in_name, "input")
+        self.reset_port_count()
+        pgen.write_to_xmlfile()
+
 if __name__ == "__main__":
     infile_name_list = ["csp-sdf-rx.occ", "csp-sdf-tx.occ", "csp-sdf-sim.occ"]
     # the input occam program which we will be processing
@@ -548,8 +558,8 @@ if __name__ == "__main__":
     top_handler.print_chan_list()
     top_handler.print_proc_dict()
     top_handler.print_top_matrix()
-    #test_ptolemy()
     top_handler.generate_code(PTOLEMY)
+    #top_handler.generate_code(GNURADIO)
 
     #outfile.close()
     #infile.close)(

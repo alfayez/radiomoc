@@ -34,9 +34,15 @@ DIRECT = 2
 CH = 3
 
 SDF = 0
+
+PTOLEMY       = 0
+GNURADIO      = 1
+SDF3          = 2
 #XML_INIT = "entity "
 class ptolemy_writer:
     def __init__(self, outfile_name, model_name):
+        self.mode = PTOLEMY
+
         self.outfile = file(outfile_name, 'w')
         self.outfile.flush()
         self.model_name = model_name
