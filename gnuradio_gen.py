@@ -18,11 +18,11 @@ class gnuradio_writer:
 
         self.impl = pxdom.getDOMImplementation('')
 
-        self.doctype = self.impl.createDocumentType(FLOW, None, None)
-        self.doc = self.impl.createDocument(EMPTY_NAMESPACE, FLOW,self.doctype)
+        self.doctype = self.impl.createDocumentType(FLOW_GNU, None, None)
+        self.doc = self.impl.createDocument(EMPTY_NAMESPACE, FLOW_GNU,self.doctype)
         self.top_element = self.doc.documentElement
 
-        init_node0 = self.write_to_gnuradio_file(BLOCK, CLASS_OPTIONS, NONE, ["4096, 4096"], "None")
+        init_node0 = self.write_to_gnuradio_file(BLOCK_GNU, CLASS_OPTIONS, NONE, ["4096, 4096"], "None")
         self.top_element.appendChild(init_node0)        
         
         self.param_loc = copy.deepcopy(PARAM_ORIG)
@@ -32,14 +32,16 @@ class gnuradio_writer:
         self.outfile.close()
         
     def write_element(self, tag_str, name_str, class_str, value_str):
-        node = self.doc.createElement(tag_str)
-
-        if (name_str != "None"):        
-            node.setAttribute("name", name_str)
-        if (class_str != "None"):        
-            node.setAttribute("class", class_str)
-        if (value_str != "None"):
-            node.setAttribute("value", value_str)        
+        node  = self.doc.createElement(tag_str)
+        if name_str != NONE:
+            node2 = self.doc.createTextNode(name_str)
+            node.appendChild(node2)
+        #if (name_str != "None"):        
+        #    node.setAttribute("name", name_str)
+        #if (class_str != "None"):        
+        #    node.setAttribute("class", class_str)
+        #if (value_str != "None"):
+        #    node.setAttribute("value", value_str)        
 
         return node
     def write_to_xmlfile(self):
@@ -75,18 +77,19 @@ class gnuradio_writer:
         infile_temp.close()
         print "\n"
 
-    def ptolemy_location_update(self, req_type, offset):
+    def gnuradio_location_update(self, req_type, offset):
 
-        if req_type is PARAM:
+        if req_type is PARAM_GNU:
             self.param_loc[Y_AXIS] = self.param_loc[Y_AXIS] + PARAM_STEP
             x_axis_temp = self.param_loc[X_AXIS] + offset
-            loc_str = "{" + str(x_axis_temp) + ", " + str(self.param_loc[Y_AXIS]) + "}"
-        elif req_type is BLOCK:
+            loc_str = "(" + str(x_axis_temp) + ", " + str(self.param_loc[Y_AXIS]) + ")"
+            print "gnuradio loc_str= ", loc_str
+        elif req_type is BLOCK_GNU:
             self.block_loc[X_AXIS] = self.block_loc[X_AXIS] + BLOCK_STEP
             y_axis_temp = self.block_loc[Y_AXIS] + offset
-            loc_str = "{" + str(self.block_loc[X_AXIS]) + ", " + str(y_axis_temp) + "}"
-        elif req_type is DIRECT:
-            loc_str = "{" + str(DIRECT_LOC[X_AXIS]) + ", " + str(DIRECT_LOC[Y_AXIS]) + "}"            
+            loc_str = "(" + str(self.block_loc[X_AXIS]) + ", " + str(y_axis_temp) + ")"
+        elif req_type is DIRECT_GNU:
+            loc_str = "(" + str(DIRECT_LOC[X_AXIS]) + ", " + str(DIRECT_LOC[Y_AXIS]) + ")"
         else:
             exit("ERROR: Found in ptolemy_location_update method. Parameter passed is incompatible\n")
         return copy.deepcopy(loc_str)
@@ -96,16 +99,16 @@ class gnuradio_writer:
     # used to generate locations for virteces without updating the
     # global objection location parameters
     def current_location(self, type_str):
-        if type_str == PARAM:
+        if type_str == PARAM_GNU:
             return copy.deepcopy(self.param_loc)
-        elif type_str == BLOCK:
+        elif type_str == BLOCK_GNU:
             return copy.deepcopy(self.block_loc)
         else:
             exit("ERROR: Found in current_location method.  Invalid request\n")
     def set_location(self, type_str, loc):
-        if type_str == PARAM:
+        if type_str == PARAM_GNU:
             self.param_loc = copy.deepcopy(loc)
-        elif type_str == BLOCK:
+        elif type_str == BLOCK_GNU:
             self.block_loc = copy.deepcopy(loc)
         else:
             exit("ERROR: Found in current_location method.  Invalid request\n")
@@ -118,106 +121,136 @@ class gnuradio_writer:
         return copy.deepcopy(loc_str)
     #def write_element(self, tag_str, name_str, class_str, value_str):
     def write_to_gnuradio_file(self, type_str, class_str, name, value, offset):
-        if type_str is PARAM:
-            print "param"
-        elif type_str is BLOCK:
-            if class_str is CLASS_OPTIONS:
-                node1 = self.write_element(BLOCK, NONE, NONE, NONE)
-                node2 = self.write_element(KEY,   class_str, NONE, NONE)
+        if type_str is PARAM_GNU:
+                node1 = self.write_element(BLOCK_GNU, NONE, NONE, NONE)
+                node2 = self.write_element(KEY_GNU,   class_str, NONE, NONE)
                 node1.appendChild(node2)
 
-                node2 = self.write_element(PARAM, NONE, NONE, NONE)                
-                node3 = self.write_element(KEY,   "id", NONE, NONE)
-                node4 = self.write_element(VALUE, "top_block", NONE, NONE)                
+                node2 = self.write_element(PARAM_GNU, NONE, NONE, NONE)                
+                node3 = self.write_element(KEY_GNU,   "id", NONE, NONE)
+                node4 = self.write_element(VALUE_GNU, name, NONE, NONE)                
                 node1.appendChild(node2)
-                node1.appendChild(node3)
-                node1.appendChild(node4)
-                node2 = self.write_element(PARAM, NONE, NONE, NONE)                
-                node3 = self.write_element(KEY,   "enabled", NONE, NONE)
-                node4 = self.write_element(VALUE, "true", NONE, NONE)                
+                node2.appendChild(node3)
+                node2.appendChild(node4)
+                node2 = self.write_element(PARAM_GNU, NONE, NONE, NONE)                
+                node3 = self.write_element(KEY_GNU,   "_enabled", NONE, NONE)
+                node4 = self.write_element(VALUE_GNU, "true", NONE, NONE)                
                 node1.appendChild(node2)
-                node1.appendChild(node3)
-                node1.appendChild(node4)
-                node2 = self.write_element(PARAM, NONE, NONE, NONE)                
-                node3 = self.write_element(KEY,   "title", NONE, NONE)
-                node4 = self.write_element(VALUE, "", NONE, NONE)                
+                node2.appendChild(node3)
+                node2.appendChild(node4)
+                node2 = self.write_element(PARAM_GNU, NONE, NONE, NONE)                
+                node3 = self.write_element(KEY_GNU,   "value", NONE, NONE)
+                node4 = self.write_element(VALUE_GNU, value[0], NONE, NONE)                
                 node1.appendChild(node2)
-                node1.appendChild(node3)
-                node1.appendChild(node4)
-                node2 = self.write_element(PARAM, NONE, NONE, NONE)                
-                node3 = self.write_element(KEY,   "author", NONE, NONE)
-                node4 = self.write_element(VALUE, "", NONE, NONE)                
+                node2.appendChild(node3)
+                node2.appendChild(node4)
+
+                loc_str = self.gnuradio_location_update(PARAM_GNU, 0)
+                
+                node2 = self.write_element(PARAM_GNU, NONE, NONE, NONE)                
+                node3 = self.write_element(KEY_GNU,   "_coordinate", NONE, NONE)
+                node4 = self.write_element(VALUE_GNU, loc_str, NONE, NONE)                
                 node1.appendChild(node2)
-                node1.appendChild(node3)
-                node1.appendChild(node4)
-                node2 = self.write_element(PARAM, NONE, NONE, NONE)                
-                node3 = self.write_element(KEY,   "description", NONE, NONE)
-                node4 = self.write_element(VALUE, "", NONE, NONE)                
+                node2.appendChild(node3)
+                node2.appendChild(node4)                
+        elif type_str is BLOCK_GNU:
+            if class_str is CLASS_OPTIONS:
+                node1 = self.write_element(BLOCK_GNU, NONE, NONE, NONE)
+                node2 = self.write_element(KEY_GNU,   class_str, NONE, NONE)
                 node1.appendChild(node2)
-                node1.appendChild(node3)
-                node1.appendChild(node4)                
-                node2 = self.write_element(PARAM, NONE, NONE, NONE)                
-                node3 = self.write_element(KEY,   "window_size", NONE, NONE)
-                node4 = self.write_element(VALUE, value[0], NONE, NONE)                
+
+                node2 = self.write_element(PARAM_GNU, NONE, NONE, NONE)                
+                node3 = self.write_element(KEY_GNU,   "id", NONE, NONE)
+                node4 = self.write_element(VALUE_GNU, "top_block", NONE, NONE)                
                 node1.appendChild(node2)
-                node1.appendChild(node3)
-                node1.appendChild(node4)
-                node2 = self.write_element(PARAM, NONE, NONE, NONE)                
-                node3 = self.write_element(KEY,   "generate_options", NONE, NONE)
-                node4 = self.write_element(VALUE, "wx_gui", NONE, NONE)                
+                node2.appendChild(node3)
+                node2.appendChild(node4)
+                node2 = self.write_element(PARAM_GNU, NONE, NONE, NONE)                
+                node3 = self.write_element(KEY_GNU,   "_enabled", NONE, NONE)
+                node4 = self.write_element(VALUE_GNU, "True", NONE, NONE)                
                 node1.appendChild(node2)
-                node1.appendChild(node3)
-                node1.appendChild(node4)
-                node2 = self.write_element(PARAM, NONE, NONE, NONE)                
-                node3 = self.write_element(KEY,   "category", NONE, NONE)
-                node4 = self.write_element(VALUE, "Custom", NONE, NONE)                
+                node2.appendChild(node3)
+                node2.appendChild(node4)
+                node2 = self.write_element(PARAM_GNU, NONE, NONE, NONE)                
+                node3 = self.write_element(KEY_GNU,   "title", NONE, NONE)
+                node4 = self.write_element(VALUE_GNU, "", NONE, NONE)                
                 node1.appendChild(node2)
-                node1.appendChild(node3)
-                node1.appendChild(node4)
-                node2 = self.write_element(PARAM, NONE, NONE, NONE)                
-                node3 = self.write_element(KEY,   "run_options", NONE, NONE)
-                node4 = self.write_element(VALUE, "prompt", NONE, NONE)                
+                node2.appendChild(node3)
+                node2.appendChild(node4)
+                node2 = self.write_element(PARAM_GNU, NONE, NONE, NONE)                
+                node3 = self.write_element(KEY_GNU,   "author", NONE, NONE)
+                node4 = self.write_element(VALUE_GNU, "", NONE, NONE)                
                 node1.appendChild(node2)
-                node1.appendChild(node3)
-                node1.appendChild(node4)
-                node2 = self.write_element(PARAM, NONE, NONE, NONE)                
-                node3 = self.write_element(KEY,   "run", NONE, NONE)
-                node4 = self.write_element(VALUE, "True", NONE, NONE)                
+                node2.appendChild(node3)
+                node2.appendChild(node4)
+                node2 = self.write_element(PARAM_GNU, NONE, NONE, NONE)                
+                node3 = self.write_element(KEY_GNU,   "description", NONE, NONE)
+                node4 = self.write_element(VALUE_GNU, "", NONE, NONE)                
                 node1.appendChild(node2)
-                node1.appendChild(node3)
-                node1.appendChild(node4)
-                node2 = self.write_element(PARAM, NONE, NONE, NONE)                
-                node3 = self.write_element(KEY,   "max_nouts", NONE, NONE)
-                node4 = self.write_element(VALUE, "0", NONE, NONE)                
+                node2.appendChild(node3)
+                node2.appendChild(node4)                
+                node2 = self.write_element(PARAM_GNU, NONE, NONE, NONE)                
+                node3 = self.write_element(KEY_GNU,   "window_size", NONE, NONE)
+                node4 = self.write_element(VALUE_GNU, value[0], NONE, NONE)                
                 node1.appendChild(node2)
-                node1.appendChild(node3)
-                node1.appendChild(node4)
-                node2 = self.write_element(PARAM, NONE, NONE, NONE)                
-                node3 = self.write_element(KEY,   "realtime_scheduling", NONE, NONE)
-                node4 = self.write_element(VALUE, "", NONE, NONE)                
+                node2.appendChild(node3)
+                node2.appendChild(node4)
+                node2 = self.write_element(PARAM_GNU, NONE, NONE, NONE)                
+                node3 = self.write_element(KEY_GNU,   "generate_options", NONE, NONE)
+                node4 = self.write_element(VALUE_GNU, "wx_gui", NONE, NONE)                
                 node1.appendChild(node2)
-                node1.appendChild(node3)
-                node1.appendChild(node4)
-                node2 = self.write_element(PARAM, NONE, NONE, NONE)                
-                node3 = self.write_element(KEY,   "coordinate", NONE, NONE)
-                node4 = self.write_element(VALUE, "(10, 10)", NONE, NONE)                
+                node2.appendChild(node3)
+                node2.appendChild(node4)
+                node2 = self.write_element(PARAM_GNU, NONE, NONE, NONE)                
+                node3 = self.write_element(KEY_GNU,   "category", NONE, NONE)
+                node4 = self.write_element(VALUE_GNU, "Custom", NONE, NONE)                
                 node1.appendChild(node2)
-                node1.appendChild(node3)
-                node1.appendChild(node4)
-                node2 = self.write_element(PARAM, NONE, NONE, NONE)                
-                node3 = self.write_element(KEY,   "rotation", NONE, NONE)
-                node4 = self.write_element(VALUE, "0", NONE, NONE)                
+                node2.appendChild(node3)
+                node2.appendChild(node4)
+                node2 = self.write_element(PARAM_GNU, NONE, NONE, NONE)                
+                node3 = self.write_element(KEY_GNU,   "run_options", NONE, NONE)
+                node4 = self.write_element(VALUE_GNU, "prompt", NONE, NONE)                
                 node1.appendChild(node2)
-                node1.appendChild(node3)
-                node1.appendChild(node4)                
+                node2.appendChild(node3)
+                node2.appendChild(node4)
+                node2 = self.write_element(PARAM_GNU, NONE, NONE, NONE)                
+                node3 = self.write_element(KEY_GNU,   "run", NONE, NONE)
+                node4 = self.write_element(VALUE_GNU, "True", NONE, NONE)                
+                node1.appendChild(node2)
+                node2.appendChild(node3)
+                node2.appendChild(node4)
+                node2 = self.write_element(PARAM_GNU, NONE, NONE, NONE)                
+                node3 = self.write_element(KEY_GNU,   "max_nouts", NONE, NONE)
+                node4 = self.write_element(VALUE_GNU, "0", NONE, NONE)                
+                node1.appendChild(node2)
+                node2.appendChild(node3)
+                node2.appendChild(node4)
+                node2 = self.write_element(PARAM_GNU, NONE, NONE, NONE)                
+                node3 = self.write_element(KEY_GNU,   "realtime_scheduling", NONE, NONE)
+                node4 = self.write_element(VALUE_GNU, "", NONE, NONE)                
+                node1.appendChild(node2)
+                node2.appendChild(node3)
+                node2.appendChild(node4)
+                node2 = self.write_element(PARAM_GNU, NONE, NONE, NONE)                
+                node3 = self.write_element(KEY_GNU,   "_coordinate", NONE, NONE)
+                node4 = self.write_element(VALUE_GNU, "(10, 10)", NONE, NONE)                
+                node1.appendChild(node2)
+                node2.appendChild(node3)
+                node2.appendChild(node4)
+                node2 = self.write_element(PARAM_GNU, NONE, NONE, NONE)                
+                node3 = self.write_element(KEY_GNU,   "_rotation", NONE, NONE)
+                node4 = self.write_element(VALUE_GNU, "0", NONE, NONE)                
+                node1.appendChild(node2)
+                node2.appendChild(node3)
+                node2.appendChild(node4)                
             else:
                 print "ERROR: Found in write_to_gnuradio BLOCK method. Parameter passed is incompatible= ",  class_str
-        elif type_str is CH:
-            print "channel"            
-        elif type_str is DIRECT:
-            print "director"            
-        elif type_str is PORT:
-            print "port"            
+        #elif type_str is CH_GNU:
+        #    print "channel"            
+        #elif type_str is DIRECT_GNU:
+        #    print "director"            
+        #elif type_str is PORT_GNU:
+        #    print "port"            
         else:
             print "ERROR: Found in write_to_gnuradio method. Parameter passed is incompatible= ",  type_str
             exit(-1)            

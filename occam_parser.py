@@ -473,18 +473,29 @@ class graph_handler:
 
 
         # Choose MoC
-        node1 = self.write_to_file(pgen, DIRECT, CLASS_SDF, NAME_SDF, "None", 0, mode)
-        pgen.top_element.appendChild(node1)
+        if mode is PTOLEMY:
+            node1 = self.write_to_file(pgen, DIRECT, CLASS_SDF, NAME_SDF, "None", 0, mode)
+            pgen.top_element.appendChild(node1)
 
         # Generate and Instantiate Parameters
         len_list = len(self.param_list)
+        print "START PARAMETER EXPORT"
         for i in range(len_list):
             param_name = self.param_list[i]
             param_val  = self.param_dict[param_name]
             param_val  = self.check_if_int_enforce(param_name, param_val)
             param_val  = self.check_if_long_enforce(param_name, param_val)
-            node1      = self.write_to_file(pgen, PARAM, CLASS_PARAMETER, param_name, [param_val], 0, mode)
+
+            if mode is PTOLEMY:
+                node1      = self.write_to_file(pgen, PARAM, CLASS_PARAMETER, param_name, [param_val], 0, mode)
+            elif mode is GNURADIO:
+                node1      = self.write_to_file(pgen, PARAM_GNU, CLASS_VARIABLE, param_name, [param_val], 0, mode)
+
             pgen.top_element.appendChild(node1)
+        if mode is GNURADIO:
+            pgen.write_to_xmlfile()
+            return True
+        print "END PARAMETER EXPORT"
         # Generate and Instantiate Blocks
         len_list = len(self.proc_list)
         for i in range(len_list):
@@ -532,6 +543,7 @@ class graph_handler:
                     self.inc_port_count(block_in_name, "input")
         self.reset_port_count()
         pgen.write_to_xmlfile()
+        return True
 
 if __name__ == "__main__":
     infile_name_list = ["csp-sdf-rx.occ", "csp-sdf-tx.occ", "csp-sdf-sim.occ"]
@@ -559,7 +571,7 @@ if __name__ == "__main__":
     top_handler.print_proc_dict()
     top_handler.print_top_matrix()
     top_handler.generate_code(PTOLEMY)
-    #top_handler.generate_code(GNURADIO)
+    top_handler.generate_code(GNURADIO)
 
     #outfile.close()
     #infile.close)(
