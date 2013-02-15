@@ -22,7 +22,7 @@ class gnuradio_writer:
         self.doc = self.impl.createDocument(EMPTY_NAMESPACE, FLOW_GNU,self.doctype)
         self.top_element = self.doc.documentElement
 
-        init_node0 = self.write_to_gnuradio_file(BLOCK_GNU, CLASS_OPTIONS, NONE, ["4096, 4096"], "None")
+        init_node0 = self.write_to_gnuradio_file(BLOCK_GNU, CLASS_OPTIONS, "OCCAM_generated", ["4096, 4096"], NONE)
         self.top_element.appendChild(init_node0)        
         
         self.param_loc = copy.deepcopy(PARAM_ORIG)
@@ -97,7 +97,7 @@ class gnuradio_writer:
         elif req_type is DIRECT_GNU:
             loc_str = "(" + str(DIRECT_LOC[X_AXIS]) + ", " + str(DIRECT_LOC[Y_AXIS]) + ")"
         else:
-            exit("ERROR: Found in ptolemy_location_update method. Parameter passed is incompatible\n")
+            exit("ERROR: Found in gnuradio_location_update method. Parameter passed is incompatible\n")
         return copy.deepcopy(loc_str)
     def convert_loc_to_str(self, loc):
         loc_str = "{" + str(loc[X_AXIS]) + ", " + str(loc[Y_AXIS]) + "}"
@@ -118,7 +118,7 @@ class gnuradio_writer:
             self.block_loc = copy.deepcopy(loc)
         else:
             exit("ERROR: Found in current_location method.  Invalid request\n")
-    def ptolemy_location_gen(self, offset):
+    def gnuradio_location_gen(self, offset):
 
         x_axis_temp = self.block_loc[X_AXIS] + BLOCK_STEP/2
         y_axis_temp = self.block_loc[Y_AXIS] + offset
@@ -134,21 +134,23 @@ class gnuradio_writer:
         # the type of the block
         node2 = self.write_element(KEY_GNU,   class_str, NONE)
         node1.appendChild(node2)
+        #if class_str != CLASS_OPTIONS:
         # the name of the block
         node2 = self.write_element(PARAM_GNU, "id", name)
         node1.appendChild(node2)
         # enable block
         node2 = self.write_element(PARAM_GNU, "enabled", "True")
         node1.appendChild(node2)
-        # set location for block
-        loc_str = self.gnuradio_location_update(PARAM_GNU, offset)
         if type_str is PARAM_GNU:
+                # set location for block
+                loc_str = self.gnuradio_location_update(PARAM_GNU, offset)
                 node2 = self.write_element(PARAM_GNU, "value", value[0])                
                 node1.appendChild(node2)
                 node2 = self.write_element(PARAM_GNU, "_coordinate", loc_str)                
                 node1.appendChild(node2)
         elif type_str is BLOCK_GNU:
             if class_str is CLASS_OPTIONS:
+                print "NAME= ", name
                 node2 = self.write_element(PARAM_GNU, "title", "")                
                 node1.appendChild(node2)
                 node2 = self.write_element(PARAM_GNU, "author","Almohanad Fayez")                
@@ -174,6 +176,8 @@ class gnuradio_writer:
                 node2 = self.write_element(PARAM_GNU, "_rotation", "0")                
                 node1.appendChild(node2)
             elif class_str is CLASS_INTERP_FIR_GNU:
+                # set location for block
+                loc_str = self.gnuradio_location_update(BLOCK_GNU, offset)
                 # 1- name of file with taps
                 # 2- type of filter "ccc", "ccf", ... etc
                 # 3- interpolation factor
@@ -191,6 +195,8 @@ class gnuradio_writer:
                 node1.appendChild(node2)                
                 infile_temp.close()                
             elif class_str is CLASS_FIR_GNU:
+                # set location for block
+                loc_str = self.gnuradio_location_update(BLOCK_GNU, offset)                
                 # 1- name of file with taps
                 # 2- type of filter "ccc", "ccf", ... etc
                 # 3- decimation factor
@@ -208,7 +214,10 @@ class gnuradio_writer:
                 node1.appendChild(node2)                
                 infile_temp.close()
             elif class_str is CLASS_MULT_CONST_GNU:
+                # set location for block
+                loc_str = self.gnuradio_location_update(BLOCK_GNU, offset)                
                 # 1- type (e.g. complex)
+                # 2- const value
                 node2 = self.write_element(PARAM_GNU, "type", value[0])
                 node1.appendChild(node2)
                 node2 = self.write_element(PARAM_GNU, "const", value[1])
@@ -217,12 +226,172 @@ class gnuradio_writer:
                 node1.appendChild(node2)
                 node2 = self.write_element(PARAM_GNU, COORDINATE, loc_str)
                 node1.appendChild(node2)
-                node2 = self.write_element(PARAM_GNU, ROTATION, loc_str)
+                node2 = self.write_element(PARAM_GNU, ROTATION, "0")
                 node1.appendChild(node2)
             elif class_str is CLASS_DBPSK_TX_GNU:
+                # set location for block
+                loc_str = self.gnuradio_location_update(BLOCK_GNU, offset)                
+                # 1- type (e.g. dbpsk)
+                # 2- samples per symbol
+                # 3- excess bw
+                # 4- gray coded? yes, no
+                # 5- verbose True or False
+                # 6- log, True or False
+                node2 = self.write_element(PARAM_GNU, "type", value[0])
+                node1.appendChild(node2)
+                node2 = self.write_element(PARAM_GNU, "samples_per_symbol", value[1])
+                node1.appendChild(node2)
+                node2 = self.write_element(PARAM_GNU, "excess_bw", value[2])
+                node1.appendChild(node2)
+                node2 = self.write_element(PARAM_GNU, "gray_coded", value[3])
+                node1.appendChild(node2)
+                node2 = self.write_element(PARAM_GNU, "verbose", value[4])
+                node1.appendChild(node2)
+                node2 = self.write_element(PARAM_GNU, "log", value[5])
+                node1.appendChild(node2)
+                node2 = self.write_element(PARAM_GNU, COORDINATE, loc_str)
+                node1.appendChild(node2)
+                node2 = self.write_element(PARAM_GNU, ROTATION, "0")
+                node1.appendChild(node2)
+            elif class_str is CLASS_DBPSK_ENC_GNU:
+                # set location for block
+                loc_str = self.gnuradio_location_update(BLOCK_GNU, offset)                
+                # 1- type (e.g. float)
+                # 2- samples per symbol
+                # 3- bits per symbol (e.g. 1 for dbpsk)
+                # - access_code
+                # - pad for usrp (True)
+                # - payload length (0 = auto)
+                node2 = self.write_element(PARAM_GNU, "type", value[0])
+                node1.appendChild(node2)
+                node2 = self.write_element(PARAM_GNU, "samples_per_symbol", value[1])
+                node1.appendChild(node2)
+                node2 = self.write_element(PARAM_GNU, "bits_per_symbol", value[2])
+                node1.appendChild(node2)
+                node2 = self.write_element(PARAM_GNU, "access_code", "")
+                node1.appendChild(node2)
+                node2 = self.write_element(PARAM_GNU, "pad_for_usrp", "True")
+                node1.appendChild(node2)
+                node2 = self.write_element(PARAM_GNU, "payload_length", "0")
+                node1.appendChild(node2)
+                node2 = self.write_element(PARAM_GNU, COORDINATE, loc_str)
+                node1.appendChild(node2)
+                node2 = self.write_element(PARAM_GNU, ROTATION, "0")
+                node1.appendChild(node2)
+            elif class_str is CLASS_DBPSK_DEC_GNU:
+                # set location for block
+                loc_str = self.gnuradio_location_update(BLOCK_GNU, offset)
+                # 1- type (float)
+                #  - access code (fixed "")
+                # 2- threshold (-1 auto ?)
+                node2 = self.write_element(PARAM_GNU, "type", value[0])
+                node1.appendChild(node2)
+                node2 = self.write_element(PARAM_GNU, "access_code", "")
+                node1.appendChild(node2)
+                node2 = self.write_element(PARAM_GNU, "threshold", value[1])
+                node1.appendChild(node2)                                
+                node2 = self.write_element(PARAM_GNU, COORDINATE, loc_str)
+                node1.appendChild(node2)
+                node2 = self.write_element(PARAM_GNU, ROTATION, "0")
+                node1.appendChild(node2)                                
+
             elif class_str is CLASS_DBPSK_RX_GNU:
+                # set location for block
+                loc_str = self.gnuradio_location_update(BLOCK_GNU, offset)                
+                # 1- type (e.g. dbpsk)
+                # 2- samples per symbol
+                # 3- excess bw
+                # 4- freq_bw
+                # 5- phase bw
+                # 6- timing bw
+                # 7- gray coded
+                # 8- verbose
+                # 9- log
+                # 10- sync_out, False for differential
+                node2 = self.write_element(PARAM_GNU, "type", value[0])
+                node1.appendChild(node2)
+                node2 = self.write_element(PARAM_GNU, "samples_per_symbol", value[1])
+                node1.appendChild(node2)
+                node2 = self.write_element(PARAM_GNU, "excess_bw", value[2])
+                node1.appendChild(node2)
+                node2 = self.write_element(PARAM_GNU, "freq_bw", value[3])
+                node1.appendChild(node2)
+                node2 = self.write_element(PARAM_GNU, "phase_bw", value[4])
+                node1.appendChild(node2)
+                node2 = self.write_element(PARAM_GNU, "timing_bw", value[5])
+                node1.appendChild(node2)
+                node2 = self.write_element(PARAM_GNU, "gray_coded", value[6])
+                node1.appendChild(node2)
+                node2 = self.write_element(PARAM_GNU, "verbose", value[7])
+                node1.appendChild(node2)
+                node2 = self.write_element(PARAM_GNU, "log", value[8])
+                node1.appendChild(node2)
+                node2 = self.write_element(PARAM_GNU, "sync_out", value[9])
+                node1.appendChild(node2)
+                node2 = self.write_element(PARAM_GNU, COORDINATE, loc_str)
+                node1.appendChild(node2)
+                node2 = self.write_element(PARAM_GNU, ROTATION, "0")
+                node1.appendChild(node2)
             elif class_str is CLASS_SCOPE_GNU:
+                # set location for block
+                loc_str = self.gnuradio_location_update(BLOCK_GNU, offset)                
+                # 1-  (0)type (e.g. float, complex)
+                # 2-  (1)title
+                # 3-  (2)samp_rate
+                # 4-  (-)v_scale (0-fixed)
+                # 5-  (-)v_offset (0-fixed)
+                # 6-  (3)t_scale  (e.g. 1/freq)
+                # 7-  (-)ac_couple (False)
+                # 8-  (-)xy_mode (False)
+                # 9-  (4)num_inputs (e.g. 1)
+                # 10- (-)win_size (e.g. "")
+                # 11- (-)grid_pos ""
+                # 12- (-)trig_mode (fixed gr.gr_TRIG_MODE_AUTO)
+                # 13- (5)y_axis_labl
+                node2 = self.write_element(PARAM_GNU, "type", value[0])
+                node1.appendChild(node2)
+                node2 = self.write_element(PARAM_GNU, "title", value[1])
+                node1.appendChild(node2)
+                node2 = self.write_element(PARAM_GNU, "samp_rate", value[2])
+                node1.appendChild(node2)
+                node2 = self.write_element(PARAM_GNU, "v_scale", "0")
+                node1.appendChild(node2)
+                node2 = self.write_element(PARAM_GNU, "v_offset", "0")
+                node1.appendChild(node2)
+                node2 = self.write_element(PARAM_GNU, "t_scale", value[3])
+                node1.appendChild(node2)
+                node2 = self.write_element(PARAM_GNU, "ac_couple", "False")
+                node1.appendChild(node2)
+                node2 = self.write_element(PARAM_GNU, "num_inputs", value[4])
+                node1.appendChild(node2)
+                node2 = self.write_element(PARAM_GNU, "win_size", "")
+                node1.appendChild(node2)
+                node2 = self.write_element(PARAM_GNU, "grid_pos", "")
+                node1.appendChild(node2)
+                node2 = self.write_element(PARAM_GNU, "trig_mode", "gr.gr_TRIG_MODE_AUTO")
+                node1.appendChild(node2)
+                node2 = self.write_element(PARAM_GNU, "y_axis_label", value[5])
+                node1.appendChild(node2)
+                node2 = self.write_element(PARAM_GNU, COORDINATE, loc_str)
+                node1.appendChild(node2)
+                node2 = self.write_element(PARAM_GNU, ROTATION, "0")
+                node1.appendChild(node2)                
+            elif class_str is CLASS_ADD_GNU:
+                # set location for block
+                loc_str = self.gnuradio_location_update(BLOCK_GNU, offset)                
+                # 1- type (e.g. complex)
+                # 2- number of inputs
+                node2 = self.write_element(PARAM_GNU, "type", value[0])
+                node1.appendChild(node2)
+                node2 = self.write_element(PARAM_GNU, "type", value[1])
+                node1.appendChild(node2)
+                node2 = self.write_element(PARAM_GNU, COORDINATE, loc_str)
+                node1.appendChild(node2)
+                node2 = self.write_element(PARAM_GNU, ROTATION, "0")
+                node1.appendChild(node2)
             elif class_str is CLASS_NOISE_GNU:
+                # set location for block
+                loc_str = self.gnuradio_location_update(BLOCK_GNU, offset)                
                 # 1- Type (e.g. complex)
                 # 2- Noise Type
                 # 3- Amplitude
@@ -240,6 +409,8 @@ class gnuradio_writer:
                 node2 = self.write_element(PARAM_GNU, ROTATION, "0")
                 node1.appendChild(node2)
             elif class_str is CLASS_SIG_GNU:
+                # set location for block
+                loc_str = self.gnuradio_location_update(BLOCK_GNU, offset)                
                 # 1- sampling_freq
                 # 2- waveform
                 # 3- frequency

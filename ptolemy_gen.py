@@ -389,11 +389,11 @@ class ptolemy_writer:
                 node1 = self.write_element(ENT, name, class_str, "None")
                 node2 = self.write_element(PROP, NAME_LOCATION, CLASS_LOCATION, loc_str)                
                 node1.appendChild(node2)                
-            elif class_str is CLASS_BOOL_ANY:
-                loc_str = self.ptolemy_location_update(BLOCK, offset)
-                node1 = self.write_element(ENT, name, class_str, "None")
-                node2 = self.write_element(PROP, NAME_LOCATION, CLASS_LOCATION, loc_str)                
-                node1.appendChild(node2)
+            #elif class_str is CLASS_BOOL_ANY:
+            #    loc_str = self.ptolemy_location_update(BLOCK, offset)
+            #    node1 = self.write_element(ENT, name, class_str, "None")
+            #    node2 = self.write_element(PROP, NAME_LOCATION, CLASS_LOCATION, loc_str)                
+            #    node1.appendChild(node2)
             elif class_str is CLASS_RAMP:
                 loc_str = self.ptolemy_location_update(BLOCK, offset)
                 node1 = self.write_element(ENT, name, class_str, "None")
@@ -419,6 +419,95 @@ class ptolemy_writer:
                 node1.appendChild(node4)
                 
             # User Defined Composite Blocks
+            elif class_str is CLASS_DBPSK_DEC:
+                name_inport = "input"
+                name_outport = "output"
+                
+                name_rel_inport = "inCh"
+
+                # save the current location in the flowgraph so we can
+                # go back to it after we're done building the current
+                # composite actor                
+                orig_loc_str = self.ptolemy_location_update(BLOCK, offset)
+                orig_loc = self.current_location(BLOCK)
+                self.set_location(BLOCK, BLOCK_ORIG)
+
+                # Instantiate the container composite actor
+                node0 = self.write_element(ENT, name, CLASS_COMP_ACT, "None")
+
+                # set location the composite actor
+                node1 = self.write_element(PROP, NAME_LOCATION, CLASS_LOCATION, orig_loc_str)
+                node0.appendChild(node1)
+
+                # create ports for the composite actor
+                node1 = self.write_element(PORT, name_inport, CLASS_NAMED_IO_PORT, "None")
+                node2 = self.write_element(PROP, "input", "None", "None")
+                node0.appendChild(node1)
+                node1.appendChild(node2)
+
+                #contents of composite actor
+
+                loc_str = self.ptolemy_location_update(BLOCK, offset)
+                node1 = self.write_element(PORT, name_outport, CLASS_NAMED_IO_PORT, "None")
+                node2 = self.write_element(PROP, "output", "None", "None")
+                node3 = self.write_element(PROP, NAME_LOCATION, CLASS_LOCATION, loc_str)                
+                node0.appendChild(node1)
+                node1.appendChild(node2)
+                node1.appendChild(node3)
+
+                chan1 = self.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_rel_inport, ["no"], 0)
+                node0.appendChild(chan1)
+                [chana, chanb] = self.link_in_ptolemy_file(name_inport, name_outport, name_rel_inport)
+                node0.appendChild(chana)
+                node0.appendChild(chanb)
+
+                self.set_location(BLOCK, orig_loc)
+                
+                return node0                                
+            elif class_str is CLASS_DBPSK_ENC:
+                name_inport = "input"
+                name_outport = "output"
+                
+                name_rel_inport = "inCh"
+
+                # save the current location in the flowgraph so we can
+                # go back to it after we're done building the current
+                # composite actor                
+                orig_loc_str = self.ptolemy_location_update(BLOCK, offset)
+                orig_loc = self.current_location(BLOCK)
+                self.set_location(BLOCK, BLOCK_ORIG)
+
+                # Instantiate the container composite actor
+                node0 = self.write_element(ENT, name, CLASS_COMP_ACT, "None")
+
+                # set location the composite actor
+                node1 = self.write_element(PROP, NAME_LOCATION, CLASS_LOCATION, orig_loc_str)
+                node0.appendChild(node1)
+
+                # create ports for the composite actor
+                node1 = self.write_element(PORT, name_inport, CLASS_NAMED_IO_PORT, "None")
+                node2 = self.write_element(PROP, "input", "None", "None")
+                node0.appendChild(node1)
+                node1.appendChild(node2)
+
+
+                loc_str = self.ptolemy_location_update(BLOCK, offset)
+                node1 = self.write_element(PORT, name_outport, CLASS_NAMED_IO_PORT, "None")
+                node2 = self.write_element(PROP, "output", "None", "None")
+                node3 = self.write_element(PROP, NAME_LOCATION, CLASS_LOCATION, loc_str)                
+                node0.appendChild(node1)
+                node1.appendChild(node2)
+                node1.appendChild(node3)
+
+                chan1 = self.write_to_ptolemy_file(CH, CLASS_NAMED_IO_RELATION, name_rel_inport, ["no"], 0)
+                node0.appendChild(chan1)
+                [chana, chanb] = self.link_in_ptolemy_file(name_inport, name_outport, name_rel_inport)
+                node0.appendChild(chana)
+                node0.appendChild(chanb)
+
+                self.set_location(BLOCK, orig_loc)
+                
+                return node0                                
             elif class_str is CLASS_USER_FIR:
                 name_inport = "input"
                 name_outport = "output"
@@ -1258,7 +1347,9 @@ class ptolemy_writer:
                 node0.appendChild(chan1)
                 [chana, chanb] = self.link_in_ptolemy_file(name_demod+".output", name_dec+".input", name_rel_demod)
                 node0.appendChild(chana)
-                node0.appendChild(chanb)                
+                node0.appendChild(chanb)
+
+                
                 #####################################################################
                 ## OUTPUT Port
                 #####################################################################

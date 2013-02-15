@@ -42,6 +42,10 @@ class graph_handler:
         # ptolemy
         self.int_param_enforce_dict  = {'symbolTime':0, 'samplingRate':0, 'seedValG':0, 'samplingRate':0, 'samplingRate2':0}
         self.long_param_enforce_dict = {'seedValG':0}
+        ###################################################
+        ## Provides the class names for the blocks in    ##
+        ## Ptolemy and GNU Radio                         ##
+        ###################################################        
         # PORT_COUNT = used to iterate through connecting ports for
         # blocks with multiple input or output ports
         self.block_map_dict = {'rfOut'            :[CLASS_USER_OUTPUT, 0, 0, 0],
@@ -52,14 +56,19 @@ class graph_handler:
                                'dataSrc'          :[CLASS_CONST,   CLASS_SIG_GNU, 0, 0],
                                'carrierScale'     :[CLASS_SCALE,   CLASS_MULT_CONST_GNU, 0, 0],
                                'carrier'          :[CLASS_SINE,    CLASS_SIG_GNU, 0, 0],
-                               'dbpskTransmitter' :[CLASS_DBPSK_TX,CLASS_DBPSK_TX_GNU, 0, 0],
+                               'dbpskMod'         :[CLASS_DBPSK_TX,CLASS_DBPSK_TX_GNU, 0, 0],
+                               'dbpskEnc'         :[CLASS_DBPSK_ENC,CLASS_DBPSK_ENC_GNU, 0, 0],
                                'rfIn'             :[CLASS_CONST,       0, 0, 0],
-                               'dbpskReceiver'    :[CLASS_DBPSK_RX, CLASS_DBPSK_RX_GNU, 0, 0],
+                               'dbpskDemod'       :[CLASS_DBPSK_RX, CLASS_DBPSK_RX_GNU, 0, 0],
+                               'dbpskDec'         :[CLASS_DBPSK_DEC, CLASS_DBPSK_DEC_GNU, 0, 0],
                                'dataOut'          :[CLASS_USER_OUTPUT, CLASS_SCOPE_GNU, 0, 0],
                                'gauss'            :[CLASS_GAUSS, CLASS_NOISE_GNU, 0, 0],
                                'gaussScale'       :[CLASS_SCALE, CLASS_MULT_CONST_GNU, 0, 0],
                                'add'              :[CLASS_ADDSUB,CLASS_ADD_GNU, 0, 0]
                               }
+        ###################################################
+        ## Provides port names for the respective blocks ##
+        ###################################################        
         self.block_port_dict_input = {'rfOut'    :[".input"],
                                'channelFilter'   :[".input"],
                                'channelFilter2'  :[".input"],
@@ -68,13 +77,32 @@ class graph_handler:
                                'dataSrc'         :[".input"],
                                'carrierScale'    :[".input"],
                                'carrier'         :[".input"],
-                               'dbpskTransmitter':[".datain"],
+                               'dbpskMod'        :[".datain"],
+                               'dbpskEnc'        :[".input"],                                      
                                'rfIn'            :[".input"],
-                               'dbpskReceiver'   :[".rfsig"],
+                               'dbpskDemod'      :[".rfsig"],
+                               'dbpskDec'        :[".input"],
                                'dataOut'         :[".input"],
                                'gaussScale'      :[".input"],
                                'add'             :[".plus"]
                               }
+        self.block_port_dict_input_gnu = {'rfOut'    :["0"],
+                               'channelFilter'   :["0"],
+                               'channelFilter2'  :["0"],
+                               'rfScale'         :["0"],
+                               'rfScale2'        :["0"],
+                               'dataSrc'         :["0"],
+                               'carrierScale'    :["0"],
+                               'carrier'         :["0"],
+                               'dbpskMod'        :["0"],
+                               'dbpskEnc'        :["0"],                                      
+                               'rfIn'            :["0"],
+                               'dbpskDemod'      :["0"],
+                               'dbpskDec'        :["0"],
+                               'dataOut'         :["0"],
+                               'gaussScale'      :["0"],
+                               'add'             :["0, 1"]
+                              }        
         self.block_port_dict_output = {'rfOut'   :[".output"],
                                'channelFilter'   :[".output"],
                                'channelFilter2'  :[".output"],
@@ -83,14 +111,37 @@ class graph_handler:
                                'dataSrc'         :[".output"],
                                'carrierScale'    :[".output"],
                                'carrier'         :[".output"],
-                               'dbpskTransmitter':[".output"],
+                               'dbpskMod'        :[".output"],
+                               'dbpskEnc'        :[".output"],
                                'rfIn'            :[".output"],
-                               'dbpskReceiver'   :[".output"],
+                               'dbpskDemod'      :[".output"],
+                               'dbpskDec'        :[".output"],
                                'dataOut'         :[".output"],
                                'gauss'           :[".output"],
                                'gaussScale'      :[".output"],
                                'add'             :[".output"]
                               }
+        self.block_port_dict_output_gnu = {'rfOut'   :["0"],
+                               'channelFilter'   :["0"],
+                               'channelFilter2'  :["0"],
+                               'rfScale'         :["0"],
+                               'rfScale2'        :["0"],
+                               'dataSrc'         :["0"],
+                               'carrierScale'    :["0"],
+                               'carrier'         :["0"],
+                               'dbpskMod'        :["0"],
+                               'dbpskEnc'        :["0"],
+                               'rfIn'            :["0"],
+                               'dbpskDemod'      :["0"],
+                               'dbpskDec'        :["0"],
+                               'dataOut'         :["0"],
+                               'gauss'           :["0"],
+                               'gaussScale'      :["0"],
+                               'add'             :["0"]
+                              }
+        ###################################################
+        ## Provides offset in the x,y plane for blocks   ##
+        ###################################################        
         self.offset_dict = {'rfOut'            :[0,  0],
                              'channelFilter'   :[0,  0],
                              'channelFilter2'  :[0,  0],
@@ -99,14 +150,22 @@ class graph_handler:
                              'dataSrc'         :[0,  0],
                              'carrierScale'    :[50, 0],
                              'carrier'         :[50, 0],
-                             'dbpskTransmitter':[0,  0],
+                             'dbpskMod'        :[0,  0],
+                             'dbpskEnc'        :[0,  0],
                              'rfIn'            :[0,  0],
-                             'dbpskReceiver'   :[0,  0],
+                             'dbpskDemod'      :[0,  0],
+                             'dbpskDec'        :[0,  0],
                              'dataOut'         :[0,  0],
                              'gauss'           :[50, 50],
                              'gaussScale'      :[50, 50], 
                              'add'             :[0,  0]
                            }
+        #######################################################
+        ## Provides the initial value of blocks in ptolemy   ##
+        ## and gnuradio                                      ##
+        ## NOTE: these are setup later in the code according ##
+        ## to the metadata associated with the blocks        ##
+        #######################################################
         self.value_dict = {'rfOut'           :["None"],
                            'channelFilter'   :["None"],
                            'channelFilter2'  :["None"],
@@ -115,9 +174,11 @@ class graph_handler:
                            'dataSrc'         :["None"],
                            'carrierScale'    :["None"],
                            'carrier'         :["None"],
-                           'dbpskTransmitter':["None"],
+                           'dbpskMod'        :["None"],
+                           'dbpskEnc'        :["None"],                           
                            'rfIn'            :["None"],
-                           'dbpskReceiver'   :["None"],
+                           'dbpskDemod'      :["None"],
+                           'dbpskDec'        :["None"],                           
                            'dataOut'         :["None"],
                            'gauss'           :["None"],
                            'gaussScale'      :["None"],
@@ -131,9 +192,11 @@ class graph_handler:
                            'dataSrc'         :["None"],
                            'carrierScale'    :["None"],
                            'carrier'         :["None"],
-                           'dbpskTransmitter':["None"],
+                           'dbpskMod'        :["None"],
+                           'dbpskEnc'        :["None"],                               
                            'rfIn'            :["None"],
-                           'dbpskReceiver'   :["None"],
+                           'dbpskDemod'      :["None"],
+                           'dbpskDec'        :["None"],                               
                            'dataOut'         :["None"],
                            'gauss'           :["None"],
                            'gaussScale'      :["None"],
@@ -422,31 +485,45 @@ class graph_handler:
                            'dataSrc'          :["7"],
                            'carrierScale'     :["carrierGain"],
                            'carrier'          :["samplingRate", "carrierFreq", "carrierPhase"],
-                           'dbpskTransmitter' :["samplingRate*symbolTime"],
+                           'dbpskMod'         :["samplingRate*symbolTime"],
+                           'dbpskEnc'         :["1"],
                            'rfIn'             :["None"],
-                           'dbpskReceiver'    :["recvThresh"],
+                           'dbpskDemod'       :["recvThresh"],
+                           'dbpskDec'         :["1"],                           
                            'dataOut'          :["None"],
                            'gauss'            :["seedValG", "meanValG", "stdValG"],
                            'gaussScale'       :["gaussGain"],
                            'add'              :["None"],
                            'rfScale2'         :["rfGain2"]
                             }
-        self.value_dict_gnu = {'rfOut'        :["None"],
-                           'channelFilter'    :["rc"+self.param_dict["rcFiltCoeff"]+".dat", "samplingRate2/samplingRate", "1"],
-                           'channelFilter2'   :["rc"+self.param_dict["rcFiltCoeff"]+".dat", "1", "samplingRate2/samplingRate"],
-                           'rfScale'          :["rfGain"],
+        self.value_dict_gnu = {'rfOut'        :["complex", "Output RF", "samplingRate2", "1/500.0", "1", "RF Value"],
+                           'channelFilter'    :["rc"+self.param_dict["rcFiltCoeff"]+".dat", "1", "samplingRate2/samplingRate", "ccf", "samplingRate2/samplingRate"],
+                           'channelFilter2'   :["rc"+self.param_dict["rcFiltCoeff"]+".dat", "1", "samplingRate2/samplingRate", "ccf", "samplingRate2/samplingRate"],
+                           'rfScale'          :["complex", "rfGain"],
                            'dataSrc'          :["samplingRate", CLASS_SINE_GNU, "500.0", "carrierGain"],
                            'carrierScale'     :["carrierGain"],
                            'carrier'          :["samplingRate", CLASS_SINE_GNU, "500.0", "carrierGain"],
-                           'dbpskTransmitter' :["samplingRate*symbolTime"],
+                           'dbpskEnc'         :["float", "2", "1"],
+                           'dbpskMod'         :["dbpsk", "2", "0.35","yes", "False", "False"],
                            'rfIn'             :["None"],
-                           'dbpskReceiver'    :["recvThresh"],
-                           'dataOut'          :["None"],
-                           'gauss'            :["seedValG", "meanValG", "stdValG"],
-                           'gaussScale'       :["gaussGain"],
-                           'add'              :["None"],
-                           'rfScale2'         :["rfGain2"]
-                            }        
+                           'dbpskDemod'       :["dbpsk","2","0.35","6.28/100.0", "6.28/100.0", "6.28/100.0", "True", "False", "False", "False"],
+                           'dbpskDec'         :["float", "-1"],
+                           'dataOut'          :["float", "Data Out","samplingRate", "1/500.0", "1", "Data Value"],
+                           'gauss'            :["complex", CLASS_GAUSS_GNU, "0.3", "0"],
+                           'gaussScale'       :["complex", "gaussGain"],
+                           'add'              :["complex", "2"],
+                           'rfScale2'         :["complex", "gaussGain"]
+                            }
+                        # 1- type (e.g. dbpsk)
+                # 2- samples per symbol
+                # 3- excess bw
+                # 4- freq_bw
+                # 5- phase bw
+                # 6- timing bw
+                # 7- gray coded
+                # 8- verbose
+                # 9- log
+                # 10- sync_out, False for differential
     def get_port_count(self, block_name, direction):
         if direction == "input":
             return self.block_map_dict[block_name][INPORT_COUNT]
@@ -511,7 +588,6 @@ class graph_handler:
 
         # Generate and Instantiate Parameters
         len_list = len(self.param_list)
-        print "START PARAMETER EXPORT"
         for i in range(len_list):
             param_name = self.param_list[i]
             param_val  = self.param_dict[param_name]
@@ -530,20 +606,18 @@ class graph_handler:
         for i in range(len_list):
             block_name   = self.proc_list[i]
             class_name   = self.block_map_dict[block_name][mode]
-            print "ptolem= ", self.block_map_dict[block_name][0], "gnuradio= ", self.block_map_dict[block_name][1]
             block_offset = self.offset_dict[block_name][mode]
             if mode == PTOLEMY:
                 block_value  = self.value_dict[block_name]
                 node1 = self.write_to_file(pgen, BLOCK, class_name, block_name, block_value, block_offset, mode)
             elif mode == GNURADIO:
-                block_value  = self.value_dict_gnu[block_name]
                 print "block_name = ", block_name, " class_name= ", class_name
+                block_value  = self.value_dict_gnu[block_name]
                 node1 = self.write_to_file(pgen, BLOCK_GNU, class_name, block_name, block_value, block_offset, mode)
             pgen.top_element.appendChild(node1)
-            print "END PARAMETER EXPORT"
-            if mode is GNURADIO:
-                pgen.write_to_xmlfile()
-                return True
+        if mode is GNURADIO:
+            pgen.write_to_xmlfile()
+            return True
 
         #Generate and Instantiate Connections
         len_list  = len(self.chan_list)

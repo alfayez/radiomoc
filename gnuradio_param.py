@@ -13,6 +13,9 @@ CLASS_DBPSK_RX_GNU       = "digital_dxpsk_demod"
 CLASS_NOISE_GNU          = "analog_noise_source_x"
 CLASS_ADD_GNU            = "blocks_add_xx"
 CLASS_SCOPE_GNU          = "wxgui_scopesink2"
+CLASS_GAUSS_GNU          = "analog.GR_GAUSSIAN"
+CLASS_DBPSK_ENC_GNU      = "blks2_packet_encoder"
+CLASS_DBPSK_DEC_GNU      = "blks2_packet_decoder"
 
 # Init Values
 XML_HEADER1 = "<?xml version=\"1.0\" standalone=\"no\"?>"
@@ -24,7 +27,7 @@ PARAM_STEP  = 60
 PARAM_OFFSET = 25
 
 BLOCK_ORIG  = [0, 200]
-BLOCK_STEP  = 200
+BLOCK_STEP  = 230
 BLOCK_OFFSET = 25
 
 X_AXIS = 0
