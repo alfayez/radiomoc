@@ -89,7 +89,6 @@ class gnuradio_writer:
             self.param_loc[Y_AXIS] = self.param_loc[Y_AXIS] + PARAM_STEP
             x_axis_temp = self.param_loc[X_AXIS] + offset
             loc_str = "(" + str(x_axis_temp) + ", " + str(self.param_loc[Y_AXIS]) + ")"
-            print "gnuradio loc_str= ", loc_str
         elif req_type is BLOCK_GNU:
             self.block_loc[X_AXIS] = self.block_loc[X_AXIS] + BLOCK_STEP
             y_axis_temp = self.block_loc[Y_AXIS] + offset
@@ -150,7 +149,6 @@ class gnuradio_writer:
                 node1.appendChild(node2)
         elif type_str is BLOCK_GNU:
             if class_str is CLASS_OPTIONS:
-                print "NAME= ", name
                 node2 = self.write_element(PARAM_GNU, "title", "")                
                 node1.appendChild(node2)
                 node2 = self.write_element(PARAM_GNU, "author","Almohanad Fayez")                
@@ -443,22 +441,31 @@ class gnuradio_writer:
             print "ERROR: Found in write_to_gnuradio method. Parameter passed is incompatible= ",  type_str
             exit(-1)            
         return node1
-    def link_in_gnuradio_file(self, out_unit, in_unit, name_relation):
-        if out_unit != "None":
-            node1 = self.doc.createElement(LINK)
-            node1.setAttribute("port", out_unit)
-            node1.setAttribute(RELATION, name_relation)
-        else:
-            node1 = "None"
-            
-        if in_unit != "None":
-            node2 = self.doc.createElement(LINK)
-            node2.setAttribute("port", in_unit)
-            node2.setAttribute(RELATION, name_relation)
-        else:
-            node2 = "None"
+    def link_in_gnuradio_file(self, block_out, out_index, block_in, in_index):
+        node1 = self.doc.createElement("connection")
 
-        return [node1, node2]
+        if block_out != "None":
+            node2 = self.doc.createElement("source_block_id")
+            node3 = self.doc.createTextNode(block_out)
+            node1.appendChild(node2)
+            node2.appendChild(node3)
+        if block_in != "None":
+            node2 = self.doc.createElement("sink_block_id")
+            node3 = self.doc.createTextNode(block_in)
+            node1.appendChild(node2)
+            node2.appendChild(node3)
+        if block_out != "None":
+            node2 = self.doc.createElement("source_key")
+            node3 = self.doc.createTextNode(str(out_index))
+            node1.appendChild(node2)
+            node2.appendChild(node3)
+        if block_in != "None":
+            node2 = self.doc.createElement("sink_key")
+            node3 = self.doc.createTextNode(str(in_index))
+            node1.appendChild(node2)
+            node2.appendChild(node3)
+
+        return node1
 
 def test_gnuradio():
     print "Hello!"

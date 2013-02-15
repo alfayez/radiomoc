@@ -101,7 +101,7 @@ class graph_handler:
                                'dbpskDec'        :["0"],
                                'dataOut'         :["0"],
                                'gaussScale'      :["0"],
-                               'add'             :["0, 1"]
+                               'add'             :["0", "1"]
                               }        
         self.block_port_dict_output = {'rfOut'   :[".output"],
                                'channelFilter'   :[".output"],
@@ -497,8 +497,8 @@ class graph_handler:
                            'rfScale2'         :["rfGain2"]
                             }
         self.value_dict_gnu = {'rfOut'        :["complex", "Output RF", "samplingRate2", "1/500.0", "1", "RF Value"],
-                           'channelFilter'    :["rc"+self.param_dict["rcFiltCoeff"]+".dat", "1", "samplingRate2/samplingRate", "ccf", "samplingRate2/samplingRate"],
-                           'channelFilter2'   :["rc"+self.param_dict["rcFiltCoeff"]+".dat", "1", "samplingRate2/samplingRate", "ccf", "samplingRate2/samplingRate"],
+                           'channelFilter'    :["rc"+self.param_dict["rcFiltCoeff"]+".dat", "ccf", "samplingRate2/samplingRate"],
+                           'channelFilter2'   :["rc"+self.param_dict["rcFiltCoeff"]+".dat", "ccf", "samplingRate2/samplingRate"],
                            'rfScale'          :["complex", "rfGain"],
                            'dataSrc'          :["samplingRate", CLASS_SINE_GNU, "500.0", "carrierGain"],
                            'carrierScale'     :["carrierGain"],
@@ -567,7 +567,6 @@ class graph_handler:
             return pgen.link_in_gnuradio_file(out_unit, in_unit, name_relation)
     def generate_code(self, mode):
         
-        print "Mode = ", mode
         filename = self.get_filename(infile_name)
         model_name = filename
 
@@ -611,13 +610,9 @@ class graph_handler:
                 block_value  = self.value_dict[block_name]
                 node1 = self.write_to_file(pgen, BLOCK, class_name, block_name, block_value, block_offset, mode)
             elif mode == GNURADIO:
-                print "block_name = ", block_name, " class_name= ", class_name
                 block_value  = self.value_dict_gnu[block_name]
                 node1 = self.write_to_file(pgen, BLOCK_GNU, class_name, block_name, block_value, block_offset, mode)
             pgen.top_element.appendChild(node1)
-        if mode is GNURADIO:
-            pgen.write_to_xmlfile()
-            return True
 
         #Generate and Instantiate Connections
         len_list  = len(self.chan_list)
@@ -627,30 +622,36 @@ class graph_handler:
             chan_name      = self.chan_list[i]
             block_out_name = self.chan_dict[chan_name][OUT_CHAN]
             block_in_name  = self.chan_dict[chan_name][IN_CHAN]
-            if ((len(block_in_name)>0) and (len(block_out_name)>0)):                    
-                out_index = self.get_port_count(block_out_name, "output")
+            if ((len(block_in_name)>0) and (len(block_out_name)>0)):
+                Out_index = self.get_port_count(block_out_name, "output")
                 in_index  = self.get_port_count(block_in_name, "input")
+                if mode == PTOLEMY:
+                    chan1 = self.write_to_file(pgen, CH, CLASS_NAMED_IO_RELATION, chan_name, "no", 0, mode)
+                    pgen.top_element.appendChild(chan1)
 
-                chan1 = self.write_to_file(pgen, CH, CLASS_NAMED_IO_RELATION, chan_name, "no", 0, mode)
-                pgen.top_element.appendChild(chan1)
+                    # this allows connections into blocks with
+                    # multiple input ports or non-default port names.
+                    # Each time a block name appears an index is
+                    # iterated which allows us to access the name of
+                    # the next physical port in the block
+                    outport_name = block_out_name+self.block_port_dict_output[block_out_name][out_index]
+                    inport_name  = block_in_name+self.block_port_dict_input[block_in_name][in_index]
 
-                # this allows connections into blocks with
-                # multiple input ports or non-default port names.
-                # Each time a block name appears an index is
-                # iterated which allows us to access the name of
-                # the next physical port in the block
-                outport_name = block_out_name+self.block_port_dict_output[block_out_name][out_index]
-                inport_name  = block_in_name+self.block_port_dict_input[block_in_name][in_index]
+                    [chana, chanb] = pgen.link_in_ptolemy_file(outport_name, inport_name, chan_name)
+                    pgen.top_element.appendChild(chana)
+                    pgen.top_element.appendChild(chanb)
 
-                [chana, chanb] = self.link_in_file(pgen, outport_name, inport_name, chan_name, mode)
-                pgen.top_element.appendChild(chana)
-                pgen.top_element.appendChild(chanb)
-
-                # increment port count except if port count limit
-                # is reached but there are more connections then
-                # this port is a multiport allowing multiple connections
-                out_lim = len(self.block_port_dict_output[block_out_name])
-                in_lim  = len(self.block_port_dict_input[block_in_name])
+                    # increment port count except if port count limit
+                    # is reached but there are more connections then
+                    # this port is a multiport allowing multiple connections
+                    out_lim = len(self.block_port_dict_output[block_out_name])
+                    in_lim  = len(self.block_port_dict_input[block_in_name])
+                elif mode == GNURADIO:
+                    chana = pgen.link_in_gnuradio_file(block_out_name, Out_index, block_in_name, in_index)
+                    pgen.top_element.appendChild(chana)
+                    out_lim = len(self.block_port_dict_output_gnu[block_out_name])
+                    in_lim  = len(self.block_port_dict_input_gnu[block_in_name])
+                    
                 if out_lim > (out_index+1):
                     self.inc_port_count(block_out_name, "output")
                 if in_lim > (in_index+1):
@@ -672,19 +673,21 @@ if __name__ == "__main__":
 
     # peforms initial parameter parsing of the occam file
     top_handler.parse_input_file_param()
-    top_handler.print_parameters()
-    top_handler.print_parameter_list()    
+    #top_handler.print_parameters()
+    #top_handler.print_parameter_list()    
     top_handler.set_param_values()
     top_handler.parse_input_file_channels()
-    top_handler.print_channels()
+    #top_handler.print_channels()
 
     top_handler.parse_proc_connection()
 
-    top_handler.print_proc_list()
-    top_handler.print_chan_list()
-    top_handler.print_proc_dict()
+    #top_handler.print_proc_list()
+    #top_handler.print_chan_list()
+    #top_handler.print_proc_dict()
     top_handler.print_top_matrix()
+    print "Generating Ptolemy simulation ..."
     top_handler.generate_code(PTOLEMY)
+    print "Generating GNU Radio project file ..."
     top_handler.generate_code(GNURADIO)
 
     #outfile.close()
