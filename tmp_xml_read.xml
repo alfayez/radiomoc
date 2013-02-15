@@ -9,7 +9,7 @@
     </param><param>
       <key>title</key><value></value>
     </param><param>
-      <key>author</key><value></value>
+      <key>author</key><value>Almohanad Fayez</value>
     </param><param>
       <key>description</key><value></value>
     </param><param>
@@ -35,7 +35,7 @@
     <key>variable</key><param>
       <key>id</key><value>symbolTime</value>
     </param><param>
-      <key>_enabled</key><value>true</value>
+      <key>_enabled</key><value>True</value>
     </param><param>
       <key>value</key><value>2</value>
     </param><param>
@@ -45,7 +45,7 @@
     <key>variable</key><param>
       <key>id</key><value>samplingRate</value>
     </param><param>
-      <key>_enabled</key><value>true</value>
+      <key>_enabled</key><value>True</value>
     </param><param>
       <key>value</key><value>16000</value>
     </param><param>
@@ -55,7 +55,7 @@
     <key>variable</key><param>
       <key>id</key><value>samplingRate2</value>
     </param><param>
-      <key>_enabled</key><value>true</value>
+      <key>_enabled</key><value>True</value>
     </param><param>
       <key>value</key><value>256000</value>
     </param><param>
@@ -65,7 +65,7 @@
     <key>variable</key><param>
       <key>id</key><value>carrierFreq</value>
     </param><param>
-      <key>_enabled</key><value>true</value>
+      <key>_enabled</key><value>True</value>
     </param><param>
       <key>value</key><value>4.0</value>
     </param><param>
@@ -75,7 +75,7 @@
     <key>variable</key><param>
       <key>id</key><value>rcFiltCoeff</value>
     </param><param>
-      <key>_enabled</key><value>true</value>
+      <key>_enabled</key><value>True</value>
     </param><param>
       <key>value</key><value>1.0</value>
     </param><param>
@@ -85,7 +85,7 @@
     <key>variable</key><param>
       <key>id</key><value>carrierGain</value>
     </param><param>
-      <key>_enabled</key><value>true</value>
+      <key>_enabled</key><value>True</value>
     </param><param>
       <key>value</key><value>1.0</value>
     </param><param>
@@ -95,7 +95,7 @@
     <key>variable</key><param>
       <key>id</key><value>rfGain</value>
     </param><param>
-      <key>_enabled</key><value>true</value>
+      <key>_enabled</key><value>True</value>
     </param><param>
       <key>value</key><value>30.0</value>
     </param><param>
@@ -105,7 +105,7 @@
     <key>variable</key><param>
       <key>id</key><value>rfGain2</value>
     </param><param>
-      <key>_enabled</key><value>true</value>
+      <key>_enabled</key><value>True</value>
     </param><param>
       <key>value</key><value>1.0</value>
     </param><param>
@@ -115,7 +115,7 @@
     <key>variable</key><param>
       <key>id</key><value>carrierPhase</value>
     </param><param>
-      <key>_enabled</key><value>true</value>
+      <key>_enabled</key><value>True</value>
     </param><param>
       <key>value</key><value>0.0</value>
     </param><param>
@@ -125,7 +125,7 @@
     <key>variable</key><param>
       <key>id</key><value>gaussGain</value>
     </param><param>
-      <key>_enabled</key><value>true</value>
+      <key>_enabled</key><value>True</value>
     </param><param>
       <key>value</key><value>0.3</value>
     </param><param>
@@ -135,7 +135,7 @@
     <key>variable</key><param>
       <key>id</key><value>recvThresh</value>
     </param><param>
-      <key>_enabled</key><value>true</value>
+      <key>_enabled</key><value>True</value>
     </param><param>
       <key>value</key><value>0.3</value>
     </param><param>
@@ -145,7 +145,7 @@
     <key>variable</key><param>
       <key>id</key><value>seedValG</value>
     </param><param>
-      <key>_enabled</key><value>true</value>
+      <key>_enabled</key><value>True</value>
     </param><param>
       <key>value</key><value>0L</value>
     </param><param>
@@ -155,7 +155,7 @@
     <key>variable</key><param>
       <key>id</key><value>meanValG</value>
     </param><param>
-      <key>_enabled</key><value>true</value>
+      <key>_enabled</key><value>True</value>
     </param><param>
       <key>value</key><value>0.0</value>
     </param><param>
@@ -165,11 +165,33 @@
     <key>variable</key><param>
       <key>id</key><value>stdValG</value>
     </param><param>
-      <key>_enabled</key><value>true</value>
+      <key>_enabled</key><value>True</value>
     </param><param>
       <key>value</key><value>0.40</value>
     </param><param>
       <key>_coordinate</key><value>(1, 840)</value>
+    </param>
+  </block><block>
+    <key>gr_sig_source_x</key><param>
+      <key>id</key><value>dataSrc</value>
+    </param><param>
+      <key>_enabled</key><value>True</value>
+    </param><param>
+      <key>type</key><value>float</value>
+    </param><param>
+      <key>samp_rate</key><value>samplingRate</value>
+    </param><param>
+      <key>waveform</key><value>gr.GR_COS_WAVE</value>
+    </param><param>
+      <key>freq</key><value>500.0</value>
+    </param><param>
+      <key>amp</key><value>carrierGain</value>
+    </param><param>
+      <key>offset</key><value>0</value>
+    </param><param>
+      <key>_coordinate</key><value>(200, 200)</value>
+    </param><param>
+      <key>_rotation</key><value>0</value>
     </param>
   </block>
 </flow_graph>

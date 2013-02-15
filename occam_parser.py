@@ -22,8 +22,8 @@ PTOLEMY       = 0
 GNURADIO      = 1
 SDF3          = 2
 
-INPORT_COUNT  = 1
-OUTPORT_COUNT = 2 
+INPORT_COUNT  = 2
+OUTPORT_COUNT = 3 
 class graph_handler:
     def __init__(self, infile_name):
         self.infile  = file(infile_name, 'r') 
@@ -44,21 +44,21 @@ class graph_handler:
         self.long_param_enforce_dict = {'seedValG':0}
         # PORT_COUNT = used to iterate through connecting ports for
         # blocks with multiple input or output ports
-        self.block_map_dict = {'rfOut'            :[CLASS_USER_OUTPUT, 0, 0],
-                               'channelFilter'    :[CLASS_USER_FIR,    0, 0],
-                               'channelFilter2'   :[CLASS_USER_FIR,    0, 0],
-                               'rfScale'          :[CLASS_SCALE,    0, 0],
-                               'rfScale2'         :[CLASS_SCALE,    0, 0],
-                               'dataSrc'          :[CLASS_CONST,    0, 0],
-                               'carrierScale'     :[CLASS_SCALE,    0, 0],
-                               'carrier'          :[CLASS_SINE,     0, 0],
-                               'dbpskTransmitter' :[CLASS_DBPSK_TX, 0, 0],
-                               'rfIn'             :[CLASS_CONST,    0, 0],
-                               'dbpskReceiver'    :[CLASS_DBPSK_RX, 0, 0],
-                               'dataOut'          :[CLASS_USER_OUTPUT,  0, 0],
-                               'gauss'            :[CLASS_GAUSS,    0, 0],
-                               'gaussScale'       :[CLASS_SCALE,    0, 0],
-                               'add'              :[CLASS_ADDSUB,   0, 0]
+        self.block_map_dict = {'rfOut'            :[CLASS_USER_OUTPUT, 0, 0, 0],
+                               'channelFilter'    :[CLASS_USER_FIR,CLASS_INTERP_FIR_GNU, 0, 0],
+                               'channelFilter2'   :[CLASS_USER_FIR,CLASS_FIR_GNU, 0, 0],
+                               'rfScale'          :[CLASS_SCALE,   CLASS_MULT_CONST_GNU, 0, 0],
+                               'rfScale2'         :[CLASS_SCALE,   CLASS_MULT_CONST_GNU, 0, 0],
+                               'dataSrc'          :[CLASS_CONST,   CLASS_SIG_GNU, 0, 0],
+                               'carrierScale'     :[CLASS_SCALE,   CLASS_MULT_CONST_GNU, 0, 0],
+                               'carrier'          :[CLASS_SINE,    CLASS_SIG_GNU, 0, 0],
+                               'dbpskTransmitter' :[CLASS_DBPSK_TX,CLASS_DBPSK_TX_GNU, 0, 0],
+                               'rfIn'             :[CLASS_CONST,       0, 0, 0],
+                               'dbpskReceiver'    :[CLASS_DBPSK_RX, CLASS_DBPSK_RX_GNU, 0, 0],
+                               'dataOut'          :[CLASS_USER_OUTPUT, CLASS_SCOPE_GNU, 0, 0],
+                               'gauss'            :[CLASS_GAUSS, CLASS_NOISE_GNU, 0, 0],
+                               'gaussScale'       :[CLASS_SCALE, CLASS_MULT_CONST_GNU, 0, 0],
+                               'add'              :[CLASS_ADDSUB,CLASS_ADD_GNU, 0, 0]
                               }
         self.block_port_dict_input = {'rfOut'    :[".input"],
                                'channelFilter'   :[".input"],
@@ -91,23 +91,39 @@ class graph_handler:
                                'gaussScale'      :[".output"],
                                'add'             :[".output"]
                               }
-        self.offset_dict = {'rfOut'            :[0],
-                             'channelFilter'   :[0],
-                             'channelFilter2'  :[0],
-                             'rfScale'         :[0],
-                             'rfScale2'        :[0],
-                             'dataSrc'         :[0],
-                             'carrierScale'    :[50],
-                             'carrier'         :[50],
-                             'dbpskTransmitter':[0],
-                             'rfIn'            :[0],
-                             'dbpskReceiver'   :[0],
-                             'dataOut'         :[0],
-                             'gauss'           :[50],
-                             'gaussScale'      :[50], 
-                             'add'             :[0]
+        self.offset_dict = {'rfOut'            :[0,  0],
+                             'channelFilter'   :[0,  0],
+                             'channelFilter2'  :[0,  0],
+                             'rfScale'         :[0,  0],
+                             'rfScale2'        :[0,  0],
+                             'dataSrc'         :[0,  0],
+                             'carrierScale'    :[50, 0],
+                             'carrier'         :[50, 0],
+                             'dbpskTransmitter':[0,  0],
+                             'rfIn'            :[0,  0],
+                             'dbpskReceiver'   :[0,  0],
+                             'dataOut'         :[0,  0],
+                             'gauss'           :[50, 50],
+                             'gaussScale'      :[50, 50], 
+                             'add'             :[0,  0]
                            }
         self.value_dict = {'rfOut'           :["None"],
+                           'channelFilter'   :["None"],
+                           'channelFilter2'  :["None"],
+                           'rfScale'         :["None"],
+                           'rfScale2'        :["None"],                           
+                           'dataSrc'         :["None"],
+                           'carrierScale'    :["None"],
+                           'carrier'         :["None"],
+                           'dbpskTransmitter':["None"],
+                           'rfIn'            :["None"],
+                           'dbpskReceiver'   :["None"],
+                           'dataOut'         :["None"],
+                           'gauss'           :["None"],
+                           'gaussScale'      :["None"],
+                           'add'             :["None"]
+                            }
+        self.value_dict_gnu = {'rfOut'       :["None"],
                            'channelFilter'   :["None"],
                            'channelFilter2'  :["None"],
                            'rfScale'         :["None"],
@@ -415,6 +431,22 @@ class graph_handler:
                            'add'              :["None"],
                            'rfScale2'         :["rfGain2"]
                             }
+        self.value_dict_gnu = {'rfOut'        :["None"],
+                           'channelFilter'    :["rc"+self.param_dict["rcFiltCoeff"]+".dat", "samplingRate2/samplingRate", "1"],
+                           'channelFilter2'   :["rc"+self.param_dict["rcFiltCoeff"]+".dat", "1", "samplingRate2/samplingRate"],
+                           'rfScale'          :["rfGain"],
+                           'dataSrc'          :["samplingRate", CLASS_SINE_GNU, "500.0", "carrierGain"],
+                           'carrierScale'     :["carrierGain"],
+                           'carrier'          :["samplingRate", CLASS_SINE_GNU, "500.0", "carrierGain"],
+                           'dbpskTransmitter' :["samplingRate*symbolTime"],
+                           'rfIn'             :["None"],
+                           'dbpskReceiver'    :["recvThresh"],
+                           'dataOut'          :["None"],
+                           'gauss'            :["seedValG", "meanValG", "stdValG"],
+                           'gaussScale'       :["gaussGain"],
+                           'add'              :["None"],
+                           'rfScale2'         :["rfGain2"]
+                            }        
     def get_port_count(self, block_name, direction):
         if direction == "input":
             return self.block_map_dict[block_name][INPORT_COUNT]
@@ -492,19 +524,27 @@ class graph_handler:
                 node1      = self.write_to_file(pgen, PARAM_GNU, CLASS_VARIABLE, param_name, [param_val], 0, mode)
 
             pgen.top_element.appendChild(node1)
-        if mode is GNURADIO:
-            pgen.write_to_xmlfile()
-            return True
-        print "END PARAMETER EXPORT"
+
         # Generate and Instantiate Blocks
         len_list = len(self.proc_list)
         for i in range(len_list):
             block_name   = self.proc_list[i]
             class_name   = self.block_map_dict[block_name][mode]
+            print "ptolem= ", self.block_map_dict[block_name][0], "gnuradio= ", self.block_map_dict[block_name][1]
             block_offset = self.offset_dict[block_name][mode]
-            block_value  = self.value_dict[block_name]
-            node1 = self.write_to_file(pgen, BLOCK, class_name, block_name, block_value, block_offset, mode)
+            if mode == PTOLEMY:
+                block_value  = self.value_dict[block_name]
+                node1 = self.write_to_file(pgen, BLOCK, class_name, block_name, block_value, block_offset, mode)
+            elif mode == GNURADIO:
+                block_value  = self.value_dict_gnu[block_name]
+                print "block_name = ", block_name, " class_name= ", class_name
+                node1 = self.write_to_file(pgen, BLOCK_GNU, class_name, block_name, block_value, block_offset, mode)
             pgen.top_element.appendChild(node1)
+            print "END PARAMETER EXPORT"
+            if mode is GNURADIO:
+                pgen.write_to_xmlfile()
+                return True
+
         #Generate and Instantiate Connections
         len_list  = len(self.chan_list)
         out_index = 0

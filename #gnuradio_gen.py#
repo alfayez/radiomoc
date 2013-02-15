@@ -220,6 +220,7 @@ class gnuradio_writer:
                 node2 = self.write_element(PARAM_GNU, ROTATION, loc_str)
                 node1.appendChild(node2)
             elif class_str is CLASS_DBPSK_TX_GNU:
+                
             elif class_str is CLASS_DBPSK_RX_GNU:
             elif class_str is CLASS_SCOPE_GNU:
             elif class_str is CLASS_NOISE_GNU:

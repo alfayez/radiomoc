@@ -3,6 +3,16 @@
 # GNU Radio block names
 CLASS_OPTIONS            = "options"
 CLASS_VARIABLE           = "variable"
+CLASS_SIG_GNU            = "gr_sig_source_x"
+CLASS_SINE_GNU           = "gr.GR_COS_WAVE"
+CLASS_FIR_GNU            = "gr_fir_filter_xxx"
+CLASS_INTERP_FIR_GNU     = "gr_interp_fir_filter_xxx"
+CLASS_MULT_CONST_GNU     = "blocks_multiply_const_vxx"
+CLASS_DBPSK_TX_GNU       = "digital_dxpsk_mod"
+CLASS_DBPSK_RX_GNU       = "digital_dxpsk_demod"
+CLASS_NOISE_GNU          = "analog_noise_source_x"
+CLASS_ADD_GNU            = "blocks_add_xx"
+CLASS_SCOPE_GNU          = "wxgui_scopesink2"
 
 # Init Values
 XML_HEADER1 = "<?xml version=\"1.0\" standalone=\"no\"?>"
@@ -28,4 +38,5 @@ FLOW_GNU                 = "flow_graph"
 BLOCK_GNU                = "block"
 TIMESTAMP_GNU            = "timestamp"
 NONE                     = "None"
-
+COORDINATE               = "_coordinate"
+ROTATION                 = "_rotation"
