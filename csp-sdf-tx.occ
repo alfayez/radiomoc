@@ -42,21 +42,6 @@ PROC rfOut(CHAN REAL32 DTopC!, CHAN REAL32 inC?)
     inC  ? meanValG
     inC  ? stdValG
     
-    --outC ! symbolTime
-    --outC ! samplingRate
-    --outC ! samplingRate2
-    --outC ! carrierFreq
-    --outC ! rcFiltCoeff
-    --outC ! carrierGain
-    --outC ! rfGain
-    --outC ! rfGain2
-    --outC ! carrierPhase
-    --outC ! gaussGain
-    --outC ! recvThresh
-    --outC ! seedValG
-    --outC ! meanValG
-    --outC ! stdValG
-    
     DTopC ! rfGain
 :
 -- Define the Raised Root Cosine Channel Filter Block
@@ -379,7 +364,7 @@ PROC carrier(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
     DTopC ! rfGain    
 :
 -- Define the DBPSK Receiver Block
-PROC dbpskReceiver(CHAN REAL32 outC!,      CHAN REAL32 DTopC!,
+PROC dbpskDemod(CHAN REAL32 outC!,      CHAN REAL32 DTopC!,
                    CHAN REAL32 inDataC?)
   REAL32 symbolTime  :
   REAL32 samplingRate:
@@ -458,7 +443,7 @@ PROC rfIn(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
     inC  ? rfGain
     inC  ? rfGain2
     inC  ? carrierPhase
-    inC  ? gaussGain        
+    inC  ? gaussGain    
     inC  ? recvThresh
     inC  ? seedValG
     inC  ? meanValG
@@ -571,7 +556,7 @@ PROC channelFilter2(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
 :
 
 -- Define the DBPSK Transmitter Block
-PROC dbpskTransmitter(CHAN REAL32 outC!,      CHAN REAL32 DTopC!, CHAN REAL32 inDataC?)
+PROC dbpskMod(CHAN REAL32 outC!,      CHAN REAL32 DTopC!, CHAN REAL32 inDataC?)
   REAL32 symbolTime  :
   REAL32 samplingRate:
   REAL32 samplingRate2:  
@@ -622,7 +607,110 @@ PROC dbpskTransmitter(CHAN REAL32 outC!,      CHAN REAL32 DTopC!, CHAN REAL32 in
     
     DTopC      ! rfGain
 :
+-- Define the DBPSK Packet Encoder
+PROC dbpskEnc(CHAN REAL32 outC!,      CHAN REAL32 DTopC!, CHAN REAL32 inDataC?)
+  REAL32 symbolTime  :
+  REAL32 samplingRate:
+  REAL32 samplingRate2:  
+  REAL32 carrierFreq :
+  REAL32 rcFiltCoeff :  -- provides the name of the file with the coeff rcFilt<int>.dat
+  REAL32 carrierGain :
+  REAL32 rfGain      :
+  REAL32 rfGain2     :
+  REAL32 carrierPhase :
+  REAL32 gaussGain    :
+  REAL32 recvThresh   :
+  
+  REAL32 seedValG    :
+  REAL32 meanValG    :
+  REAL32 stdValG     :
+  SEQ
+    -- We're rcv/fw radio configuration parameters through the channel
 
+    inDataC    ? symbolTime
+    inDataC    ? samplingRate
+    inDataC    ? samplingRate2
+    inDataC    ? carrierFreq
+    inDataC    ? rcFiltCoeff
+    inDataC    ? carrierGain
+    inDataC    ? rfGain
+    inDataC    ? rfGain2   
+    inDataC    ? carrierPhase    
+    inDataC    ? gaussGain
+    inDataC    ? recvThresh
+    inDataC    ? seedValG
+    inDataC    ? meanValG
+    inDataC    ? stdValG
+
+    outC       ! symbolTime
+    outC       ! samplingRate
+    outC       ! samplingRate2
+    outC       ! carrierFreq
+    outC       ! rcFiltCoeff
+    outC       ! carrierGain
+    outC       ! rfGain
+    outC       ! rfGain2    
+    outC       ! carrierPhase
+    outC       ! gaussGain    
+    outC       ! recvThresh
+    outC       ! seedValG
+    outC       ! meanValG
+    outC       ! stdValG    
+    
+    DTopC      ! rfGain
+:
+-- Define the DBPSK Packet Decoder Block
+PROC dbpskDec(CHAN REAL32 outC!,      CHAN REAL32 DTopC!, CHAN REAL32 inDataC?)
+  REAL32 symbolTime  :
+  REAL32 samplingRate:
+  REAL32 samplingRate2:  
+  REAL32 carrierFreq :
+  REAL32 rcFiltCoeff :  -- provides the name of the file with the coeff rcFilt<int>.dat
+  REAL32 carrierGain :
+  REAL32 rfGain      :
+  REAL32 rfGain2     :
+  REAL32 carrierPhase :
+  REAL32 gaussGain    :
+  REAL32 recvThresh   :
+  
+  REAL32 seedValG    :
+  REAL32 meanValG    :
+  REAL32 stdValG     :
+  SEQ
+    -- We're rcv/fw radio configuration parameters through the channel
+
+    inDataC    ? symbolTime
+    inDataC    ? samplingRate
+    inDataC    ? samplingRate2
+    inDataC    ? carrierFreq
+    inDataC    ? rcFiltCoeff
+    inDataC    ? carrierGain
+    inDataC    ? rfGain
+    inDataC    ? rfGain2   
+    inDataC    ? carrierPhase    
+    inDataC    ? gaussGain
+    inDataC    ? recvThresh
+    inDataC    ? seedValG
+    inDataC    ? meanValG
+    inDataC    ? stdValG
+
+    outC       ! symbolTime
+    outC       ! samplingRate
+    outC       ! samplingRate2
+    outC       ! carrierFreq
+    outC       ! rcFiltCoeff
+    outC       ! carrierGain
+    outC       ! rfGain
+    outC       ! rfGain2    
+    outC       ! carrierPhase
+    outC       ! gaussGain    
+    outC       ! recvThresh
+    outC       ! seedValG
+    outC       ! meanValG
+    outC       ! stdValG    
+    
+    DTopC      ! rfGain
+:
 -- Define the RF Scaling Block
 PROC gauss(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?)
   REAL32 symbolTime   :
@@ -831,7 +919,7 @@ PROC add(CHAN REAL32 outC!, CHAN REAL32 DTopC!, CHAN REAL32 inC?, CHAN REAL32 in
 PROC DoutputToScreenTop(CHAN BYTE out!,
                        CHAN REAL32 dataSrcC?,                  CHAN REAL32 dbpskModC?,      
                        CHAN REAL32 rrcFiltC,                   CHAN REAL32 rfScaleC?,
-                       CHAN REAL32 rfOutC?)
+                       CHAN REAL32 encC?,                      CHAN REAL32 rfOutC?) 
   
   REAL32 txParam :
   SEQ
@@ -839,6 +927,10 @@ PROC DoutputToScreenTop(CHAN BYTE out!,
     dataSrcC ? txParam
     out.string("*tData Source*t", 0, out!)
     out.string("*n", 0, out!)
+
+    encC ? txParam
+    out.string("*tPacket Encoder*t", 0, out!)
+    out.string("*n", 0, out!)        
     
     dbpskModC ? txParam
     out.string("*tDBPSK Modulator*t", 0, out!)
@@ -853,8 +945,9 @@ PROC DoutputToScreenTop(CHAN BYTE out!,
     out.string("*n", 0, out!)    
     
     rfOutC ? txParam
-    out.string("*tRF Out*t", 0, out!)
+    out.string("*tRf Out*t", 0, out!)
     out.string("*n", 0, out!)    
+
 :
 
 PROC parameterGen(CHAN REAL32 paramOC!)
@@ -910,7 +1003,7 @@ PROC parameterGen(CHAN REAL32 paramOC!)
 
 PROC main(CHAN BYTE out!)
   CHAN REAL32 scaleToTxC      :
-  CHAN REAL32 dataToTxC       :
+  CHAN REAL32 dataToEncC       :
   CHAN REAL32 txToChanFiltC   :
   CHAN REAL32 filterToScaleC  :  
   CHAN REAL32 scaleToAddC   :
@@ -920,9 +1013,13 @@ PROC main(CHAN BYTE out!)
   CHAN REAL32 scaleToRrcFiltC :
   CHAN REAL32 rrcFiltToDemodC :
   CHAN REAL32 carrierToScaleC :
-  CHAN REAL32 demodToDataOutC :   
+  CHAN REAL32 demodToDecC     :    
+  CHAN REAL32 decToDataOutC   :
+  CHAN REAL32 encToModC       :
+  
   CHAN REAL32 addToRfScale2C  :  
   CHAN REAL32 gaussToScaleC   :
+  CHAN REAL32 DEncToModC      :
   
   CHAN REAL32 gaussScaleToAddC    :
   CHAN REAL32 rfOutToAddC    :
@@ -935,6 +1032,8 @@ PROC main(CHAN BYTE out!)
   CHAN REAL32 DRfScaleC      :
   CHAN REAL32 DRfOutC        :
   CHAN REAL32 DGaussScaleC   :
+  CHAN REAL32 DEncC          :
+  CHAN REAL32 DDecC          :
   
   CHAN REAL32 DRfInC         :
   CHAN REAL32 DRfScale2C     :
@@ -943,7 +1042,6 @@ PROC main(CHAN BYTE out!)
   CHAN REAL32 DGaussC        : 
 
   CHAN REAL32 DAddC          :
-  CHAN REAL32 scaleToRfC     :
   
   CHAN REAL32 setupC         :
   CHAN REAL32 setup2C        :
@@ -951,19 +1049,12 @@ PROC main(CHAN BYTE out!)
   
   PAR
     parameterGen     (setupC!)
-    dataSrc          (dataToTxC!,        DDataSrcC!,      setupC?)
-    dbpskTransmitter (txToChanFiltC!,    DModulatorC!,    dataToTxC?)
-    channelFilter    (filterToScaleC!,   DRrcFiltC!,      txToChanFiltC?)
-    rfScale          (scaleToRfC!,       DRfScaleC!,      filterToScaleC?)
-    rfOut            (DRfOutC!,          scaleToRfC?)
+    dataSrc          (dataToEncC!,      DDataSrcC!,      setupC?)
+    dbpskEnc         (encToModC!,       DEncC!,          dataToEncC?)
+    dbpskMod         (txToChanFiltC!,   DModulatorC!,    encToModC?)
+    channelFilter    (filterToScaleC!,  DRrcFiltC!,      txToChanFiltC?)
+    rfScale          (scaleToAddC!,     DRfScaleC!,      filterToScaleC?)
+    rfOut            (DRfOutC!,         scaleToAddC?)
 
-    --gauss            (gaussToScaleC!,    DGaussC!,        setup3C?)
-    --gaussScale       (gaussScaleToAddC!, DGaussScaleC!,    gaussToScaleC?)
-    --add              (addToRfScale2C!,   DAddC!,          scaleToAddC?, gaussScaleToAddC?)
-    --rfScale2         (scaleToRrcFiltC!, DRfScale2C!,     addToRfScale2C?)
-    --channelFilter2   (rrcFiltToDemodC!, DRrcFilt2C!,     scaleToRrcFiltC?)
-    --dbpskReceiver    (demodToDataOutC!, DDemodulatorC!,  rrcFiltToDemodC?)      
-    --dataOut          (DDataC!,          demodToDataOutC?)
-
-    DoutputToScreenTop (out!, DDataSrcC?, DModulatorC?, DRrcFiltC?, DRfScaleC?, DRfOutC?)
+    DoutputToScreenTop (out!, DDataSrcC?, DModulatorC?, DRrcFiltC?, DRfScaleC?, DEncC?, DRfOutC?)
 :

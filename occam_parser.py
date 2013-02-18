@@ -471,7 +471,7 @@ class graph_handler:
             
             proc_out  = self.chan_dict[chan_name][0]
             proc_in   = self.chan_dict[chan_name][1]
-
+            print "proc in= ", proc_in, "proc out= ", proc_out
             if (proc_out != ""):
                 proc_out_index  = self.proc_dict[proc_out]
                 if (proc_in != ""):                

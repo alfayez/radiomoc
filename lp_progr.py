@@ -2,7 +2,6 @@
 import numpy
 import scipy
 from scipy import linalg, matrix
-from rank_nullspace import nullspace
 
 import glpk
 
@@ -23,7 +22,7 @@ for c in lp.cols:
     print "i= ", i
     c.name   = "x"+str(i)
     if i == 1: 
-        c.bounds = 23, None
+        c.bounds = 1, None
     else:
         c.bounds = 1, None
     c.kind   = int
