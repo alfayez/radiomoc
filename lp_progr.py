@@ -15,20 +15,23 @@ lp.obj.maximize = False
 lp.rows.add(3)
 for r in lp.rows:
     r.name = "d"+str(r)
-    r.bounds = 0, tol
+    r.bounds = 0, 0
 
 lp.cols.add(3)
 i=1
 for c in lp.cols:
     print "i= ", i
     c.name   = "x"+str(i)
-    c.bounds = 1, None
+    if i == 1: 
+        c.bounds = 23, None
+    else:
+        c.bounds = 1, None
     c.kind   = int
     i        = i+1
 
-lp.obj[0] = 3
+lp.obj[0] = 1
 lp.obj[1] = 1
-lp.obj[2] = -2
+lp.obj[2] = 1
 lp.matrix = [1, -1, 0,
              0, 2, -1,
              2, 0, -1]
