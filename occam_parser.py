@@ -746,21 +746,14 @@ if __name__ == "__main__":
 
     # peforms initial parameter parsing of the occam file
     top_handler.parse_input_file_param()
-    #top_handler.print_parameter_list()    
     top_handler.set_param_values()
     top_handler.parse_input_file_channels()
-    #top_handler.print_channels()
 
     top_handler.parse_proc_connection()
 
-    #top_handler.print_proc_list()
-    #top_handler.print_chan_list()
-    #top_handler.print_proc_dict()
     top_handler.print_top_matrix()
     print "Generating Ptolemy simulation ..."
     top_handler.generate_code(PTOLEMY)
     print "Generating GNU Radio project file ..."
     top_handler.generate_code(GNURADIO)
 
-    #outfile.close()
-    #infile.close)(
