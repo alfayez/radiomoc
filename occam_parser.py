@@ -3,6 +3,7 @@
 import sys, string, types, os, copy
 import getopt
 import numpy as np
+import scipy
 
 from ptolemy_gen  import *
 from gnuradio_gen import *
@@ -11,9 +12,17 @@ Checks if the token specifies an OCCAM process
 it basically checks if the token starts with
 the word PROC
 '''
+# Indices for block_map_dict
 OUT_CHAN = 0
 IN_CHAN  = 1
+
+# Indices for proc_dict
+PROC_LIST_IND    = 0
+PROC_RATE_IN     = 1
+PROC_RATE_OUT    = 2
+
 IGNORE_PROC = ["parameterGen"]
+IGNORE_CHAN = ["setupC", "setupC2", "setupC3"]
 INIT_PROC = "parameterGen"
 
 # Code Generation Modes
@@ -28,13 +37,15 @@ class graph_handler:
     def __init__(self, infile_name):
         self.infile  = file(infile_name, 'r') 
         self.outfile = file('tmp_assignment_body.txt', 'w')
-        self.chan_dict    = {}
-        self.chan_list    = []
-        self.proc_dict    = {}
-        self.proc_list    = []        
-        self.param_dict   = {}
-        self.param_list   = []
-        self.top_matrix   = np.zeros((1,1))
+        self.chan_dict      = {}
+        self.chan_dict_temp = {}        
+        self.chan_list      = []
+        self.proc_dict      = {}
+        self.proc_list      = []        
+        self.param_dict     = {}
+        self.param_list     = []
+        self.rate_list      = [] # list of rates in current flowgraph
+        self.top_matrix     = np.zeros((1,1))
         
         self.fcn_interest = []
         self.init_chans   = []
@@ -48,23 +59,23 @@ class graph_handler:
         ###################################################        
         # PORT_COUNT = used to iterate through connecting ports for
         # blocks with multiple input or output ports
-        self.block_map_dict = {'rfOut'            :[CLASS_USER_OUTPUT, 0, 0, 0],
-                               'channelFilter'    :[CLASS_USER_FIR,CLASS_INTERP_FIR_GNU, 0, 0],
-                               'channelFilter2'   :[CLASS_USER_FIR,CLASS_FIR_GNU, 0, 0],
-                               'rfScale'          :[CLASS_SCALE,   CLASS_MULT_CONST_GNU, 0, 0],
-                               'rfScale2'         :[CLASS_SCALE,   CLASS_MULT_CONST_GNU, 0, 0],
-                               'dataSrc'          :[CLASS_CONST,   CLASS_SIG_GNU, 0, 0],
-                               'carrierScale'     :[CLASS_SCALE,   CLASS_MULT_CONST_GNU, 0, 0],
-                               'carrier'          :[CLASS_SINE,    CLASS_SIG_GNU, 0, 0],
-                               'dbpskMod'         :[CLASS_DBPSK_TX,CLASS_DBPSK_TX_GNU, 0, 0],
-                               'dbpskEnc'         :[CLASS_DBPSK_ENC,CLASS_DBPSK_ENC_GNU, 0, 0],
-                               'rfIn'             :[CLASS_CONST,       0, 0, 0],
-                               'dbpskDemod'       :[CLASS_DBPSK_RX, CLASS_DBPSK_RX_GNU, 0, 0],
-                               'dbpskDec'         :[CLASS_DBPSK_DEC, CLASS_DBPSK_DEC_GNU, 0, 0],
+        self.block_map_dict = {'rfOut'            :[CLASS_USER_OUTPUT, CLASS_SCOPE_GNU, 0, 0],
+                               'channelFilter'    :[CLASS_USER_FIR,    CLASS_INTERP_FIR_GNU, 0, 0],
+                               'channelFilter2'   :[CLASS_USER_FIR,    CLASS_FIR_GNU, 0, 0],
+                               'rfScale'          :[CLASS_SCALE,       CLASS_MULT_CONST_GNU, 0, 0],
+                               'rfScale2'         :[CLASS_SCALE,       CLASS_MULT_CONST_GNU, 0, 0],
+                               'dataSrc'          :[CLASS_CONST,       CLASS_SIG_GNU, 0, 0],
+                               'carrierScale'     :[CLASS_SCALE,       CLASS_MULT_CONST_GNU, 0, 0],
+                               'carrier'          :[CLASS_SINE,        CLASS_SIG_GNU, 0, 0],
+                               'dbpskMod'         :[CLASS_DBPSK_TX,    CLASS_DBPSK_TX_GNU, 0, 0],
+                               'dbpskEnc'         :[CLASS_DBPSK_ENC,   CLASS_DBPSK_ENC_GNU, 0, 0],
+                               'rfIn'             :[CLASS_CONST,       CLASS_SIG_GNU, 0, 0],
+                               'dbpskDemod'       :[CLASS_DBPSK_RX,    CLASS_DBPSK_RX_GNU, 0, 0],
+                               'dbpskDec'         :[CLASS_DBPSK_DEC,   CLASS_DBPSK_DEC_GNU, 0, 0],
                                'dataOut'          :[CLASS_USER_OUTPUT, CLASS_SCOPE_GNU, 0, 0],
-                               'gauss'            :[CLASS_GAUSS, CLASS_NOISE_GNU, 0, 0],
-                               'gaussScale'       :[CLASS_SCALE, CLASS_MULT_CONST_GNU, 0, 0],
-                               'add'              :[CLASS_ADDSUB,CLASS_ADD_GNU, 0, 0]
+                               'gauss'            :[CLASS_GAUSS,       CLASS_NOISE_GNU, 0, 0],
+                               'gaussScale'       :[CLASS_SCALE,       CLASS_MULT_CONST_GNU, 0, 0],
+                               'add'              :[CLASS_ADDSUB,      CLASS_ADD_GNU, 0, 0]
                               }
         ###################################################
         ## Provides port names for the respective blocks ##
@@ -202,6 +213,25 @@ class graph_handler:
                            'gaussScale'      :["None"],
                            'add'             :["None"]
                             }
+        self.block_io_rates = {
+                             'rfOut'           :["samplingRate2", "samplingRate2"],
+                             'channelFilter'   :["samplingRate",  "samplingRate2"],
+                             'channelFilter2'  :["samplingRate2", "samplingRate" ],
+                             'rfScale'         :["samplingRate2", "samplingRate2"],
+                             'rfScale2'        :["samplingRate2", "samplingRate2"],
+                             'dataSrc'         :["samplingRate",  "samplingRate" ],
+                             'carrierScale'    :["samplingRate2", "samplingRate2"],
+                             'carrier'         :["samplingRate2", "samplingRate2"],
+                             'dbpskMod'        :["samplingRate",  "samplingRate" ],
+                             'dbpskEnc'        :["samplingRate",  "samplingRate" ],
+                             'rfIn'            :["samplingRate2", "samplingRate2"],
+                             'dbpskDemod'      :["samplingRate",  "samplingRate" ],
+                             'dbpskDec'        :["samplingRate",  "samplingRate" ],
+                             'dataOut'         :["samplingRate",  "samplingRate" ],
+                             'gauss'           :["samplingRate2", "samplingRate2"],
+                             'gaussScale'      :["samplingRate2", "samplingRate2"], 
+                             'add'             :["samplingRate2", "samplingRate2"]
+                           }        
     def __del__(self):
         self.outfile.close()
         self.infile.close()
@@ -380,8 +410,7 @@ class graph_handler:
                 self.is_process(line) == False):
                 token_name = self.extract_var2(line)
                 if (self.is_debug(token_name) == False):
-                    self.chan_dict[token_name] = ["", ""]
-                    self.chan_list.append(token_name)                    
+                    self.chan_dict_temp[token_name] = ["", ""]
 
             elif self.is_process_body(line):
                 process_body = True
@@ -389,7 +418,16 @@ class graph_handler:
             line = self.infile.readline()
 
         return True
-        #return {'chan_dict':chan_dict, 'infile2':infile2}
+    def finalize_top_matrix_chan_dict(self):
+        chan_dict = {}
+        for key, value in self.chan_dict_temp.items():
+            if value != ["", ""]:
+                if self.is_ignore_chan(key) == False:
+                    self.chan_dict[key] = self.chan_dict_temp[key]
+                    self.chan_list.append(key)
+        len_proc = len(self.proc_list)
+        len_chan = len(self.chan_list)
+        self.top_matrix = np.zeros((len_chan, len_proc))    
     def clean_from_punc(self, tokens):
         len_tokens = len(tokens)
         for i in range(len_tokens):
@@ -419,14 +457,25 @@ class graph_handler:
             if proc_name == IGNORE_PROC[i]:
                 return True
         return False
-        
+    def is_ignore_chan(self, proc_name):
+        len_list = len(IGNORE_CHAN);
+        for i in range(len_list):
+            if proc_name == IGNORE_CHAN[i]:
+                return True
+        return False
+    def append_rate(self, rate_pass):
+        if rate_pass not in self.rate_list:
+            self.rate_list.append(rate_pass)
+            
     def parse_channel_directions(self, line):
         tokens     = line.split()
         tokens     = self.clean_from_punc(tokens)
         len_tokens = len(tokens)
         chan_name  = ""
         chan_dir   = ""
-
+        rate_in    = 0
+        rate_out   = 0
+        
         proc_name  = tokens[0]
         # the first token is the function name.  If this is a debug
         # function then ignore it
@@ -445,11 +494,11 @@ class graph_handler:
                            #      and (self.is_ignore_proc(proc_name) == False)):
                            #     self.proc_list.append(proc_name)
                            #     self.proc_dict[proc_name] = len(self.proc_dict)
-                            self.chan_dict[chan_name][OUT_CHAN] = proc_name
+                            self.chan_dict_temp[chan_name][OUT_CHAN] = proc_name
                             if proc_name == INIT_PROC:
                                 self.init_chans = self.init_chans+[chan_name]
                         elif chan_dir == "in":
-                            self.chan_dict[chan_name][IN_CHAN] = proc_name
+                            self.chan_dict_temp[chan_name][IN_CHAN] = proc_name
                         elif chan_dir == "debug":
                             chan_dir = chan_dir
                         else:                        
@@ -459,24 +508,50 @@ class graph_handler:
                                 False):
                                 if(self.is_ignore_proc(proc_name)==False):
                                     self.proc_list.append(proc_name)
-                                    self.proc_dict[proc_name] = len(self.proc_dict)                                    
-                        
-            len_proc = len(self.proc_list)
-            self.top_matrix = np.zeros((len_proc, len_proc))    
+                                    self.proc_dict[proc_name] = [0,0,0]
+                                    self.proc_dict[proc_name][PROC_LIST_IND] = len(self.proc_dict)-1
+                                    #Get the parameter name indicating
+                                    #the I/O data rate then get the
+                                    #physical value from the parameter dictionary
+                                    rate_in  = self.param_dict[self.block_io_rates[proc_name][0]]
+                                    rate_out = self.param_dict[self.block_io_rates[proc_name][1]]
+                                    self.proc_dict[proc_name][PROC_RATE_IN]  = rate_in
+                                    self.proc_dict[proc_name][PROC_RATE_OUT] = rate_out
+                                    self.append_rate(rate_in)
+                                    self.append_rate(rate_out)
     def parse_proc_connection(self):
+        self.finalize_top_matrix_chan_dict()
         len_chans = len(self.chan_list)
+        self.proc_rate_gcd()
         for i in range(len_chans):
             
             chan_name = self.chan_list[i]
             
             proc_out  = self.chan_dict[chan_name][0]
             proc_in   = self.chan_dict[chan_name][1]
-            print "proc in= ", proc_in, "proc out= ", proc_out
             if (proc_out != ""):
-                proc_out_index  = self.proc_dict[proc_out]
+                proc_out_index  = self.proc_dict[proc_out][PROC_LIST_IND]
                 if (proc_in != ""):                
-                    proc_in_index   = self.proc_dict[proc_in]
-                self.top_matrix[proc_out_index][proc_in_index] = 1
+                    proc_in_index   = self.proc_dict[proc_in][PROC_LIST_IND]
+                #print "i= ", i, " proc in= ", proc_in, " proc_in ind =", proc_in_index, " proc out= ", proc_out, " proc_out_ind= ", proc_out_index
+                self.top_matrix[i][proc_out_index] = 1
+                self.top_matrix[i][proc_in_index] = -1
+                #self.print_chan_list()
+                #self.print_top_matrix()
+                #self.print_channels()
+                #self.print_proc_list()
+                #self.print_proc_dict()
+    def proc_rate_gcd(self):
+        return self.find_gcd([], self.rate_list)
+    def find_gcd(self, one, two):
+        list_len = len(two)
+        print "one= ", one, "two= ", two
+        if list_len > 1:
+            return self.find_gcd(two[0], two[1:])
+        else:
+            return scipy.gcd(one, two)
+        
+        
     def set_param_values(self):
         self.value_dict = {'rfOut'            :["None"],
                            'channelFilter'    :["rc"+self.param_dict["rcFiltCoeff"]+".dat", "samplingRate2/samplingRate", "1"],
@@ -505,7 +580,7 @@ class graph_handler:
                            'carrier'          :["samplingRate", CLASS_SINE_GNU, "500.0", "carrierGain"],
                            'dbpskEnc'         :["float", "2", "1"],
                            'dbpskMod'         :["dbpsk", "2", "0.35","yes", "False", "False"],
-                           'rfIn'             :["None"],
+                           'rfIn'             :["samplingRate", CLASS_SINE_GNU, "500.0", "carrierGain"],
                            'dbpskDemod'       :["dbpsk","2","0.35","6.28/100.0", "6.28/100.0", "6.28/100.0", "True", "False", "False", "False"],
                            'dbpskDec'         :["float", "-1"],
                            'dataOut'          :["float", "Data Out","samplingRate", "1/500.0", "1", "Data Value"],
@@ -609,7 +684,7 @@ class graph_handler:
             if mode == PTOLEMY:
                 block_value  = self.value_dict[block_name]
                 node1 = self.write_to_file(pgen, BLOCK, class_name, block_name, block_value, block_offset, mode)
-            elif mode == GNURADIO:
+            elif mode == GNURADIO:              
                 block_value  = self.value_dict_gnu[block_name]
                 node1 = self.write_to_file(pgen, BLOCK_GNU, class_name, block_name, block_value, block_offset, mode)
             pgen.top_element.appendChild(node1)
@@ -663,7 +738,7 @@ class graph_handler:
 if __name__ == "__main__":
     infile_name_list = ["csp-sdf-rx.occ", "csp-sdf-tx.occ", "csp-sdf-sim.occ"]
     # the input occam program which we will be processing
-    infile_name = infile_name_list[2]
+    infile_name = infile_name_list[1]
     # specifies processes of interest in the occam program
     fcn_list    = ["parameterGen", "main"]
     
@@ -673,7 +748,6 @@ if __name__ == "__main__":
 
     # peforms initial parameter parsing of the occam file
     top_handler.parse_input_file_param()
-    #top_handler.print_parameters()
     #top_handler.print_parameter_list()    
     top_handler.set_param_values()
     top_handler.parse_input_file_channels()
@@ -683,7 +757,7 @@ if __name__ == "__main__":
 
     #top_handler.print_proc_list()
     #top_handler.print_chan_list()
-    #top_handler.print_proc_dict()
+    top_handler.print_proc_dict()
     top_handler.print_top_matrix()
     print "Generating Ptolemy simulation ..."
     top_handler.generate_code(PTOLEMY)
