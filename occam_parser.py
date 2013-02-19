@@ -4,6 +4,7 @@ import sys, string, types, os, copy
 import getopt
 import numpy as np
 import scipy
+import fractions
 
 from ptolemy_gen  import *
 from gnuradio_gen import *
@@ -515,14 +516,15 @@ class graph_handler:
                                     #physical value from the parameter dictionary
                                     rate_in  = self.param_dict[self.block_io_rates[proc_name][0]]
                                     rate_out = self.param_dict[self.block_io_rates[proc_name][1]]
-                                    self.proc_dict[proc_name][PROC_RATE_IN]  = rate_in
-                                    self.proc_dict[proc_name][PROC_RATE_OUT] = rate_out
-                                    self.append_rate(rate_in)
-                                    self.append_rate(rate_out)
+                                    self.proc_dict[proc_name][PROC_RATE_IN]  = int(float(rate_in))
+                                    self.proc_dict[proc_name][PROC_RATE_OUT] = int(float(rate_out))
+                                    self.append_rate(int(float(rate_in)))
+                                    self.append_rate(int(float(rate_out)))
     def parse_proc_connection(self):
         self.finalize_top_matrix_chan_dict()
         len_chans = len(self.chan_list)
-        self.proc_rate_gcd()
+        proc_gcd = self.proc_rate_gcd()
+
         for i in range(len_chans):
             
             chan_name = self.chan_list[i]
@@ -533,23 +535,19 @@ class graph_handler:
                 proc_out_index  = self.proc_dict[proc_out][PROC_LIST_IND]
                 if (proc_in != ""):                
                     proc_in_index   = self.proc_dict[proc_in][PROC_LIST_IND]
-                #print "i= ", i, " proc in= ", proc_in, " proc_in ind =", proc_in_index, " proc out= ", proc_out, " proc_out_ind= ", proc_out_index
-                self.top_matrix[i][proc_out_index] = 1
-                self.top_matrix[i][proc_in_index] = -1
-                #self.print_chan_list()
-                #self.print_top_matrix()
-                #self.print_channels()
-                #self.print_proc_list()
-                #self.print_proc_dict()
+                self.top_matrix[i][proc_out_index] = self.proc_dict[proc_out][PROC_RATE_OUT]/proc_gcd
+                self.top_matrix[i][proc_in_index]  = -self.proc_dict[proc_in][PROC_RATE_IN]/proc_gcd
+
+    # function finds the gcd of the I/O sampling rates of the various
+    # blocks recursively
     def proc_rate_gcd(self):
         return self.find_gcd([], self.rate_list)
     def find_gcd(self, one, two):
         list_len = len(two)
-        print "one= ", one, "two= ", two
         if list_len > 1:
             return self.find_gcd(two[0], two[1:])
         else:
-            return scipy.gcd(one, two)
+            return fractions.gcd(one, two[0])
         
         
     def set_param_values(self):
@@ -667,7 +665,7 @@ class graph_handler:
             param_val  = self.param_dict[param_name]
             param_val  = self.check_if_int_enforce(param_name, param_val)
             param_val  = self.check_if_long_enforce(param_name, param_val)
-
+            
             if mode is PTOLEMY:
                 node1      = self.write_to_file(pgen, PARAM, CLASS_PARAMETER, param_name, [param_val], 0, mode)
             elif mode is GNURADIO:
@@ -757,7 +755,7 @@ if __name__ == "__main__":
 
     #top_handler.print_proc_list()
     #top_handler.print_chan_list()
-    top_handler.print_proc_dict()
+    #top_handler.print_proc_dict()
     top_handler.print_top_matrix()
     print "Generating Ptolemy simulation ..."
     top_handler.generate_code(PTOLEMY)
