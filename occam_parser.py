@@ -8,6 +8,7 @@ import fractions
 
 from ptolemy_gen  import *
 from gnuradio_gen import *
+from lp_gen       import *
 '''
 Checks if the token specifies an OCCAM process
 it basically checks if the token starts with
@@ -47,7 +48,7 @@ class graph_handler:
         self.param_list     = []
         self.rate_list      = [] # list of rates in current flowgraph
         self.top_matrix     = np.zeros((1,1))
-        
+        self.sched          = 0
         self.fcn_interest = []
         self.init_chans   = []
         # The following parameters should be written as ints for
@@ -348,6 +349,11 @@ class graph_handler:
     def print_top_matrix(self):
         print "Topology Matrix"
         print self.top_matrix
+    def print_schedule(self):
+        print "Firing Schedule"
+        print self.sched
+    def calculate_schedule(self):
+        self.sched = setup_sched_lp(self.top_matrix)
     def parse_input_file_param(self):
         # output filestream used to save the parameter generator
         # body for further processing after we discover the requested
@@ -756,4 +762,5 @@ if __name__ == "__main__":
     top_handler.generate_code(PTOLEMY)
     print "Generating GNU Radio project file ..."
     top_handler.generate_code(GNURADIO)
-
+    top_handler.print_schedule()
+    top_handler.calculate_schedule()

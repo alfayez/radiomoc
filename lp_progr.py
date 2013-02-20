@@ -1,8 +1,5 @@
 #!/usr/bin/env python
 import numpy
-import scipy
-from scipy import linalg, matrix
-
 import glpk
 
 tol = 1
