@@ -3,7 +3,7 @@
 # Gnuradio Python Flow Graph
 # Title: Occam Generated
 # Author: Almohanad Fayez
-# Generated: Fri Feb 22 18:12:10 2013
+# Generated: Fri Feb 22 18:47:35 2013
 ##################################################
 
 from gnuradio import audio
@@ -47,43 +47,43 @@ class OCCAM_generated(grc_wxgui.top_block_gui):
 		##################################################
 		# Blocks
 		##################################################
-		self.uhd_usrp_source_0 = uhd.usrp_source(
+		self.uhd_usrp_sink_0 = uhd.usrp_sink(
 			device_addr="",
 			stream_args=uhd.stream_args(
 				cpu_format="fc32",
 				channels=range(1),
 			),
 		)
-		self.uhd_usrp_source_0.set_samp_rate(samplingRate2)
-		self.uhd_usrp_source_0.set_center_freq(462562500, 0)
-		self.uhd_usrp_source_0.set_gain(25, 0)
-		self.dbpskDemod = digital.dbpsk_demod(
-			samples_per_symbol=samplingRate2/samplingRate,
+		self.uhd_usrp_sink_0.set_samp_rate(samplingRate2)
+		self.uhd_usrp_sink_0.set_center_freq(462562500, 0)
+		self.uhd_usrp_sink_0.set_gain(3, 0)
+		self.rfScale_0 = blocks.multiply_const_vff((30, ))
+		self.rfScale = blocks.multiply_const_vcc((0.2, ))
+		self.dbpskMod = digital.dbpsk_mod(
+			samples_per_symbol=16,
 			excess_bw=0.35,
-			freq_bw=6.28/100.0,
-			phase_bw=6.28/100.0,
-			timing_bw=6.28/100.0,
 			gray_coded=True,
 			verbose=False,
-			log=False
-		)
-		self.dbpskDec = grc_blks2.packet_demod_f(grc_blks2.packet_decoder(
+			log=False)
+			
+		self.dbpskEnc = grc_blks2.packet_mod_f(grc_blks2.packet_encoder(
+				samples_per_symbol=1,
+				bits_per_symbol=1,
 				access_code="",
-				threshold=-1,
-				callback=lambda ok, payload: self.dbpskDec.recv_pkt(ok, payload),
+				pad_for_usrp=True,
 			),
+			payload_length=0,
 		)
-		self.blocks_multiply_const_vxx_0 = blocks.multiply_const_vcc((3, ))
-		self.audio_sink_0 = audio.sink(samplingRate, "plughw:1,0", True)
+		self.audio_source_0 = audio.source(samplingRate, "plughw:0,0", True)
 
 		##################################################
 		# Connections
 		##################################################
-		self.connect((self.dbpskDemod, 0), (self.dbpskDec, 0))
-		self.connect((self.uhd_usrp_source_0, 0), (self.blocks_multiply_const_vxx_0, 0))
-		self.connect((self.blocks_multiply_const_vxx_0, 0), (self.dbpskDemod, 0))
-		self.connect((self.dbpskDec, 0), (self.audio_sink_0, 0))
-		self.connect((self.dbpskDec, 0), (self.audio_sink_0, 1))
+		self.connect((self.dbpskEnc, 0), (self.dbpskMod, 0))
+		self.connect((self.rfScale, 0), (self.uhd_usrp_sink_0, 0))
+		self.connect((self.dbpskMod, 0), (self.rfScale, 0))
+		self.connect((self.rfScale_0, 0), (self.dbpskEnc, 0))
+		self.connect((self.audio_source_0, 0), (self.rfScale_0, 0))
 
 
 	def get_symbolTime(self):
@@ -109,7 +109,7 @@ class OCCAM_generated(grc_wxgui.top_block_gui):
 
 	def set_samplingRate2(self, samplingRate2):
 		self.samplingRate2 = samplingRate2
-		self.uhd_usrp_source_0.set_samp_rate(self.samplingRate2)
+		self.uhd_usrp_sink_0.set_samp_rate(self.samplingRate2)
 
 	def get_samplingRate(self):
 		return self.samplingRate
