@@ -1,6 +1,10 @@
 <?xml version='1.0' encoding='ASCII'?>
 <flow_graph>
+<<<<<<< HEAD
   <timestamp>Fri Feb 22 16:00:48 2013</timestamp>
+=======
+  <timestamp>Fri Feb 22 15:42:10 2013</timestamp>
+>>>>>>> d253dd1463c581458efdc3b49c802fac6fdc65a2
   <block>
     <key>options</key>
     <param>
@@ -1145,6 +1149,154 @@
     </param>
   </block>
   <block>
+    <key>gr_sig_source_x</key>
+    <param>
+      <key>id</key>
+      <value>dataSrc</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+<<<<<<< HEAD
+      <key>value</key>
+      <value>128000</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(1, 121)</value>
+=======
+      <key>type</key>
+      <value>float</value>
+    </param>
+    <param>
+      <key>samp_rate</key>
+      <value>samplingRate</value>
+    </param>
+    <param>
+      <key>waveform</key>
+      <value>gr.GR_COS_WAVE</value>
+    </param>
+    <param>
+      <key>freq</key>
+      <value>500.0</value>
+    </param>
+    <param>
+      <key>amp</key>
+      <value>carrierGain</value>
+    </param>
+    <param>
+      <key>offset</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(109, 199)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+  </block>
+  <block>
+    <key>blks2_packet_encoder</key>
+    <param>
+      <key>id</key>
+      <value>dbpskEnc</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>float</value>
+    </param>
+    <param>
+      <key>samples_per_symbol</key>
+      <value>1</value>
+    </param>
+    <param>
+      <key>bits_per_symbol</key>
+      <value>1</value>
+    </param>
+    <param>
+      <key>access_code</key>
+      <value></value>
+    </param>
+    <param>
+      <key>pad_for_usrp</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>payload_length</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(510, 198)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+  </block>
+  <block>
+    <key>blocks_multiply_const_vxx</key>
+    <param>
+      <key>id</key>
+      <value>rfScale</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>complex</value>
+    </param>
+    <param>
+      <key>const</key>
+      <value>0.2</value>
+    </param>
+    <param>
+      <key>vlen</key>
+      <value>1</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(1232, 205)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+  </block>
+  <block>
+    <key>variable</key>
+    <param>
+      <key>id</key>
+      <value>samplingRate2</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>512000</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(1, 180)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+  </block>
+  <block>
     <key>variable</key>
     <param>
       <key>id</key>
@@ -1156,11 +1308,55 @@
     </param>
     <param>
       <key>value</key>
-      <value>128000</value>
+      <value>32000</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1, 121)</value>
+      <value>(1, 120)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+  </block>
+  <block>
+    <key>digital_dxpsk_mod</key>
+    <param>
+      <key>id</key>
+      <value>dbpskMod</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>dbpsk</value>
+    </param>
+    <param>
+      <key>samples_per_symbol</key>
+      <value>16</value>
+    </param>
+    <param>
+      <key>excess_bw</key>
+      <value>0.35</value>
+    </param>
+    <param>
+      <key>gray_coded</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>verbose</key>
+      <value>False</value>
+    </param>
+    <param>
+      <key>log</key>
+      <value>False</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(760, 190)</value>
+>>>>>>> d253dd1463c581458efdc3b49c802fac6fdc65a2
     </param>
     <param>
       <key>_rotation</key>
