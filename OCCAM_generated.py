@@ -3,7 +3,7 @@
 # Gnuradio Python Flow Graph
 # Title: Occam Generated
 # Author: Almohanad Fayez
-# Generated: Fri Feb 22 18:12:10 2013
+# Generated: Fri Feb 22 19:40:57 2013
 ##################################################
 
 from gnuradio import audio
@@ -33,7 +33,7 @@ class OCCAM_generated(grc_wxgui.top_block_gui):
 		self.stdValG = stdValG = 0.40
 		self.seedValG = seedValG = 0L
 		self.samplingRate2 = samplingRate2 = 256000
-		self.samplingRate = samplingRate = 32000
+		self.samplingRate = samplingRate = 48000
 		self.rfGain2 = rfGain2 = 1.0
 		self.rfGain = rfGain = 30.0
 		self.recvThresh = recvThresh = 0.3
@@ -73,8 +73,8 @@ class OCCAM_generated(grc_wxgui.top_block_gui):
 				callback=lambda ok, payload: self.dbpskDec.recv_pkt(ok, payload),
 			),
 		)
-		self.blocks_multiply_const_vxx_0 = blocks.multiply_const_vcc((3, ))
-		self.audio_sink_0 = audio.sink(samplingRate, "plughw:1,0", True)
+		self.blocks_multiply_const_vxx_0 = blocks.multiply_const_vcc((1, ))
+		self.audio_sink_0 = audio.sink(samplingRate, "", True)
 
 		##################################################
 		# Connections
@@ -83,7 +83,6 @@ class OCCAM_generated(grc_wxgui.top_block_gui):
 		self.connect((self.uhd_usrp_source_0, 0), (self.blocks_multiply_const_vxx_0, 0))
 		self.connect((self.blocks_multiply_const_vxx_0, 0), (self.dbpskDemod, 0))
 		self.connect((self.dbpskDec, 0), (self.audio_sink_0, 0))
-		self.connect((self.dbpskDec, 0), (self.audio_sink_0, 1))
 
 
 	def get_symbolTime(self):
