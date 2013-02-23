@@ -3,7 +3,7 @@
 # Gnuradio Python Flow Graph
 # Title: Occam Generated
 # Author: Almohanad Fayez
-# Generated: Fri Feb 22 18:47:35 2013
+# Generated: Fri Feb 22 19:47:27 2013
 ##################################################
 
 from gnuradio import audio
@@ -14,6 +14,7 @@ from gnuradio import gr
 from gnuradio import uhd
 from gnuradio.eng_option import eng_option
 from gnuradio.gr import firdes
+from gnuradio.wxgui import scopesink2
 from grc_gnuradio import blks2 as grc_blks2
 from grc_gnuradio import wxgui as grc_wxgui
 from optparse import OptionParser
@@ -33,7 +34,7 @@ class OCCAM_generated(grc_wxgui.top_block_gui):
 		self.stdValG = stdValG = 0.40
 		self.seedValG = seedValG = 0L
 		self.samplingRate2 = samplingRate2 = 256000
-		self.samplingRate = samplingRate = 32000
+		self.samplingRate = samplingRate = 48000
 		self.rfGain2 = rfGain2 = 1.0
 		self.rfGain = rfGain = 30.0
 		self.recvThresh = recvThresh = 0.3
@@ -47,6 +48,20 @@ class OCCAM_generated(grc_wxgui.top_block_gui):
 		##################################################
 		# Blocks
 		##################################################
+		self.wxgui_scopesink2_0 = scopesink2.scope_sink_f(
+			self.GetWin(),
+			title="Scope Plot",
+			sample_rate=samplingRate,
+			v_scale=0,
+			v_offset=0,
+			t_scale=0,
+			ac_couple=False,
+			xy_mode=False,
+			num_inputs=1,
+			trig_mode=gr.gr_TRIG_MODE_AUTO,
+			y_axis_label="Counts",
+		)
+		self.Add(self.wxgui_scopesink2_0.win)
 		self.uhd_usrp_sink_0 = uhd.usrp_sink(
 			device_addr="",
 			stream_args=uhd.stream_args(
@@ -57,10 +72,10 @@ class OCCAM_generated(grc_wxgui.top_block_gui):
 		self.uhd_usrp_sink_0.set_samp_rate(samplingRate2)
 		self.uhd_usrp_sink_0.set_center_freq(462562500, 0)
 		self.uhd_usrp_sink_0.set_gain(3, 0)
-		self.rfScale_0 = blocks.multiply_const_vff((30, ))
+		self.rfScale_0 = blocks.multiply_const_vff((500, ))
 		self.rfScale = blocks.multiply_const_vcc((0.2, ))
 		self.dbpskMod = digital.dbpsk_mod(
-			samples_per_symbol=16,
+			samples_per_symbol=samplingRate2/samplingRate,
 			excess_bw=0.35,
 			gray_coded=True,
 			verbose=False,
@@ -74,7 +89,7 @@ class OCCAM_generated(grc_wxgui.top_block_gui):
 			),
 			payload_length=0,
 		)
-		self.audio_source_0 = audio.source(samplingRate, "plughw:0,0", True)
+		self.audio_source_0 = audio.source(samplingRate, "", True)
 
 		##################################################
 		# Connections
@@ -84,6 +99,7 @@ class OCCAM_generated(grc_wxgui.top_block_gui):
 		self.connect((self.dbpskMod, 0), (self.rfScale, 0))
 		self.connect((self.rfScale_0, 0), (self.dbpskEnc, 0))
 		self.connect((self.audio_source_0, 0), (self.rfScale_0, 0))
+		self.connect((self.rfScale_0, 0), (self.wxgui_scopesink2_0, 0))
 
 
 	def get_symbolTime(self):
@@ -116,6 +132,7 @@ class OCCAM_generated(grc_wxgui.top_block_gui):
 
 	def set_samplingRate(self, samplingRate):
 		self.samplingRate = samplingRate
+		self.wxgui_scopesink2_0.set_sample_rate(self.samplingRate)
 
 	def get_rfGain2(self):
 		return self.rfGain2
