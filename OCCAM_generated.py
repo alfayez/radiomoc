@@ -3,10 +3,9 @@
 # Gnuradio Python Flow Graph
 # Title: Occam Generated
 # Author: Almohanad Fayez
-# Generated: Fri Feb 22 20:04:17 2013
+# Generated: Thu Feb 28 18:44:59 2013
 ##################################################
 
-from gnuradio import audio
 from gnuradio import blocks
 from gnuradio import digital
 from gnuradio import eng_notation
@@ -32,8 +31,8 @@ class OCCAM_generated(grc_wxgui.top_block_gui):
 		self.symbolTime = symbolTime = 2
 		self.stdValG = stdValG = 0.40
 		self.seedValG = seedValG = 0L
-		self.samplingRate2 = samplingRate2 = 96000*2
-		self.samplingRate = samplingRate = 96000
+		self.samplingRate2 = samplingRate2 = 2000000
+		self.samplingRate = samplingRate = 320000
 		self.rfGain2 = rfGain2 = 1.0
 		self.rfGain = rfGain = 30.0
 		self.recvThresh = recvThresh = 0.3
@@ -54,11 +53,14 @@ class OCCAM_generated(grc_wxgui.top_block_gui):
 				channels=range(1),
 			),
 		)
+		self.uhd_usrp_sink_0.set_subdev_spec("A:0", 0)
 		self.uhd_usrp_sink_0.set_samp_rate(samplingRate2)
 		self.uhd_usrp_sink_0.set_center_freq(462562500, 0)
-		self.uhd_usrp_sink_0.set_gain(3, 0)
+		self.uhd_usrp_sink_0.set_gain(0, 0)
+		self.uhd_usrp_sink_0.set_antenna("TX/RX", 0)
 		self.rfScale_0 = blocks.multiply_const_vff((10, ))
-		self.rfScale = blocks.multiply_const_vcc((0.2, ))
+		self.rfScale = blocks.multiply_const_vcc((0.3, ))
+		self.gr_file_source_0 = gr.file_source(gr.sizeof_float*1, "/home/alfayez/workspace/occam-research/music-tx.dat", True)
 		self.dbpskMod = digital.dbpsk_mod(
 			samples_per_symbol=samplingRate2/samplingRate,
 			excess_bw=0.35,
@@ -67,14 +69,13 @@ class OCCAM_generated(grc_wxgui.top_block_gui):
 			log=False)
 			
 		self.dbpskEnc = grc_blks2.packet_mod_f(grc_blks2.packet_encoder(
-				samples_per_symbol=1,
+				samples_per_symbol=10,
 				bits_per_symbol=1,
 				access_code="",
 				pad_for_usrp=True,
 			),
 			payload_length=0,
 		)
-		self.audio_source_0 = audio.source(samplingRate, "", True)
 
 		##################################################
 		# Connections
@@ -83,7 +84,7 @@ class OCCAM_generated(grc_wxgui.top_block_gui):
 		self.connect((self.rfScale, 0), (self.uhd_usrp_sink_0, 0))
 		self.connect((self.dbpskMod, 0), (self.rfScale, 0))
 		self.connect((self.rfScale_0, 0), (self.dbpskEnc, 0))
-		self.connect((self.audio_source_0, 0), (self.rfScale_0, 0))
+		self.connect((self.gr_file_source_0, 0), (self.rfScale_0, 0))
 
 
 	def get_symbolTime(self):

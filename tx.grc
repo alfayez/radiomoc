@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='ASCII'?>
 <flow_graph>
-  <timestamp>Fri Feb 22 20:05:49 2013</timestamp>
+  <timestamp>Thu Feb 28 18:44:56 2013</timestamp>
   <block>
     <key>options</key>
     <param>
@@ -337,6 +337,37 @@
     </param>
   </block>
   <block>
+    <key>blocks_multiply_const_vxx</key>
+    <param>
+      <key>id</key>
+      <value>rfScale</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>complex</value>
+    </param>
+    <param>
+      <key>const</key>
+      <value>0.3</value>
+    </param>
+    <param>
+      <key>vlen</key>
+      <value>1</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(1118, 197)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+  </block>
+  <block>
     <key>uhd_usrp_sink</key>
     <param>
       <key>id</key>
@@ -384,7 +415,7 @@
     </param>
     <param>
       <key>sd_spec0</key>
-      <value></value>
+      <value>A:0</value>
     </param>
     <param>
       <key>clock_source1</key>
@@ -484,11 +515,11 @@
     </param>
     <param>
       <key>gain0</key>
-      <value>3</value>
+      <value>0</value>
     </param>
     <param>
       <key>ant0</key>
-      <value></value>
+      <value>TX/RX</value>
     </param>
     <param>
       <key>bw0</key>
@@ -1000,30 +1031,22 @@
     </param>
   </block>
   <block>
-    <key>blocks_multiply_const_vxx</key>
+    <key>variable</key>
     <param>
       <key>id</key>
-      <value>rfScale</value>
+      <value>samplingRate</value>
     </param>
     <param>
       <key>_enabled</key>
       <value>True</value>
     </param>
     <param>
-      <key>type</key>
-      <value>complex</value>
-    </param>
-    <param>
-      <key>const</key>
-      <value>0.2</value>
-    </param>
-    <param>
-      <key>vlen</key>
-      <value>1</value>
+      <key>value</key>
+      <value>320000</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1118, 197)</value>
+      <value>(1, 119)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1046,7 +1069,7 @@
     </param>
     <param>
       <key>samples_per_symbol</key>
-      <value>1</value>
+      <value>10</value>
     </param>
     <param>
       <key>bits_per_symbol</key>
@@ -1066,7 +1089,73 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(510, 198)</value>
+      <value>(597, 319)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+  </block>
+  <block>
+    <key>gr_file_source</key>
+    <param>
+      <key>id</key>
+      <value>gr_file_source_0</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>file</key>
+      <value>/home/alfayez/workspace/occam-research/music-tx.dat</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>float</value>
+    </param>
+    <param>
+      <key>repeat</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>vlen</key>
+      <value>1</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(265, 332)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+  </block>
+  <block>
+    <key>blocks_multiply_const_vxx</key>
+    <param>
+      <key>id</key>
+      <value>rfScale_0</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>float</value>
+    </param>
+    <param>
+      <key>const</key>
+      <value>10</value>
+    </param>
+    <param>
+      <key>vlen</key>
+      <value>1</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(413, 449)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1117,72 +1206,6 @@
     </param>
   </block>
   <block>
-    <key>audio_source</key>
-    <param>
-      <key>id</key>
-      <value>audio_source_0</value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>samp_rate</key>
-      <value>samplingRate</value>
-    </param>
-    <param>
-      <key>device_name</key>
-      <value></value>
-    </param>
-    <param>
-      <key>ok_to_block</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>num_outputs</key>
-      <value>1</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(127, 101)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-  </block>
-  <block>
-    <key>blocks_multiply_const_vxx</key>
-    <param>
-      <key>id</key>
-      <value>rfScale_0</value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>type</key>
-      <value>float</value>
-    </param>
-    <param>
-      <key>const</key>
-      <value>10</value>
-    </param>
-    <param>
-      <key>vlen</key>
-      <value>1</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(373, 101)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-  </block>
-  <block>
     <key>variable</key>
     <param>
       <key>id</key>
@@ -1194,34 +1217,11 @@
     </param>
     <param>
       <key>value</key>
-      <value>256000</value>
+      <value>2000000</value>
     </param>
     <param>
       <key>_coordinate</key>
       <value>(1, 180)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-  </block>
-  <block>
-    <key>variable</key>
-    <param>
-      <key>id</key>
-      <value>samplingRate</value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>value</key>
-      <value>48000</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(1, 119)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1253,7 +1253,7 @@
     <sink_key>0</sink_key>
   </connection>
   <connection>
-    <source_block_id>audio_source_0</source_block_id>
+    <source_block_id>gr_file_source_0</source_block_id>
     <sink_block_id>rfScale_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
