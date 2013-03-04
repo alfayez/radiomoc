@@ -37,6 +37,8 @@ INPORT_COUNT  = 2
 OUTPORT_COUNT = 3 
 class graph_handler:
     def __init__(self, infile_name):
+        self.default_buffer_size = 32*1024
+        self.cur_bufer_size      = 32*1024
         self.infile  = file(infile_name, 'r') 
         self.outfile = file('tmp_assignment_body.txt', 'w')
         self.chan_dict      = {}
@@ -51,6 +53,7 @@ class graph_handler:
         self.sched          = 0
         self.fcn_interest = []
         self.init_chans   = []
+        self.rankVal      = 0
         # The following parameters should be written as ints for
         # ptolemy
         self.int_param_enforce_dict  = {'symbolTime':0, 'samplingRate':0, 'seedValG':0, 'samplingRate':0, 'samplingRate2':0}
@@ -233,7 +236,10 @@ class graph_handler:
                              'gauss'           :["samplingRate2", "samplingRate2"],
                              'gaussScale'      :["samplingRate2", "samplingRate2"], 
                              'add'             :["samplingRate2", "samplingRate2"]
-                           }        
+                           }
+        self.top_impl_info = {'consistent'      : False,
+                              
+                          }
     def __del__(self):
         self.outfile.close()
         self.infile.close()
@@ -364,6 +370,9 @@ class graph_handler:
         return token_val
     def set_fcn_interest(self, fcn_pass):
         self.fcn_interest = fcn_pass
+    def print_top_impl_info(self):
+        for item in self.top_impl_info.keys():
+            print item, "= ", self.top_impl_info[item]
     def print_parameters(self):
         print "Parameter Dictionary"
         print self.param_dict
@@ -389,7 +398,15 @@ class graph_handler:
         print "Firing Schedule"
         print self.sched
     def calculate_schedule(self):
-        self.sched = setup_sched_lp(self.top_matrix)
+        [errorCond, self.sched] = setup_sched_lp(self.top_matrix)
+        return errorCond
+    def is_consistent(self):
+        self.rankVal = np.linalg.matrix_rank(self.top_matrix)
+        num_actors   = len(self.top_matrix[0])
+        if self.rankVal < num_actors:
+            self.top_impl_info["consistent"] = True
+        else:
+            self.top_impl_info["consistent"] = False
     def parse_input_file_param(self):
         # output filestream used to save the parameter generator
         # body for further processing after we discover the requested
@@ -464,13 +481,14 @@ class graph_handler:
     def finalize_top_matrix_chan_dict(self):
         chan_dict = {}
         for key, value in self.chan_dict_temp.items():
-            if value != ["", ""]:
+            if value[0] != "" and value[1] != "":
                 if self.is_ignore_chan(key) == False:
                     self.chan_dict[key] = self.chan_dict_temp[key]
                     self.chan_list.append(key)
         len_proc = len(self.proc_list)
         len_chan = len(self.chan_list)
-        self.top_matrix = np.zeros((len_chan, len_proc))    
+        self.top_matrix = np.zeros((len_chan, len_proc))
+        
     def clean_from_punc(self, tokens):
         len_tokens = len(tokens)
         for i in range(len_tokens):
@@ -573,12 +591,15 @@ class graph_handler:
             
             proc_out  = self.chan_dict[chan_name][0]
             proc_in   = self.chan_dict[chan_name][1]
-            if (proc_out != ""):
+            if proc_out != "":
                 proc_out_index  = self.proc_dict[proc_out][PROC_LIST_IND]
                 if (proc_in != ""):                
                     proc_in_index   = self.proc_dict[proc_in][PROC_LIST_IND]
                 self.top_matrix[i][proc_out_index] = self.proc_dict[proc_out][PROC_RATE_OUT]/proc_gcd
                 self.top_matrix[i][proc_in_index]  = -self.proc_dict[proc_in][PROC_RATE_IN]/proc_gcd
+            else:
+                print "ERROR: in parse_proc_connection, found an empty output process"
+                exit(1)                
 
     # function finds the gcd of the I/O sampling rates of the various
     # blocks recursively
@@ -745,9 +766,14 @@ if __name__ == "__main__":
     top_handler.parse_proc_connection()
 
     top_handler.print_top_matrix()
-    print "Generating Ptolemy simulation ..."
+
+    
+    print "Genertaing Ptolemy simulation ..."
     top_handler.generate_code(PTOLEMY)
     print "Generating GNU Radio project file ..."
     top_handler.generate_code(GNURADIO)
+    errorCond = top_handler.calculate_schedule()
     top_handler.print_schedule()
-    top_handler.calculate_schedule()
+    top_handler.is_consistent()
+
+    top_handler.print_top_impl_info()

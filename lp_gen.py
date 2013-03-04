@@ -1,15 +1,18 @@
 #!/usr/bin/env python
 import numpy as np
 import glpk
+import copy
 
+OK             = 0
+RELAXED_NO_SOL = 1
+INTEGER_NO_SOL = 2
 def setup_sched_lp(mat):
     firing_lb = 1
     mat_temp  = []
     obj_temp  = []
-    
+    sched_loc = []    
     row = len(mat)
     col = len(mat[0])
-    print "row= ", row, "col= ", col
     lp  = glpk.LPX()
 
     # the objective function is all ones because we're interested in
@@ -48,25 +51,28 @@ def setup_sched_lp(mat):
     # solved the relaxed form of the LP
     retval = lp.simplex()
     assert retval == None
+    if lp.status != 'opt':
+        return [RELAXED_NO_SOL, copy.deepcopy(sched_loc)]
 
     #################################################
     #################################################
     ## IMPORTANT RETURN INFO
     stat = lp.status
-    print "status= ", lp.status
     print "obj val= ", lp.obj.value
-
-    print "firing schedule= "
-    for c in lp.cols:
-        print c.primal
 
     # setup the LP as a MIP
     for c in lp.cols:
         c.kind = int
     retval = lp.integer()
-    #assert retval == None    
-    print "firing schedule= "
+    assert retval == None
+    if lp.status != 'opt':
+        return [INTEGER_NO_SOL, copy.deepcopy(sched_loc)]
+    
+    sched_loc = np.zeros((len(lp.cols), 1))
+    i = 0
     for c in lp.cols:
-        print c.primal    
+        sched_loc[i][0] = c.primal
+        i = i + 1
+    return [OK, copy.deepcopy(sched_loc)]
     #################################################
     #################################################
