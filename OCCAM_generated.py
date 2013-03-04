@@ -3,7 +3,7 @@
 # Gnuradio Python Flow Graph
 # Title: Occam Generated
 # Author: Almohanad Fayez
-# Generated: Thu Feb 28 18:44:59 2013
+# Generated: Sun Mar  3 23:01:35 2013
 ##################################################
 
 from gnuradio import blocks
@@ -28,70 +28,66 @@ class OCCAM_generated(grc_wxgui.top_block_gui):
 		##################################################
 		# Variables
 		##################################################
-		self.symbolTime = symbolTime = 2
 		self.stdValG = stdValG = 0.40
 		self.seedValG = seedValG = 0L
-		self.samplingRate2 = samplingRate2 = 2000000
+		self.samplingRate2 = samplingRate2 = 640000
 		self.samplingRate = samplingRate = 320000
-		self.rfGain2 = rfGain2 = 1.0
-		self.rfGain = rfGain = 30.0
+		self.rfGain2 = rfGain2 = 25.0
+		self.rfGain = rfGain = 1.0
 		self.recvThresh = recvThresh = 0.3
 		self.rcFiltCoeff = rcFiltCoeff = 1.0
 		self.meanValG = meanValG = 0.0
 		self.gaussGain = gaussGain = 0.3
-		self.carrierPhase = carrierPhase = 0.0
-		self.carrierGain = carrierGain = 1.0
-		self.carrierFreq = carrierFreq = 4.0
+		self.excessBw = excessBw = 0.35
+		self.dataName = dataName = 1.0
+		self.dataGain = dataGain = 10.0
+		self.carrierFreq = carrierFreq = 462562500.0
+		self.bbGain2 = bbGain2 = 1.0
+		self.bbGain = bbGain = 1.3
 
 		##################################################
 		# Blocks
 		##################################################
-		self.uhd_usrp_sink_0 = uhd.usrp_sink(
+		self.rfOut = uhd.usrp_sink(
 			device_addr="",
 			stream_args=uhd.stream_args(
 				cpu_format="fc32",
 				channels=range(1),
 			),
 		)
-		self.uhd_usrp_sink_0.set_subdev_spec("A:0", 0)
-		self.uhd_usrp_sink_0.set_samp_rate(samplingRate2)
-		self.uhd_usrp_sink_0.set_center_freq(462562500, 0)
-		self.uhd_usrp_sink_0.set_gain(0, 0)
-		self.uhd_usrp_sink_0.set_antenna("TX/RX", 0)
-		self.rfScale_0 = blocks.multiply_const_vff((10, ))
-		self.rfScale = blocks.multiply_const_vcc((0.3, ))
-		self.gr_file_source_0 = gr.file_source(gr.sizeof_float*1, "/home/alfayez/workspace/occam-research/music-tx.dat", True)
+		self.rfOut.set_subdev_spec("A:0", 0)
+		self.rfOut.set_samp_rate(carrierFreq)
+		self.rfOut.set_center_freq(samplingRate2, 0)
+		self.rfOut.set_gain(rfGain, 0)
+		self.rfOut.set_antenna("TX/RX", 0)
 		self.dbpskMod = digital.dbpsk_mod(
-			samples_per_symbol=samplingRate2/samplingRate,
+			samples_per_symbol=2,
 			excess_bw=0.35,
 			gray_coded=True,
 			verbose=False,
 			log=False)
 			
 		self.dbpskEnc = grc_blks2.packet_mod_f(grc_blks2.packet_encoder(
-				samples_per_symbol=10,
+				samples_per_symbol=2,
 				bits_per_symbol=1,
 				access_code="",
 				pad_for_usrp=True,
 			),
 			payload_length=0,
 		)
+		self.dataSrc = gr.file_source(gr.sizeof_float*1, "music-tx1.0", False)
+		self.channelFilter = blocks.multiply_const_vcc((1.0, ))
+		self.basebandScale = blocks.multiply_const_vcc((bbGain, ))
 
 		##################################################
 		# Connections
 		##################################################
+		self.connect((self.dbpskMod, 0), (self.channelFilter, 0))
+		self.connect((self.basebandScale, 0), (self.rfOut, 0))
+		self.connect((self.dataSrc, 0), (self.dbpskEnc, 0))
 		self.connect((self.dbpskEnc, 0), (self.dbpskMod, 0))
-		self.connect((self.rfScale, 0), (self.uhd_usrp_sink_0, 0))
-		self.connect((self.dbpskMod, 0), (self.rfScale, 0))
-		self.connect((self.rfScale_0, 0), (self.dbpskEnc, 0))
-		self.connect((self.gr_file_source_0, 0), (self.rfScale_0, 0))
+		self.connect((self.channelFilter, 0), (self.basebandScale, 0))
 
-
-	def get_symbolTime(self):
-		return self.symbolTime
-
-	def set_symbolTime(self, symbolTime):
-		self.symbolTime = symbolTime
 
 	def get_stdValG(self):
 		return self.stdValG
@@ -110,7 +106,7 @@ class OCCAM_generated(grc_wxgui.top_block_gui):
 
 	def set_samplingRate2(self, samplingRate2):
 		self.samplingRate2 = samplingRate2
-		self.uhd_usrp_sink_0.set_samp_rate(self.samplingRate2)
+		self.rfOut.set_center_freq(self.samplingRate2, 0)
 
 	def get_samplingRate(self):
 		return self.samplingRate
@@ -129,6 +125,7 @@ class OCCAM_generated(grc_wxgui.top_block_gui):
 
 	def set_rfGain(self, rfGain):
 		self.rfGain = rfGain
+		self.rfOut.set_gain(self.rfGain, 0)
 
 	def get_recvThresh(self):
 		return self.recvThresh
@@ -154,23 +151,43 @@ class OCCAM_generated(grc_wxgui.top_block_gui):
 	def set_gaussGain(self, gaussGain):
 		self.gaussGain = gaussGain
 
-	def get_carrierPhase(self):
-		return self.carrierPhase
+	def get_excessBw(self):
+		return self.excessBw
 
-	def set_carrierPhase(self, carrierPhase):
-		self.carrierPhase = carrierPhase
+	def set_excessBw(self, excessBw):
+		self.excessBw = excessBw
 
-	def get_carrierGain(self):
-		return self.carrierGain
+	def get_dataName(self):
+		return self.dataName
 
-	def set_carrierGain(self, carrierGain):
-		self.carrierGain = carrierGain
+	def set_dataName(self, dataName):
+		self.dataName = dataName
+
+	def get_dataGain(self):
+		return self.dataGain
+
+	def set_dataGain(self, dataGain):
+		self.dataGain = dataGain
 
 	def get_carrierFreq(self):
 		return self.carrierFreq
 
 	def set_carrierFreq(self, carrierFreq):
 		self.carrierFreq = carrierFreq
+		self.rfOut.set_samp_rate(self.carrierFreq)
+
+	def get_bbGain2(self):
+		return self.bbGain2
+
+	def set_bbGain2(self, bbGain2):
+		self.bbGain2 = bbGain2
+
+	def get_bbGain(self):
+		return self.bbGain
+
+	def set_bbGain(self, bbGain):
+		self.bbGain = bbGain
+		self.basebandScale.set_k((self.bbGain, ))
 
 if __name__ == '__main__':
 	parser = OptionParser(option_class=eng_option, usage="%prog: [options]")

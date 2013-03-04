@@ -4,19 +4,19 @@
 <entity name="csp-sdf-tx" class="ptolemy.actor.TypedCompositeActor">
   <property name="_windowProperties" class="ptolemy.actor.gui.WindowPropertiesAttribute" value="{bounds={175, 249, 808, 527}, maximized=true}"/><property name="_vergilSize" class="ptolemy.actor.gui.SizeAttribute" value="[600, 400]"/><property name="_vergilZoomFactor" class="ptolemy.data.expr.ExpertParameter" value="1.0"/><property name="_vergilCenter" class="ptolemy.data.expr.ExpertParameter" value="{300.0, 200.0}"/><property name="SDF Director" class="ptolemy.domains.sdf.kernel.SDFDirector">
     <property name="_location" class="ptolemy.kernel.util.Location" value="{200, 10}"/>
-  </property><property name="symbolTime" class="ptolemy.data.expr.Parameter" value="2">
+  </property><property name="dataName" class="ptolemy.data.expr.Parameter" value="1.0">
     <property name="_icon" class="ptolemy.vergil.icon.ValueIcon">
       <property name="_color" class="ptolemy.actor.gui.ColorAttribute" value="{0.0, 0.0, 1.0, 1.0}"/>
     </property><property name="_location" class="ptolemy.kernel.util.Location" value="{1, 15}"/>
-  </property><property name="samplingRate" class="ptolemy.data.expr.Parameter" value="16000">
+  </property><property name="samplingRate" class="ptolemy.data.expr.Parameter" value="320000">
     <property name="_icon" class="ptolemy.vergil.icon.ValueIcon">
       <property name="_color" class="ptolemy.actor.gui.ColorAttribute" value="{0.0, 0.0, 1.0, 1.0}"/>
     </property><property name="_location" class="ptolemy.kernel.util.Location" value="{1, 30}"/>
-  </property><property name="samplingRate2" class="ptolemy.data.expr.Parameter" value="256000">
+  </property><property name="samplingRate2" class="ptolemy.data.expr.Parameter" value="640000">
     <property name="_icon" class="ptolemy.vergil.icon.ValueIcon">
       <property name="_color" class="ptolemy.actor.gui.ColorAttribute" value="{0.0, 0.0, 1.0, 1.0}"/>
     </property><property name="_location" class="ptolemy.kernel.util.Location" value="{1, 45}"/>
-  </property><property name="carrierFreq" class="ptolemy.data.expr.Parameter" value="4.0">
+  </property><property name="carrierFreq" class="ptolemy.data.expr.Parameter" value="462562500.0">
     <property name="_icon" class="ptolemy.vergil.icon.ValueIcon">
       <property name="_color" class="ptolemy.actor.gui.ColorAttribute" value="{0.0, 0.0, 1.0, 1.0}"/>
     </property><property name="_location" class="ptolemy.kernel.util.Location" value="{1, 60}"/>
@@ -24,42 +24,50 @@
     <property name="_icon" class="ptolemy.vergil.icon.ValueIcon">
       <property name="_color" class="ptolemy.actor.gui.ColorAttribute" value="{0.0, 0.0, 1.0, 1.0}"/>
     </property><property name="_location" class="ptolemy.kernel.util.Location" value="{1, 75}"/>
-  </property><property name="carrierGain" class="ptolemy.data.expr.Parameter" value="1.0">
+  </property><property name="dataGain" class="ptolemy.data.expr.Parameter" value="10.0">
     <property name="_icon" class="ptolemy.vergil.icon.ValueIcon">
       <property name="_color" class="ptolemy.actor.gui.ColorAttribute" value="{0.0, 0.0, 1.0, 1.0}"/>
     </property><property name="_location" class="ptolemy.kernel.util.Location" value="{1, 90}"/>
-  </property><property name="rfGain" class="ptolemy.data.expr.Parameter" value="30.0">
+  </property><property name="rfGain" class="ptolemy.data.expr.Parameter" value="1.0">
     <property name="_icon" class="ptolemy.vergil.icon.ValueIcon">
       <property name="_color" class="ptolemy.actor.gui.ColorAttribute" value="{0.0, 0.0, 1.0, 1.0}"/>
     </property><property name="_location" class="ptolemy.kernel.util.Location" value="{1, 105}"/>
-  </property><property name="rfGain2" class="ptolemy.data.expr.Parameter" value="1.0">
+  </property><property name="rfGain2" class="ptolemy.data.expr.Parameter" value="25.0">
     <property name="_icon" class="ptolemy.vergil.icon.ValueIcon">
       <property name="_color" class="ptolemy.actor.gui.ColorAttribute" value="{0.0, 0.0, 1.0, 1.0}"/>
     </property><property name="_location" class="ptolemy.kernel.util.Location" value="{1, 120}"/>
-  </property><property name="carrierPhase" class="ptolemy.data.expr.Parameter" value="0.0">
+  </property><property name="bbGain" class="ptolemy.data.expr.Parameter" value="1.3">
     <property name="_icon" class="ptolemy.vergil.icon.ValueIcon">
       <property name="_color" class="ptolemy.actor.gui.ColorAttribute" value="{0.0, 0.0, 1.0, 1.0}"/>
     </property><property name="_location" class="ptolemy.kernel.util.Location" value="{1, 135}"/>
-  </property><property name="gaussGain" class="ptolemy.data.expr.Parameter" value="0.3">
+  </property><property name="bbGain2" class="ptolemy.data.expr.Parameter" value="1.0">
     <property name="_icon" class="ptolemy.vergil.icon.ValueIcon">
       <property name="_color" class="ptolemy.actor.gui.ColorAttribute" value="{0.0, 0.0, 1.0, 1.0}"/>
     </property><property name="_location" class="ptolemy.kernel.util.Location" value="{1, 150}"/>
-  </property><property name="recvThresh" class="ptolemy.data.expr.Parameter" value="0.3">
+  </property><property name="excessBw" class="ptolemy.data.expr.Parameter" value="0.35">
     <property name="_icon" class="ptolemy.vergil.icon.ValueIcon">
       <property name="_color" class="ptolemy.actor.gui.ColorAttribute" value="{0.0, 0.0, 1.0, 1.0}"/>
     </property><property name="_location" class="ptolemy.kernel.util.Location" value="{1, 165}"/>
-  </property><property name="seedValG" class="ptolemy.data.expr.Parameter" value="0L">
+  </property><property name="gaussGain" class="ptolemy.data.expr.Parameter" value="0.3">
     <property name="_icon" class="ptolemy.vergil.icon.ValueIcon">
       <property name="_color" class="ptolemy.actor.gui.ColorAttribute" value="{0.0, 0.0, 1.0, 1.0}"/>
     </property><property name="_location" class="ptolemy.kernel.util.Location" value="{1, 180}"/>
-  </property><property name="meanValG" class="ptolemy.data.expr.Parameter" value="0.0">
+  </property><property name="recvThresh" class="ptolemy.data.expr.Parameter" value="0.3">
     <property name="_icon" class="ptolemy.vergil.icon.ValueIcon">
       <property name="_color" class="ptolemy.actor.gui.ColorAttribute" value="{0.0, 0.0, 1.0, 1.0}"/>
     </property><property name="_location" class="ptolemy.kernel.util.Location" value="{1, 195}"/>
-  </property><property name="stdValG" class="ptolemy.data.expr.Parameter" value="0.40">
+  </property><property name="seedValG" class="ptolemy.data.expr.Parameter" value="0L">
     <property name="_icon" class="ptolemy.vergil.icon.ValueIcon">
       <property name="_color" class="ptolemy.actor.gui.ColorAttribute" value="{0.0, 0.0, 1.0, 1.0}"/>
     </property><property name="_location" class="ptolemy.kernel.util.Location" value="{1, 210}"/>
+  </property><property name="meanValG" class="ptolemy.data.expr.Parameter" value="0.0">
+    <property name="_icon" class="ptolemy.vergil.icon.ValueIcon">
+      <property name="_color" class="ptolemy.actor.gui.ColorAttribute" value="{0.0, 0.0, 1.0, 1.0}"/>
+    </property><property name="_location" class="ptolemy.kernel.util.Location" value="{1, 225}"/>
+  </property><property name="stdValG" class="ptolemy.data.expr.Parameter" value="0.40">
+    <property name="_icon" class="ptolemy.vergil.icon.ValueIcon">
+      <property name="_color" class="ptolemy.actor.gui.ColorAttribute" value="{0.0, 0.0, 1.0, 1.0}"/>
+    </property><property name="_location" class="ptolemy.kernel.util.Location" value="{1, 240}"/>
   </property><entity name="dataSrc" class="ptolemy.actor.lib.Const">
     <property name="value" class="ptolemy.data.expr.Parameter" value="7"/><property name="_icon" class="ptolemy.vergil.icon.BoxedValueIcon">
       <property name="attributeName" class="ptolemy.kernel.util.StringAttribute" value="value"/><property name="displayWidth" class="ptolemy.data.expr.Parameter" value="60"/>
@@ -162,7 +170,7 @@
     </entity><relation name="inCh" class="ptolemy.actor.TypedIORelation"/><link port="input" relation="inCh"/><link port="upsample.input" relation="inCh"/><relation name="upCh" class="ptolemy.actor.TypedIORelation"/><link port="upsample.output" relation="upCh"/><link port="channelFilter.input" relation="upCh"/><relation name="firCh" class="ptolemy.actor.TypedIORelation"/><link port="channelFilter.output" relation="firCh"/><link port="output" relation="firCh"/><port name="output" class="ptolemy.actor.TypedIOPort">
       <property name="output"/><property name="_location" class="ptolemy.kernel.util.Location" value="{600, 200}"/>
     </port>
-  </entity><entity name="rfScale" class="ptolemy.actor.lib.Scale">
+  </entity><entity name="basebandScale" class="ptolemy.actor.lib.Scale">
     <property name="factor" class="ptolemy.data.expr.Parameter" value="rfGain"/><property name="_icon" class="ptolemy.vergil.icon.AttributeValueIcon">
       <property name="attributeName" class="ptolemy.kernel.util.StringAttribute" value="factor"/>
     </property><property name="_location" class="ptolemy.kernel.util.Location" value="{1000, 200}"/>
@@ -174,5 +182,5 @@
     </entity><entity name="Display" class="ptolemy.actor.lib.gui.Display">
       <property name="_windowProperties" class="ptolemy.actor.gui.WindowPropertiesAttribute"/><property name="_location" class="ptolemy.kernel.util.Location" value="{400, 200}"/>
     </entity><relation name="inputCh" class="ptolemy.actor.TypedIORelation"/><link port="input" relation="inputCh"/><link port="BoolToAnything.input" relation="inputCh"/><relation name="displayCh" class="ptolemy.actor.TypedIORelation"/><link port="BoolToAnything.output" relation="displayCh"/><link port="Display.input" relation="displayCh"/>
-  </entity><relation name="txToChanFiltC" class="ptolemy.actor.TypedIORelation"/><link port="dbpskMod.output" relation="txToChanFiltC"/><link port="channelFilter.input" relation="txToChanFiltC"/><relation name="scaleToAddC" class="ptolemy.actor.TypedIORelation"/><link port="rfScale.output" relation="scaleToAddC"/><link port="rfOut.input" relation="scaleToAddC"/><relation name="dataToEncC" class="ptolemy.actor.TypedIORelation"/><link port="dataSrc.output" relation="dataToEncC"/><link port="dbpskEnc.input" relation="dataToEncC"/><relation name="encToModC" class="ptolemy.actor.TypedIORelation"/><link port="dbpskEnc.output" relation="encToModC"/><link port="dbpskMod.datain" relation="encToModC"/><relation name="filterToScaleC" class="ptolemy.actor.TypedIORelation"/><link port="channelFilter.output" relation="filterToScaleC"/><link port="rfScale.input" relation="filterToScaleC"/>
+  </entity><relation name="txToChanFiltC" class="ptolemy.actor.TypedIORelation"/><link port="dbpskMod.output" relation="txToChanFiltC"/><link port="channelFilter.input" relation="txToChanFiltC"/><relation name="scaleToAddC" class="ptolemy.actor.TypedIORelation"/><link port="basebandScale.output" relation="scaleToAddC"/><link port="rfOut.input" relation="scaleToAddC"/><relation name="dataToEncC" class="ptolemy.actor.TypedIORelation"/><link port="dataSrc.output" relation="dataToEncC"/><link port="dbpskEnc.input" relation="dataToEncC"/><relation name="encToModC" class="ptolemy.actor.TypedIORelation"/><link port="dbpskEnc.output" relation="encToModC"/><link port="dbpskMod.datain" relation="encToModC"/><relation name="filterToScaleC" class="ptolemy.actor.TypedIORelation"/><link port="channelFilter.output" relation="filterToScaleC"/><link port="basebandScale.input" relation="filterToScaleC"/>
 </entity>

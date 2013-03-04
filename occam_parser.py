@@ -61,20 +61,20 @@ class graph_handler:
         ###################################################        
         # PORT_COUNT = used to iterate through connecting ports for
         # blocks with multiple input or output ports
-        self.block_map_dict = {'rfOut'            :[CLASS_USER_OUTPUT, CLASS_SCOPE_GNU, 0, 0],
-                               'channelFilter'    :[CLASS_USER_FIR,    CLASS_INTERP_FIR_GNU, 0, 0],
-                               'channelFilter2'   :[CLASS_USER_FIR,    CLASS_FIR_GNU, 0, 0],
-                               'rfScale'          :[CLASS_SCALE,       CLASS_MULT_CONST_GNU, 0, 0],
-                               'rfScale2'         :[CLASS_SCALE,       CLASS_MULT_CONST_GNU, 0, 0],
-                               'dataSrc'          :[CLASS_CONST,       CLASS_SIG_GNU, 0, 0],
+        self.block_map_dict = {'rfOut'            :[CLASS_USER_OUTPUT, CLASS_USRP_SINK_GNU, 0, 0],
+                               'channelFilter'    :[CLASS_USER_FIR,    CLASS_MULT_CONST_GNU, 0, 0],
+                               'channelFilter2'   :[CLASS_USER_FIR,    CLASS_MULT_CONST_GNU, 0, 0],
+                               'basebandScale'    :[CLASS_SCALE,       CLASS_MULT_CONST_GNU, 0, 0],
+                               'basebandScale2'   :[CLASS_SCALE,       CLASS_MULT_CONST_GNU, 0, 0],
+                               'dataSrc'          :[CLASS_CONST,       CLASS_FILE_SRC_GNU, 0, 0],
                                'carrierScale'     :[CLASS_SCALE,       CLASS_MULT_CONST_GNU, 0, 0],
                                'carrier'          :[CLASS_SINE,        CLASS_SIG_GNU, 0, 0],
                                'dbpskMod'         :[CLASS_DBPSK_TX,    CLASS_DBPSK_TX_GNU, 0, 0],
                                'dbpskEnc'         :[CLASS_DBPSK_ENC,   CLASS_DBPSK_ENC_GNU, 0, 0],
-                               'rfIn'             :[CLASS_CONST,       CLASS_SIG_GNU, 0, 0],
+                               'rfIn'             :[CLASS_CONST,       CLASS_USRP_SRC_GNU, 0, 0],
                                'dbpskDemod'       :[CLASS_DBPSK_RX,    CLASS_DBPSK_RX_GNU, 0, 0],
                                'dbpskDec'         :[CLASS_DBPSK_DEC,   CLASS_DBPSK_DEC_GNU, 0, 0],
-                               'dataOut'          :[CLASS_USER_OUTPUT, CLASS_SCOPE_GNU, 0, 0],
+                               'dataOut'          :[CLASS_USER_OUTPUT, CLASS_FILE_SINK_GNU, 0, 0],
                                'gauss'            :[CLASS_GAUSS,       CLASS_NOISE_GNU, 0, 0],
                                'gaussScale'       :[CLASS_SCALE,       CLASS_MULT_CONST_GNU, 0, 0],
                                'add'              :[CLASS_ADDSUB,      CLASS_ADD_GNU, 0, 0]
@@ -85,8 +85,8 @@ class graph_handler:
         self.block_port_dict_input = {'rfOut'    :[".input"],
                                'channelFilter'   :[".input"],
                                'channelFilter2'  :[".input"],
-                               'rfScale'         :[".input"],
-                               'rfScale2'        :[".input"],
+                               'basebandScale'   :[".input"],
+                               'basebandScale2'  :[".input"],
                                'dataSrc'         :[".input"],
                                'carrierScale'    :[".input"],
                                'carrier'         :[".input"],
@@ -102,8 +102,8 @@ class graph_handler:
         self.block_port_dict_input_gnu = {'rfOut'    :["0"],
                                'channelFilter'   :["0"],
                                'channelFilter2'  :["0"],
-                               'rfScale'         :["0"],
-                               'rfScale2'        :["0"],
+                               'basebandScale'   :["0"],
+                               'basebandScale2'  :["0"],
                                'dataSrc'         :["0"],
                                'carrierScale'    :["0"],
                                'carrier'         :["0"],
@@ -119,8 +119,8 @@ class graph_handler:
         self.block_port_dict_output = {'rfOut'   :[".output"],
                                'channelFilter'   :[".output"],
                                'channelFilter2'  :[".output"],
-                               'rfScale'         :[".output"],
-                               'rfScale2'        :[".output"],
+                               'basebandScale'   :[".output"],
+                               'basebandScale2'  :[".output"],
                                'dataSrc'         :[".output"],
                                'carrierScale'    :[".output"],
                                'carrier'         :[".output"],
@@ -137,8 +137,8 @@ class graph_handler:
         self.block_port_dict_output_gnu = {'rfOut'   :["0"],
                                'channelFilter'   :["0"],
                                'channelFilter2'  :["0"],
-                               'rfScale'         :["0"],
-                               'rfScale2'        :["0"],
+                               'basebandScale'   :["0"],
+                               'basebandScale2'  :["0"],
                                'dataSrc'         :["0"],
                                'carrierScale'    :["0"],
                                'carrier'         :["0"],
@@ -158,8 +158,8 @@ class graph_handler:
         self.offset_dict = {'rfOut'            :[0,  0],
                              'channelFilter'   :[0,  0],
                              'channelFilter2'  :[0,  0],
-                             'rfScale'         :[0,  0],
-                             'rfScale2'        :[0,  0],
+                             'basebandScale'   :[0,  0],
+                             'basebandScale2'  :[0,  0],
                              'dataSrc'         :[0,  0],
                              'carrierScale'    :[50, 0],
                              'carrier'         :[50, 0],
@@ -182,8 +182,8 @@ class graph_handler:
         self.value_dict = {'rfOut'           :["None"],
                            'channelFilter'   :["None"],
                            'channelFilter2'  :["None"],
-                           'rfScale'         :["None"],
-                           'rfScale2'        :["None"],                           
+                           'basebandScale'   :["None"],
+                           'basebandScale2'  :["None"],                           
                            'dataSrc'         :["None"],
                            'carrierScale'    :["None"],
                            'carrier'         :["None"],
@@ -200,8 +200,8 @@ class graph_handler:
         self.value_dict_gnu = {'rfOut'       :["None"],
                            'channelFilter'   :["None"],
                            'channelFilter2'  :["None"],
-                           'rfScale'         :["None"],
-                           'rfScale2'        :["None"],                           
+                           'basebandScale'   :["None"],
+                           'basebandScale2'  :["None"],                           
                            'dataSrc'         :["None"],
                            'carrierScale'    :["None"],
                            'carrier'         :["None"],
@@ -219,8 +219,8 @@ class graph_handler:
                              'rfOut'           :["samplingRate2", "samplingRate2"],
                              'channelFilter'   :["samplingRate",  "samplingRate2"],
                              'channelFilter2'  :["samplingRate2", "samplingRate" ],
-                             'rfScale'         :["samplingRate2", "samplingRate2"],
-                             'rfScale2'        :["samplingRate2", "samplingRate2"],
+                             'basebandScale'   :["samplingRate2", "samplingRate2"],
+                             'basebandScale2'  :["samplingRate2", "samplingRate2"],
                              'dataSrc'         :["samplingRate",  "samplingRate" ],
                              'carrierScale'    :["samplingRate2", "samplingRate2"],
                              'carrier'         :["samplingRate2", "samplingRate2"],
@@ -237,7 +237,43 @@ class graph_handler:
     def __del__(self):
         self.outfile.close()
         self.infile.close()
-        
+    def set_param_values(self):
+        self.value_dict = {'rfOut'            :["None"],
+                           'channelFilter'    :["rc"+self.param_dict["rcFiltCoeff"]+".dat", "samplingRate2/samplingRate", "1"],
+                           'channelFilter2'   :["rc"+self.param_dict["rcFiltCoeff"]+".dat", "1", "samplingRate2/samplingRate"],
+                           'basebandScale'    :["rfGain"],
+                           'dataSrc'          :["7"],
+                           'carrierScale'     :["carrierGain"],
+                           'carrier'          :["samplingRate", "carrierFreq", "carrierPhase"],
+                           'dbpskMod'         :["samplingRate*symbolTime"],
+                           'dbpskEnc'         :["1"],
+                           'rfIn'             :["None"],
+                           'dbpskDemod'       :["recvThresh"],
+                           'dbpskDec'         :["1"],                           
+                           'dataOut'          :["None"],
+                           'gauss'            :["seedValG", "meanValG", "stdValG"],
+                           'gaussScale'       :["gaussGain"],
+                           'add'              :["None"],
+                           'basebandScale2'   :["rfGain2"]
+                            }
+        self.value_dict_gnu = {'rfOut'        :["samplingRate2", "carrierFreq", "rfGain"],
+                           'channelFilter'    :["complex", "1.0"],
+                           'channelFilter2'   :["complex", "1.0"],
+                           'basebandScale'    :["complex", "bbGain"],
+                           'dataSrc'          :["music-tx"+self.param_dict["dataName"]+".dat", "float", "False"],
+                           'carrierScale'     :["float", "carrierGain"],
+                           'carrier'          :["samplingRate", CLASS_SINE_GNU, "500.0", "carrierGain"],
+                           'dbpskEnc'         :["float", "samplingRate2/samplingRate", "1"],
+                           'dbpskMod'         :["dbpsk", "samplingRate2/samplingRate", "0.35","yes", "False", "False"],
+                           'rfIn'             :["samplingRate2", "carrierFreq", "rfGain2"],
+                           'dbpskDemod'       :["dbpsk","samplingRate2/samplingRate","0.35","6.28/100.0", "6.28/100.0", "6.28/100.0", "True", "False", "False", "False"],
+                           'dbpskDec'         :["float", "-1"],
+                           'dataOut'          :["music-rx"+self.param_dict["dataName"]+".dat", "float", "False"],
+                           'gauss'            :["complex", CLASS_GAUSS_GNU, "0.3", "0"],
+                           'gaussScale'       :["complex", "gaussGain"],
+                           'add'              :["complex", "2"],
+                           'basebandScale2'   :["complex", "bbGain2"]
+                            }
     def is_process(self, line):
         if "PROC" in line:
             if self.not_comment(line):
@@ -554,55 +590,6 @@ class graph_handler:
             return self.find_gcd(two[0], two[1:])
         else:
             return fractions.gcd(one, two[0])
-        
-        
-    def set_param_values(self):
-        self.value_dict = {'rfOut'            :["None"],
-                           'channelFilter'    :["rc"+self.param_dict["rcFiltCoeff"]+".dat", "samplingRate2/samplingRate", "1"],
-                           'channelFilter2'   :["rc"+self.param_dict["rcFiltCoeff"]+".dat", "1", "samplingRate2/samplingRate"],
-                           'rfScale'          :["rfGain"],
-                           'dataSrc'          :["7"],
-                           'carrierScale'     :["carrierGain"],
-                           'carrier'          :["samplingRate", "carrierFreq", "carrierPhase"],
-                           'dbpskMod'         :["samplingRate*symbolTime"],
-                           'dbpskEnc'         :["1"],
-                           'rfIn'             :["None"],
-                           'dbpskDemod'       :["recvThresh"],
-                           'dbpskDec'         :["1"],                           
-                           'dataOut'          :["None"],
-                           'gauss'            :["seedValG", "meanValG", "stdValG"],
-                           'gaussScale'       :["gaussGain"],
-                           'add'              :["None"],
-                           'rfScale2'         :["rfGain2"]
-                            }
-        self.value_dict_gnu = {'rfOut'        :["complex", "Output RF", "samplingRate2", "1/500.0", "1", "RF Value"],
-                           'channelFilter'    :["rc"+self.param_dict["rcFiltCoeff"]+".dat", "ccf", "samplingRate2/samplingRate"],
-                           'channelFilter2'   :["rc"+self.param_dict["rcFiltCoeff"]+".dat", "ccf", "samplingRate2/samplingRate"],
-                           'rfScale'          :["complex", "rfGain"],
-                           'dataSrc'          :["samplingRate", CLASS_SINE_GNU, "500.0", "carrierGain"],
-                           'carrierScale'     :["carrierGain"],
-                           'carrier'          :["samplingRate", CLASS_SINE_GNU, "500.0", "carrierGain"],
-                           'dbpskEnc'         :["float", "2", "1"],
-                           'dbpskMod'         :["dbpsk", "2", "0.35","yes", "False", "False"],
-                           'rfIn'             :["samplingRate", CLASS_SINE_GNU, "500.0", "carrierGain"],
-                           'dbpskDemod'       :["dbpsk","2","0.35","6.28/100.0", "6.28/100.0", "6.28/100.0", "True", "False", "False", "False"],
-                           'dbpskDec'         :["float", "-1"],
-                           'dataOut'          :["float", "Data Out","samplingRate", "1/500.0", "1", "Data Value"],
-                           'gauss'            :["complex", CLASS_GAUSS_GNU, "0.3", "0"],
-                           'gaussScale'       :["complex", "gaussGain"],
-                           'add'              :["complex", "2"],
-                           'rfScale2'         :["complex", "gaussGain"]
-                            }
-                        # 1- type (e.g. dbpsk)
-                # 2- samples per symbol
-                # 3- excess bw
-                # 4- freq_bw
-                # 5- phase bw
-                # 6- timing bw
-                # 7- gray coded
-                # 8- verbose
-                # 9- log
-                # 10- sync_out, False for differential
     def get_port_count(self, block_name, direction):
         if direction == "input":
             return self.block_map_dict[block_name][INPORT_COUNT]
@@ -742,7 +729,7 @@ class graph_handler:
 if __name__ == "__main__":
     infile_name_list = ["csp-sdf-rx.occ", "csp-sdf-tx.occ", "csp-sdf-sim.occ"]
     # the input occam program which we will be processing
-    infile_name = infile_name_list[1]
+    infile_name = infile_name_list[2]
     # specifies processes of interest in the occam program
     fcn_list    = ["parameterGen", "main"]
     

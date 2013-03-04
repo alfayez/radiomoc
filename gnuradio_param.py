@@ -16,6 +16,10 @@ CLASS_SCOPE_GNU          = "wxgui_scopesink2"
 CLASS_GAUSS_GNU          = "analog.GR_GAUSSIAN"
 CLASS_DBPSK_ENC_GNU      = "blks2_packet_encoder"
 CLASS_DBPSK_DEC_GNU      = "blks2_packet_decoder"
+CLASS_USRP_SINK_GNU      = "uhd_usrp_sink"
+CLASS_USRP_SRC_GNU       = "uhd_usrp_source"
+CLASS_FILE_SINK_GNU      = "gr_file_sink"
+CLASS_FILE_SRC_GNU       = "gr_file_source"
 
 # Init Values
 XML_HEADER1 = "<?xml version=\"1.0\" standalone=\"no\"?>"

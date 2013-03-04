@@ -9,6 +9,7 @@ def setup_sched_lp(mat):
     
     row = len(mat)
     col = len(mat[0])
+    print "row= ", row, "col= ", col
     lp  = glpk.LPX()
 
     # the objective function is all ones because we're interested in
