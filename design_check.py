@@ -33,7 +33,7 @@ class graph_check:
         self.cur_bufer_size      = 32*1024
         self.token_size   = 1024
         self.second_top_matrix = np.zeros((1,1))
-
+        self.second_blocks_list = []
         self.top_impl_info = {# whether a graph is consistent or not
                               'consistent'      : False,
                               #Dictionary with each block output
@@ -88,7 +88,8 @@ class graph_check:
 	self.second_top_matrix = self.get_top_matrix()
         print self.second_top_matrix
 	print "GNURADIO blocks_list= "
-	print self.get_blocks_list()
+        self.second_blocks_list = self.get_blocks_list()
+	print self.second_blocks_list
         self.gnuradio_tb.alloc(self.cur_bufer_size)
         self.gnuradio_tb.go()
         time.sleep(2)        
