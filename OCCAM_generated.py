@@ -3,14 +3,14 @@
 # Gnuradio Python Flow Graph
 # Title: Occam Generated
 # Author: Almohanad Fayez
-# Generated: Sun Mar  3 23:01:35 2013
+# Generated: Tue Mar 12 17:46:51 2013
 ##################################################
 
+from gnuradio import analog
 from gnuradio import blocks
 from gnuradio import digital
 from gnuradio import eng_notation
 from gnuradio import gr
-from gnuradio import uhd
 from gnuradio.eng_option import eng_option
 from gnuradio.gr import firdes
 from grc_gnuradio import blks2 as grc_blks2
@@ -48,45 +48,63 @@ class OCCAM_generated(grc_wxgui.top_block_gui):
 		##################################################
 		# Blocks
 		##################################################
-		self.rfOut = uhd.usrp_sink(
-			device_addr="",
-			stream_args=uhd.stream_args(
-				cpu_format="fc32",
-				channels=range(1),
-			),
-		)
-		self.rfOut.set_subdev_spec("A:0", 0)
-		self.rfOut.set_samp_rate(carrierFreq)
-		self.rfOut.set_center_freq(samplingRate2, 0)
-		self.rfOut.set_gain(rfGain, 0)
-		self.rfOut.set_antenna("TX/RX", 0)
+		self.gaussScale = blocks.multiply_const_vcc((gaussGain, ))
+		self.gauss = analog.noise_source_c(analog.GR_GAUSSIAN, 0.3, 0)
 		self.dbpskMod = digital.dbpsk_mod(
-			samples_per_symbol=2,
+			samples_per_symbol=samplingRate2/samplingRate,
 			excess_bw=0.35,
 			gray_coded=True,
 			verbose=False,
 			log=False)
 			
 		self.dbpskEnc = grc_blks2.packet_mod_f(grc_blks2.packet_encoder(
-				samples_per_symbol=2,
+				samples_per_symbol=samplingRate2/samplingRate,
 				bits_per_symbol=1,
 				access_code="",
 				pad_for_usrp=True,
 			),
 			payload_length=0,
 		)
-		self.dataSrc = gr.file_source(gr.sizeof_float*1, "music-tx1.0", False)
+		self.dbpskDemod = digital.dbpsk_demod(
+			samples_per_symbol=samplingRate2/samplingRate,
+			excess_bw=0.35,
+			freq_bw=6.28/100.0,
+			phase_bw=6.28/100.0,
+			timing_bw=6.28/100.0,
+			gray_coded=True,
+			verbose=False,
+			log=False
+		)
+		self.dbpskDec = grc_blks2.packet_demod_f(grc_blks2.packet_decoder(
+				access_code="",
+				threshold=-1,
+				callback=lambda ok, payload: self.dbpskDec.recv_pkt(ok, payload),
+			),
+		)
+		self.dataSrc = gr.file_source(gr.sizeof_float*1, "music-tx1.0.dat", False)
+		self.dataOut = gr.file_sink(gr.sizeof_float*1, "music-rx1.0.dat")
+		self.dataOut.set_unbuffered(False)
+		self.channelFilter2 = blocks.multiply_const_vcc((1.0, ))
 		self.channelFilter = blocks.multiply_const_vcc((1.0, ))
+		self.basebandScale2 = blocks.multiply_const_vcc((bbGain2, ))
 		self.basebandScale = blocks.multiply_const_vcc((bbGain, ))
+		self.add = blocks.add_vcc(1)
 
 		##################################################
 		# Connections
 		##################################################
 		self.connect((self.dbpskMod, 0), (self.channelFilter, 0))
-		self.connect((self.basebandScale, 0), (self.rfOut, 0))
+		self.connect((self.dbpskDemod, 0), (self.dbpskDec, 0))
+		self.connect((self.basebandScale, 0), (self.add, 0))
+		self.connect((self.gauss, 0), (self.gaussScale, 0))
+		self.connect((self.basebandScale2, 0), (self.channelFilter2, 0))
+		self.connect((self.add, 0), (self.basebandScale2, 0))
+		self.connect((self.dbpskDec, 0), (self.dataOut, 0))
 		self.connect((self.dataSrc, 0), (self.dbpskEnc, 0))
 		self.connect((self.dbpskEnc, 0), (self.dbpskMod, 0))
+		self.connect((self.gaussScale, 0), (self.add, 1))
 		self.connect((self.channelFilter, 0), (self.basebandScale, 0))
+		self.connect((self.channelFilter2, 0), (self.dbpskDemod, 0))
 
 
 	def get_stdValG(self):
@@ -106,7 +124,6 @@ class OCCAM_generated(grc_wxgui.top_block_gui):
 
 	def set_samplingRate2(self, samplingRate2):
 		self.samplingRate2 = samplingRate2
-		self.rfOut.set_center_freq(self.samplingRate2, 0)
 
 	def get_samplingRate(self):
 		return self.samplingRate
@@ -125,7 +142,6 @@ class OCCAM_generated(grc_wxgui.top_block_gui):
 
 	def set_rfGain(self, rfGain):
 		self.rfGain = rfGain
-		self.rfOut.set_gain(self.rfGain, 0)
 
 	def get_recvThresh(self):
 		return self.recvThresh
@@ -150,6 +166,7 @@ class OCCAM_generated(grc_wxgui.top_block_gui):
 
 	def set_gaussGain(self, gaussGain):
 		self.gaussGain = gaussGain
+		self.gaussScale.set_k((self.gaussGain, ))
 
 	def get_excessBw(self):
 		return self.excessBw
@@ -174,13 +191,13 @@ class OCCAM_generated(grc_wxgui.top_block_gui):
 
 	def set_carrierFreq(self, carrierFreq):
 		self.carrierFreq = carrierFreq
-		self.rfOut.set_samp_rate(self.carrierFreq)
 
 	def get_bbGain2(self):
 		return self.bbGain2
 
 	def set_bbGain2(self, bbGain2):
 		self.bbGain2 = bbGain2
+		self.basebandScale2.set_k((self.bbGain2, ))
 
 	def get_bbGain(self):
 		return self.bbGain

@@ -1,14 +1,16 @@
 #!/usr/bin/env python
 
-import sys, string, types, os, copy
+import sys, string, types, os, copy, time
 import getopt
 import numpy as np
 import scipy
 import fractions
+import subprocess
 
 from ptolemy_gen  import *
 from gnuradio_gen import *
 from lp_gen       import *
+from design_check import *
 '''
 Checks if the token specifies an OCCAM process
 it basically checks if the token starts with
@@ -37,8 +39,9 @@ INPORT_COUNT  = 2
 OUTPORT_COUNT = 3 
 class graph_handler:
     def __init__(self, infile_name):
-        self.default_buffer_size = 32*1024
-        self.cur_bufer_size      = 32*1024
+        ########################################################
+        ########################################################
+        # Variables for internal use
         self.infile  = file(infile_name, 'r') 
         self.outfile = file('tmp_assignment_body.txt', 'w')
         self.chan_dict      = {}
@@ -53,7 +56,10 @@ class graph_handler:
         self.sched          = 0
         self.fcn_interest = []
         self.init_chans   = []
+
+        # Variables associated with performance measures
         self.rankVal      = 0
+        
         # The following parameters should be written as ints for
         # ptolemy
         self.int_param_enforce_dict  = {'symbolTime':0, 'samplingRate':0, 'seedValG':0, 'samplingRate':0, 'samplingRate2':0}
@@ -237,9 +243,7 @@ class graph_handler:
                              'gaussScale'      :["samplingRate2", "samplingRate2"], 
                              'add'             :["samplingRate2", "samplingRate2"]
                            }
-        self.top_impl_info = {'consistent'      : False,
-                              
-                          }
+
     def __del__(self):
         self.outfile.close()
         self.infile.close()
@@ -370,9 +374,6 @@ class graph_handler:
         return token_val
     def set_fcn_interest(self, fcn_pass):
         self.fcn_interest = fcn_pass
-    def print_top_impl_info(self):
-        for item in self.top_impl_info.keys():
-            print item, "= ", self.top_impl_info[item]
     def print_parameters(self):
         print "Parameter Dictionary"
         print self.param_dict
@@ -394,19 +395,6 @@ class graph_handler:
     def print_top_matrix(self):
         print "Topology Matrix"
         print self.top_matrix
-    def print_schedule(self):
-        print "Firing Schedule"
-        print self.sched
-    def calculate_schedule(self):
-        [errorCond, self.sched] = setup_sched_lp(self.top_matrix)
-        return errorCond
-    def is_consistent(self):
-        self.rankVal = np.linalg.matrix_rank(self.top_matrix)
-        num_actors   = len(self.top_matrix[0])
-        if self.rankVal < num_actors:
-            self.top_impl_info["consistent"] = True
-        else:
-            self.top_impl_info["consistent"] = False
     def parse_input_file_param(self):
         # output filestream used to save the parameter generator
         # body for further processing after we discover the requested
@@ -549,12 +537,7 @@ class graph_handler:
                 chan_dir  = self.channel_direction(tokens[j])
                 if(self.is_debug(chan_name) == False):
                     if (self.is_ignore_proc(proc_name) == False):
-                    #if True:
                         if chan_dir == "out":
-                           # if ( ((proc_name in self.proc_list) == False)
-                           #      and (self.is_ignore_proc(proc_name) == False)):
-                           #     self.proc_list.append(proc_name)
-                           #     self.proc_dict[proc_name] = len(self.proc_dict)
                             self.chan_dict_temp[chan_name][OUT_CHAN] = proc_name
                             if proc_name == INIT_PROC:
                                 self.init_chans = self.init_chans+[chan_name]
@@ -600,7 +583,14 @@ class graph_handler:
             else:
                 print "ERROR: in parse_proc_connection, found an empty output process"
                 exit(1)                
-
+    def get_port_count(self, block_name, direction):
+        if direction == "input":
+            return self.block_map_dict[block_name][INPORT_COUNT]
+        elif direction == "output":
+            return self.block_map_dict[block_name][OUTPORT_COUNT]
+        else:
+            print "ERROR in get_port_count, didn't select valid direction (input or output)"
+            exit(1)
     # function finds the gcd of the I/O sampling rates of the various
     # blocks recursively
     def proc_rate_gcd(self):
@@ -611,14 +601,6 @@ class graph_handler:
             return self.find_gcd(two[0], two[1:])
         else:
             return fractions.gcd(one, two[0])
-    def get_port_count(self, block_name, direction):
-        if direction == "input":
-            return self.block_map_dict[block_name][INPORT_COUNT]
-        elif direction == "output":
-            return self.block_map_dict[block_name][OUTPORT_COUNT]
-        else:
-            print "ERROR in get_port_count, didn't select valid direction (input or output)"
-            exit(1)
     def inc_port_count(self, block_name, direction):
         if direction == "input":
             cur = self.block_map_dict[block_name][INPORT_COUNT]
@@ -652,7 +634,7 @@ class graph_handler:
             return pgen.link_in_ptolemy_file(out_unit, in_unit, name_relation)
         elif mode is GNURADIO:
             return pgen.link_in_gnuradio_file(out_unit, in_unit, name_relation)
-    def generate_code(self, mode):
+    def generate_code(self, mode, infile_name):
         
         filename = self.get_filename(infile_name)
         model_name = filename
@@ -663,6 +645,11 @@ class graph_handler:
         elif mode is GNURADIO:
             filename = filename + ".grc"
             pgen = gnuradio_writer(filename, model_name)
+            subprocess.Popen(["grcc", "-d", os.getcwd(), filename])
+            # import the GNURadio python class/methods after they're generated
+            from OCCAM_generated import *
+            # set the gnuradio top block handler to the one generated
+            self.gnuradio_tb = OCCAM_generated()
         else:
             print "ERROR in generate_code: UNKNOW code generation mode= ", mode
 
@@ -747,33 +734,33 @@ class graph_handler:
         pgen.write_to_xmlfile()
         return True
 
-if __name__ == "__main__":
-    infile_name_list = ["csp-sdf-rx.occ", "csp-sdf-tx.occ", "csp-sdf-sim.occ"]
-    # the input occam program which we will be processing
-    infile_name = infile_name_list[2]
-    # specifies processes of interest in the occam program
-    fcn_list    = ["parameterGen", "main"]
-    
-    top_handler = graph_handler(infile_name)
-    top_handler.set_fcn_interest(fcn_list)
+#if __name__ == "__main__":
+#    infile_name_list = ["csp-sdf-rx.occ", "csp-sdf-tx.occ", "csp-sdf-sim.occ"]
+#    # the input occam program which we will be processing
+#    infile_name = infile_name_list[2]
+#    # specifies processes of interest in the occam program
+#    fcn_list    = ["parameterGen", "main"]
+#    
+#    top_handler = graph_handler(infile_name)
+#    top_handler.set_fcn_interest(fcn_list)
 
 
     # peforms initial parameter parsing of the occam file
-    top_handler.parse_input_file_param()
-    top_handler.set_param_values()
-    top_handler.parse_input_file_channels()
+#    top_handler.parse_input_file_param()
+#    top_handler.set_param_values()
+#    top_handler.parse_input_file_channels()
 
-    top_handler.parse_proc_connection()
+#    top_handler.parse_proc_connection()
 
-    top_handler.print_top_matrix()
+#    top_handler.print_top_matrix()
 
     
-    print "Genertaing Ptolemy simulation ..."
-    top_handler.generate_code(PTOLEMY)
-    print "Generating GNU Radio project file ..."
-    top_handler.generate_code(GNURADIO)
-    errorCond = top_handler.calculate_schedule()
-    top_handler.print_schedule()
-    top_handler.is_consistent()
-
-    top_handler.print_top_impl_info()
+#    print "Genertaing Ptolemy simulation ..."
+#    top_handler.generate_code(PTOLEMY)
+#    print "Generating GNU Radio project file ..."
+#    top_handler.generate_code(GNURADIO)
+#    errorCond = top_handler.calculate_schedule()
+#    top_handler.print_schedule()
+#    top_handler.is_consistent()
+#    top_handler.memory_usage()
+#    top_handler.print_top_impl_info()
