@@ -651,11 +651,9 @@ class graph_handler:
         elif mode is GNURADIO:
             filename = filename + ".grc"
             pgen = gnuradio_writer(filename, model_name)
+            # Run the gnuradio-companion parser to generate the python
+            # file from the grc file
             subprocess.Popen(["grcc", "-d", os.getcwd(), filename])
-            # import the GNURadio python class/methods after they're generated
-            from OCCAM_generated import *
-            # set the gnuradio top block handler to the one generated
-            self.gnuradio_tb = OCCAM_generated()
         else:
             print "ERROR in generate_code: UNKNOW code generation mode= ", mode
 

@@ -15,10 +15,6 @@ from ptolemy_gen  import *
 from gnuradio_gen import *
 from lp_gen       import *
 from occam_parser import *
-#IMPORTANT: This is the final gnuradio file that will be generated.
-#It must be here so you can import and reload eventually after
-#regenerating the code
-#cdfrom OCCAM_generated import *
 
 if __name__ == "__main__":
     infile_name_list = ["csp-sdf-rx.occ", "csp-sdf-tx.occ", "csp-sdf-sim.occ"]
@@ -49,6 +45,7 @@ if __name__ == "__main__":
     # Observe the first level system resource and consistency check on
     # the topology matrix and firing vector 
     design_handler.first_stage_topology_test(top_handler, top_handler.top_matrix)
+    design_handler.second_stage_topology_test(top_handler, top_handler.top_matrix)
 
 
     
