@@ -1,5 +1,10 @@
 #!/usr/bin/env python
 
+#########################################################
+# This file contains gnuradio-companion configuration
+# and parameter names
+#########################################################
+
 # GNU Radio block names
 CLASS_OPTIONS            = "options"
 CLASS_VARIABLE           = "variable"

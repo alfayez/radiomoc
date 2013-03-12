@@ -1,5 +1,10 @@
 #!/usr/bin/env python
 
+#########################################################
+# This file is responsible for running all the necessary
+# design and topology matrix checks
+#########################################################
+
 import sys, string, types, os, copy, time
 import getopt
 import numpy as np

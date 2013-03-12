@@ -3,6 +3,11 @@ import numpy as np
 import glpk
 import copy
 
+#########################################################
+# This file is responsible for setting up the Integer
+# program solver GLPK and returns the firing schedule
+#########################################################
+
 OK             = 0
 RELAXED_NO_SOL = 1
 INTEGER_NO_SOL = 2

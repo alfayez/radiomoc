@@ -1,5 +1,9 @@
 #!/usr/bin/env python
 
+#########################################################
+# This file contains ptolemy paramter and class confis
+#########################################################
+
 # Ptolemy Names
 NAME_ICON               = "_icon"
 NAME_COLOR              = "_color"

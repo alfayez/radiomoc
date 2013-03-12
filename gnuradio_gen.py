@@ -1,5 +1,10 @@
 #!/usr/bin/env python
 
+#########################################################
+# This file is responsible for generting gnuradion-companion
+# formatted xml files
+#########################################################
+
 import sys, string, types, os, copy
 import getopt
 import numpy as np

@@ -1,4 +1,9 @@
 #!/usr/bin/env python
+
+#########################################################
+# Main Program running the design environment
+#########################################################
+
 import sys, string, types, os, copy
 import getopt
 import numpy as np

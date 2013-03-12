@@ -1,5 +1,11 @@
 #!/usr/bin/env python
 
+#########################################################
+# Responsible for parsing OCCAM files and generating
+# gnuradio-companion and Ptolemy formatted xml files
+#########################################################
+
+
 import sys, string, types, os, copy, time
 import getopt
 import numpy as np

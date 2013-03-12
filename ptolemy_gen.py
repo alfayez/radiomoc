@@ -1,5 +1,10 @@
 #!/usr/bin/env python
 
+#########################################################
+# This file is responsible for generating ptolemy formatted
+# XML Files
+#########################################################
+
 import sys, string, types, os, copy
 import getopt
 import numpy as np
