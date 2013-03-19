@@ -55,3 +55,8 @@ if __name__ == "__main__":
     source_list = design_handler.find_sources(design_handler.second_top_matrix, design_handler.second_blocks_list)
     print "SOOOOURCE LIST= ", source_list 
     design_handler.set_rate_consistency(source_list, design_handler.second_top_matrix, design_handler.second_blocks_list)
+    par_node = design_handler.find_parent_node(14, design_handler.second_top_matrix, design_handler.second_blocks_list)
+    print "PAR NODE= ", par_node
+    print "Final TOP MAtrix= "
+    print design_handler.second_top_matrix
+    
