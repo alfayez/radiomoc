@@ -21,7 +21,8 @@ import occam_parser as o
 TUP_COND = 0
 TUP_RATE = 1
 TUP_ID   = 2
-TUP_INIT = (False, 0.0, 0)
+TUP_ARC  = 3
+TUP_INIT = (False, 0.0, 0, 0)
 #IMPORTANT: This is the final gnuradio file that will be generated.
 #It must be here so you can import and reload eventually after
 #regenerating the code
@@ -41,6 +42,7 @@ class graph_check:
         self.first_sched         = []
         
         self.second_top_matrix    = np.zeros((1,1))
+        self.visited_matrix       = np.zeros((1,1))
         self.second_blocks_list   = []
         self.second_is_consistent = False
         self.second_sched         = []
@@ -109,6 +111,7 @@ class graph_check:
     def second_stage_topology_test(self, graph_handler, top_matrix):
         self.gnuradio_tb.prealloc()
         self.second_top_matrix = self.get_top_matrix()
+        self.setup_visited_matrix()
         self.second_blocks_list = self.get_blocks_list()
         self.second_is_consistent = self.is_consistent(self.second_top_matrix)
         errorCond = self.calculate_schedule(self.second_top_matrix)
@@ -184,51 +187,99 @@ class graph_check:
         row       = len(top_matrix)
         sink_conn = 0
         rate      = 0.0
+        arc_list  = -1
         for j in xrange(row):
             if top_matrix[j][node] > 0:
                 rate = top_matrix[j][node]
-                if sink_conn == 1:
-                    sink_conn = -1
-                    return TUP_INIT
-                else:
-                    sink_conn = sink_conn + 1
+                # a source can have multiple outputs
+                #if sink_conn == 1:
+                #    sink_conn = -1
+                #    return TUP_INIT
+                #else:
+                sink_conn = sink_conn + 1
+                arc_list = j
             elif top_matrix[j][node] < 0:
                 sink_conn = -1
                 return TUP_INIT
         if sink_conn == 1:
-            return (True, rate, node)
+            return [True, rate, node, arc_list]
         else:
-            return [False, 0.0]
+            return TUP_INIT
         # Tuple (True/False, rate)
     def is_sink(self, node, top_matrix, block_list):
         row       = len(top_matrix)
         sink_conn = 0
         rate      = 0.0
+        arc_list  = -1
         for j in xrange(row):
             if top_matrix[j][node] < 0:
-                if sink_conn == 1:
-                    sink_conn = -1
-                    return TUP_INIT
-                else:
-                    sink_conn = sink_conn + 1
-                    rate = top_matrix[j][node]
+                #if sink_conn == 1:
+                #    sink_conn = -1
+                #    return TUP_INIT
+                #else:
+                # a sink can have multiple input lines
+                sink_conn = sink_conn + 1
+                rate = top_matrix[j][node]
+                arc_list = j
             elif top_matrix[j][node] > 0:
                 sink_conn = -1
                 return TUP_INIT
         if sink_conn == 1:
-            return [True, rate, node]
+            return [True, rate, node, arc_list]
         else:
             return TUP_INIT
     def get_prev_node(self, arc, top_matrix, block_list):
         col       = len(top_matrix[0])
+        arc_list  = -1
         for j in xrange(col):
             if top_matrix[arc][j] > 0:
-                return j
+                arc_list = arc
+                return [True, -top_matrix[arc][j], j, arc_list]
+        print "FAIL get_prev_node"
+        return TUP_INIT
+    def get_node_arcs(self, node_id, top_matrix, block_list):
+        row         = len(top_matrix)
+        arc_list    = []
+        for j in xrange(row):
+            if top_matrix[j][node_id] > 0:
+                arc_list.append(j)
+        return arc_list
     def get_next_node(self, arc, top_matrix, block_list):
         col       = len(top_matrix[0])
+        arc_list = -1
         for j in xrange(col):
             if top_matrix[arc][j] < 0:
-                return [True, -top_matrix[arc][j], j]
+                arc_list = arc
+                print "SUCCESS get_next_node"
+                return [True, -top_matrix[arc][j], j, arc_list]
+        print "FAIL get_next_node"
+        return TUP_INIT
+    def get_next_nodes(self, node, top_matrix, block_list):
+        row         = len(top_matrix)
+        sink_conn   = 0
+        source_node = 0
+        next_list   = []
+        node_id     = node[TUP_ID]
+        print "get_next_nodes= ", node
+        for j in xrange(row):
+            if top_matrix[j][node_id] > 0:
+                # This get_next_node will only generate the next node
+                # on the specified arc
+                source_node = self.get_next_node(j, top_matrix, block_list)
+                print "source_node[i]= ", source_node
+                arc_list    = self.get_node_arcs(source_node[TUP_ID], top_matrix, block_list)
+                arc_len     = len(arc_list)
+                print "arc list= ", arc_list
+                for k in xrange(arc_len):
+                    source_node[TUP_ARC] = arc_list[k]
+                    next_list.append(source_node)
+        #node_id     = node[TUP_ID]
+        #node_arc    = node[TUP_ARC]
+        #source_node = self.get_next_node(node_arc, top_matrix, block_list)      
+        #next_list.append(source_node)
+        #next_list = self.get_next_node(node_arc, top_matrix, block_list)      
+        print "next_list= ", next_list
+        return next_list
     def get_prev_nodes(self, node, top_matrix, block_list):
         row         = len(top_matrix)
         sink_conn   = 0
@@ -238,6 +289,20 @@ class graph_check:
             if top_matrix[j][node] < 0:
                 source_node = self.get_prev_node(j, top_matrix, block_list)
                 prev_list.append(source_node)
+        return prev_list
+    def get_prev_visited_nodes(self, node, top_matrix, block_list):
+        row         = len(top_matrix)
+        sink_conn   = 0
+        source_node = 0
+        prev_list   = []
+        for j in xrange(row):
+            if top_matrix[j][node] < 0:                
+                source_node = self.get_prev_node(j, top_matrix, block_list)
+                print "prev nodes= ", source_node
+                print "visited= ",
+                print self.visited_matrix
+                if self.visited_matrix[j][node] == 1:
+                    prev_list.append(source_node)
         return prev_list
     def find_parent_node(self, node, top_matrix, block_list):
         list_temp  = []
@@ -258,16 +323,30 @@ class graph_check:
                 prev_nodes = self.get_prev_nodes(node, top_matrix, block_list)
                 list_temp.extend(self.find_parent_node(prev_nodes, top_matrix, block_list))
         return list_temp
-    def get_next_nodes(self, node, top_matrix, block_list):
-        row         = len(top_matrix)
-        sink_conn   = 0
-        source_node = 0
-        next_list   = []
-        for j in xrange(row):
-            if top_matrix[j][node] > 0:
-                source_node = self.get_next_node(j, top_matrix, block_list)
-                next_list.append(source_node)
-        return next_list
+
+    def set_new_node_relative_rate(self, node, rate, top_matrix, block_list):
+        #row_len = len(top_matrix)
+        #for i in xrange(row_len):
+            #if top_matrix[i][node] > 0:
+                # configure the rate of the output arc
+         node_id  = node[TUP_ID]
+         node_arc = node[TUP_ARC]
+         print "node_id= ", node_id, " node_arc= ", node_arc
+         old_rate = top_matrix[node_arc][node_id]
+         print "OLD RATE= ", old_rate
+         self.visited_matrix[node_arc][node_id] = 1
+         top_matrix[node_arc][node_id] = rate
+         # setup the corresponding input arc for the next node
+         ret_is = self.get_next_node(node_arc, top_matrix, block_list)
+         print "Set new rate for Node= ", node, " arc= ", node_arc, " old rate= ", old_rate, " new_rate= ", rate
+         print "ret_is= ", ret_is
+         ret_len = len(ret_is)
+         print "ret len= ", ret_len
+         for i in xrange(ret_len):
+             top_matrix[node_arc][ret_is[TUP_ID]] = -rate
+             self.visited_matrix[node_arc][ret_is[TUP_ID]] = 1
+        #print "AFTER"
+        #print top_matrix
     # gnuradio doesn't explicitly set the relative rates between all
     # the blocks.  Therefore, we must set the appropriate relative
     # rates by traversing backwards, from sinks to a terminating
@@ -276,21 +355,8 @@ class graph_check:
     # programs which are already setup properly
     def set_rate_consistency(self, node_list, top_matrix, block_list):
         cur_rate = 1.0
-        self.set_rate_consistency_helper(node_list, top_matrix, block_list, cur_rate)
-    def set_new_node_relative_rate(self, node, rate, top_matrix, block_list):
-        row_len = len(top_matrix)
-        for i in xrange(row_len):
-            if top_matrix[i][node] > 0:
-                # configure the rate of the output arc
-                old_rate = top_matrix[i][node]
-                top_matrix[i][node] = rate
-                # setup the corresponding input arc for the next node
-                ret_is = self.get_next_node(i, top_matrix, block_list)
-                print "Set new rate for Node= ", node, " arc= ", i, " old rate= ", old_rate, " new_rate= ", rate
-                top_matrix[i][ret_is[TUP_ID]] = -rate
-        print "AFTER"
-        print top_matrix
-    def set_rate_consistency_helper(self, node_list, top_matrix, block_list, cur_rate):
+        self.set_rate_consistency_helper(node_list, top_matrix, block_list, cur_rate, TUP_INIT)
+    def set_rate_consistency_helper(self, node_list, top_matrix, block_list, cur_rate, prev_path):
         # NOTES WHERE I LEFT:
         # 1- Set a separate matrix for the original rates from
         # gnuradio
@@ -302,33 +368,114 @@ class graph_check:
         list_len  = len(node_list)
         ret_is    = TUP_INIT
         node_rate = 1.0
-        if self.DEBUG:
-            print "Next= ", node_list
-        #cur_rate = cur_rate*    
         for i in xrange(list_len):
             node_rate = node_list[i][TUP_RATE]
-            cur_rate  = cur_rate * node_rate
-            print "NODE LIST= ", node_list[i], " cur_rate= ", cur_rate
-            self.set_new_node_relative_rate(node_list[i][TUP_ID], cur_rate, top_matrix, block_list)
-            ret_is = self.is_sink(node_list[i][TUP_ID], top_matrix, block_list)
+            # If we never been to this node before
+            if self.visited_matrix[i][node_list[i][TUP_ARC]] == 0:
+                self.visited_matrix[i][node_list[i][TUP_ARC]] = 1
+                cur_rate  = cur_rate * node_rate
+                print "cur_rate= ", cur_rate
+                print "node_list[i]= ", node_list[i]
+                self.set_new_node_relative_rate(node_list[i], cur_rate, top_matrix, block_list)
+                ret_is = self.is_sink(node_list[i][TUP_ID], top_matrix, block_list)
+                if ret_is[TUP_COND]  == False:
+                    node_list2= self.get_next_nodes(node_list[i], top_matrix, block_list)
+                    list2_len = len(node_list2)
+                    print "node_list21= ", node_list2
+                    # run for a second time to get the outgoing rate of
+                    # the next node and not the incoming one
+                    print "node_list2= ", node_list2, " len= ", list2_len
+                    for j in xrange(list2_len):
+                        ret_is = self.is_sink(node_list2[j][TUP_ID], top_matrix, block_list)
+                        if ret_is[TUP_COND]  == False:
+                            print "node_list2= ", node_list2
+                            node_list3= self.get_next_node(node_list2[0][TUP_ARC], top_matrix, block_list)
+                            print "node_list3= ", node_list3
+                            node_list2[0][TUP_RATE] = node_list3[TUP_RATE]
+                            #if (node_list[i][TUP_ID] >= 12 and node_list[i][TUP_ID] <= 13):
+                        #    print "node# is= ", node_list[i][TUP_ID]
+                        self.set_rate_consistency_helper(node_list2, top_matrix, block_list, cur_rate, node_list[i])
+                    else:
+                        if self.DEBUG:
+                            print "FOUND SINK"
+            # If we visited this node before we need to ensure that
+            # the expected relative rate from this iteration is the
+            # same as the one we're finding.  If not then we need to
+            # calculate a common multiple factor and trigger a revised
+            # relative rate calculation going backwards through the
+            # previously traversed paths
+            '''
+            else:
+                node_rate = node_list[i][TUP_RATE]
+                print "Previously visited node= ", node_list[i][TUP_ID] 
+                print "prev_rate= ", node_rate, " cur_rate= ", cur_rate
+                if node_rate == cur_rate:
+                    if self.DEBUG:
+                        print "Rate Match"
+                else:
+                    # calculate a common relative rate in case of a
+                    # rate mismatch
+                    temp_rate  = self.least_common_mult([cur_rate, node_rate])
+                    # calculate the correction factor for already
+                    # traversed nodes
+                    cf_1 = temp_rate/node_list[i][TUP_RATE]
+                    # Calculate the correction factor for the previous
+                    # node which caused the rate mismatch
+                    cf_2 = temp_rate/prev_path[TUP_RATE]
+                    # set the new corrected relative rate to the matrix
+                    print "cf1= ", cf_1, " cf2= ", cf_2
+                    self.set_new_node_relative_rate(node_list[i], temp_rate, top_matrix, block_list)
+                    # now traverse the previosuly visited nodes to
+                    # correct their relative rates by the necessary
+                    # correction factor.  If correction factor = 1
+                    # then there is no need to traverse the previous
+                    # nodes since it means they already have the
+                    # correct relative rates set already
+                    if cf_1 != 1:
+                        prev_nodes= self.get_prev_visited_nodes(node_list[i][TUP_ID], top_matrix, block_list)
+                        list_len2 = len(prev_nodes)
+                        for i in xrange(list_len2):
+                            print "cf1 fix node= ", prev_nodes[i]
+                            self.set_rev_rate_consistency_helper(prev_nodes[i], top_matrix,block_list, cf_1)
+                    if cf_2 != 1:
+                        print "cf2 fix node= ", prev_path
+                        self.set_rev_rate_consistency_helper([prev_path], top_matrix,block_list, cf_2)
+                '''
+        #next_node = self.get_next_node(self, arc, top_matrix, block_list)
+    # traverse in reverse mode to fix inconsistency
+    def set_rev_rate_consistency_helper(self, node_list, top_matrix, block_list, cf):
+        list_len  = len(node_list)
+        ret_is    = TUP_INIT
+        node_rate = 1.0
+        print "list_len= ", list_len
+        for i in xrange(list_len):
+            node_rate = node_list[i][TUP_RATE]
+            cur_rate  = cf * node_rate
+            print "new cur rate= ", cur_rate
+            self.set_new_node_relative_rate(node_list[i], cur_rate, top_matrix, block_list)
+            # since traversing backwards make sure that node is not a
+            # source node
+            ret_is = self.is_source(node_list[i][TUP_ID], top_matrix, block_list)
+            print "check if source node"
             if ret_is[TUP_COND]  == False:
-                node_list2= self.get_next_nodes(node_list[i][TUP_ID], top_matrix, block_list)
+                print "find prev for= ", node_list[i][TUP_ID]
+                node_list2= self.get_prev_visited_nodes(node_list[i][TUP_ID], top_matrix, block_list)
+                print "new list of prev visited= ", node_list2
                 # run for a second time to get the outgoing rate of
                 # the next node and not the incoming one
-                print "1st node list2= ", node_list2
-                ret_is = self.is_sink(node_list2[0][TUP_ID], top_matrix, block_list)
+                ret_is = self.is_source(node_list2[0][TUP_ID], top_matrix, block_list)
                 if ret_is[TUP_COND]  == False:
-                    node_list3= self.get_next_nodes(node_list2[0][TUP_ID], top_matrix, block_list)
-                    print "node_list2= ", node_list2, " node_list3= ", node_list3
+                    node_list3= self.get_prev_visited_nodes(node_list2[0][TUP_ID], top_matrix, block_list)
                     node_list2[0][TUP_RATE] = node_list3[0][TUP_RATE]
-                print "NODE LIST2= ", node_list2
-                if node_list[i][TUP_ID] != 12:
-                    self.set_rate_consistency_helper(node_list2, top_matrix, block_list, cur_rate)
-            else:
-                if self.DEBUG:
-                    print "FOUND SINK"
-        #next_node = self.get_next_node(self, arc, top_matrix, block_list)
-                
+                    self.set_rev_rate_consistency_helper(node_list2, top_matrix, block_list, cur_rate)
+    def least_common_mult(self, num_list):
+        return self.find_lcm([], num_list)
+    def find_lcm(self, one, two):
+        list_len = len(two)
+        if list_len > 1:
+            return self.find_lcm(two[0], two[1:])
+        else:
+            return ((one*two[0])/fractions.gcd(one, two[0]))
     #######################################################################
     #######################################################################
     # GNURADIO specific methods
@@ -348,6 +495,10 @@ class graph_check:
                     for j in range(col):
                             matrix_loc[i][j] = self.gnuradio_tb.top_matrix_top(i, j)
             return copy.deepcopy(matrix_loc)
+    def setup_visited_matrix(self):
+            row = self.gnuradio_tb.top_get_number_of_edges()
+            col = self.gnuradio_tb.top_get_number_of_blocks()
+            self.visited_matrix = np.zeros((row, col))
     def get_blocks_list(self):
         block_loc = []
         col = self.gnuradio_tb.top_get_number_of_blocks()
