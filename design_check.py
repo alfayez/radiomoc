@@ -234,7 +234,7 @@ class graph_check:
         for j in xrange(col):
             if top_matrix[arc][j] > 0:
                 arc_list = arc
-                return [True, -top_matrix[arc][j], j, arc_list]
+                return [True, top_matrix[arc][j], j, arc_list]
         print "FAIL get_prev_node"
         return TUP_INIT
     def get_node_arcs(self, node_id, top_matrix, block_list):
@@ -250,7 +250,6 @@ class graph_check:
         for j in xrange(col):
             if top_matrix[arc][j] < 0:
                 arc_list = arc
-                print "SUCCESS get_next_node"
                 return [True, -top_matrix[arc][j], j, arc_list]
         print "FAIL get_next_node"
         return TUP_INIT
@@ -260,16 +259,13 @@ class graph_check:
         source_node = 0
         next_list   = []
         node_id     = node[TUP_ID]
-        print "get_next_nodes= ", node
         for j in xrange(row):
             if top_matrix[j][node_id] > 0:
                 # This get_next_node will only generate the next node
                 # on the specified arc
                 source_node = self.get_next_node(j, top_matrix, block_list)
-                print "source_node[i]= ", source_node
                 arc_list    = self.get_node_arcs(source_node[TUP_ID], top_matrix, block_list)
                 arc_len     = len(arc_list)
-                print "arc list= ", arc_list
                 for k in xrange(arc_len):
                     source_node[TUP_ARC] = arc_list[k]
                     next_list.append(source_node)
@@ -298,9 +294,6 @@ class graph_check:
         for j in xrange(row):
             if top_matrix[j][node] < 0:                
                 source_node = self.get_prev_node(j, top_matrix, block_list)
-                print "prev nodes= ", source_node
-                print "visited= ",
-                print self.visited_matrix
                 if self.visited_matrix[j][node] == 1:
                     prev_list.append(source_node)
         return prev_list
@@ -331,17 +324,12 @@ class graph_check:
                 # configure the rate of the output arc
          node_id  = node[TUP_ID]
          node_arc = node[TUP_ARC]
-         print "node_id= ", node_id, " node_arc= ", node_arc
          old_rate = top_matrix[node_arc][node_id]
-         print "OLD RATE= ", old_rate
          self.visited_matrix[node_arc][node_id] = 1
          top_matrix[node_arc][node_id] = rate
          # setup the corresponding input arc for the next node
          ret_is = self.get_next_node(node_arc, top_matrix, block_list)
-         print "Set new rate for Node= ", node, " arc= ", node_arc, " old rate= ", old_rate, " new_rate= ", rate
-         print "ret_is= ", ret_is
          ret_len = len(ret_is)
-         print "ret len= ", ret_len
          for i in xrange(ret_len):
              top_matrix[node_arc][ret_is[TUP_ID]] = -rate
              self.visited_matrix[node_arc][ret_is[TUP_ID]] = 1
@@ -374,23 +362,17 @@ class graph_check:
             if self.visited_matrix[i][node_list[i][TUP_ARC]] == 0:
                 self.visited_matrix[i][node_list[i][TUP_ARC]] = 1
                 cur_rate  = cur_rate * node_rate
-                print "cur_rate= ", cur_rate
-                print "node_list[i]= ", node_list[i]
                 self.set_new_node_relative_rate(node_list[i], cur_rate, top_matrix, block_list)
                 ret_is = self.is_sink(node_list[i][TUP_ID], top_matrix, block_list)
                 if ret_is[TUP_COND]  == False:
                     node_list2= self.get_next_nodes(node_list[i], top_matrix, block_list)
                     list2_len = len(node_list2)
-                    print "node_list21= ", node_list2
                     # run for a second time to get the outgoing rate of
                     # the next node and not the incoming one
-                    print "node_list2= ", node_list2, " len= ", list2_len
                     for j in xrange(list2_len):
                         ret_is = self.is_sink(node_list2[j][TUP_ID], top_matrix, block_list)
                         if ret_is[TUP_COND]  == False:
-                            print "node_list2= ", node_list2
                             node_list3= self.get_next_node(node_list2[0][TUP_ARC], top_matrix, block_list)
-                            print "node_list3= ", node_list3
                             node_list2[0][TUP_RATE] = node_list3[TUP_RATE]
                             #if (node_list[i][TUP_ID] >= 12 and node_list[i][TUP_ID] <= 13):
                         #    print "node# is= ", node_list[i][TUP_ID]
@@ -404,11 +386,9 @@ class graph_check:
             # calculate a common multiple factor and trigger a revised
             # relative rate calculation going backwards through the
             # previously traversed paths
-            '''
+            
             else:
                 node_rate = node_list[i][TUP_RATE]
-                print "Previously visited node= ", node_list[i][TUP_ID] 
-                print "prev_rate= ", node_rate, " cur_rate= ", cur_rate
                 if node_rate == cur_rate:
                     if self.DEBUG:
                         print "Rate Match"
@@ -423,7 +403,6 @@ class graph_check:
                     # node which caused the rate mismatch
                     cf_2 = temp_rate/prev_path[TUP_RATE]
                     # set the new corrected relative rate to the matrix
-                    print "cf1= ", cf_1, " cf2= ", cf_2
                     self.set_new_node_relative_rate(node_list[i], temp_rate, top_matrix, block_list)
                     # now traverse the previosuly visited nodes to
                     # correct their relative rates by the necessary
@@ -435,39 +414,36 @@ class graph_check:
                         prev_nodes= self.get_prev_visited_nodes(node_list[i][TUP_ID], top_matrix, block_list)
                         list_len2 = len(prev_nodes)
                         for i in xrange(list_len2):
-                            print "cf1 fix node= ", prev_nodes[i]
                             self.set_rev_rate_consistency_helper(prev_nodes[i], top_matrix,block_list, cf_1)
                     if cf_2 != 1:
-                        print "cf2 fix node= ", prev_path
+                        print self.second_top_matrix
                         self.set_rev_rate_consistency_helper([prev_path], top_matrix,block_list, cf_2)
-                '''
+                
         #next_node = self.get_next_node(self, arc, top_matrix, block_list)
     # traverse in reverse mode to fix inconsistency
     def set_rev_rate_consistency_helper(self, node_list, top_matrix, block_list, cf):
         list_len  = len(node_list)
         ret_is    = TUP_INIT
         node_rate = 1.0
-        print "list_len= ", list_len
         for i in xrange(list_len):
             node_rate = node_list[i][TUP_RATE]
             cur_rate  = cf * node_rate
-            print "new cur rate= ", cur_rate
             self.set_new_node_relative_rate(node_list[i], cur_rate, top_matrix, block_list)
             # since traversing backwards make sure that node is not a
             # source node
             ret_is = self.is_source(node_list[i][TUP_ID], top_matrix, block_list)
-            print "check if source node"
             if ret_is[TUP_COND]  == False:
-                print "find prev for= ", node_list[i][TUP_ID]
                 node_list2= self.get_prev_visited_nodes(node_list[i][TUP_ID], top_matrix, block_list)
-                print "new list of prev visited= ", node_list2
+                self.set_rev_rate_consistency_helper(node_list2, top_matrix, block_list, cur_rate)                
                 # run for a second time to get the outgoing rate of
                 # the next node and not the incoming one
-                ret_is = self.is_source(node_list2[0][TUP_ID], top_matrix, block_list)
-                if ret_is[TUP_COND]  == False:
-                    node_list3= self.get_prev_visited_nodes(node_list2[0][TUP_ID], top_matrix, block_list)
-                    node_list2[0][TUP_RATE] = node_list3[0][TUP_RATE]
-                    self.set_rev_rate_consistency_helper(node_list2, top_matrix, block_list, cur_rate)
+                #ret_is = self.is_source(node_list2[0][TUP_ID], top_matrix, block_list)
+                #if ret_is[TUP_COND]  == False:
+                #    node_list3= self.get_prev_visited_nodes(node_list2[0][TUP_ID], top_matrix, block_list)
+                #    node_list2[0][TUP_RATE] = node_list3[0][TUP_RATE]
+                #    self.set_rev_rate_consistency_helper(node_list2, top_matrix, block_list, cur_rate)
+                #else:
+                #    self.set_rev_rate_consistency_helper(node_list2, top_matrix, block_list, cur_rate)
     def least_common_mult(self, num_list):
         return self.find_lcm([], num_list)
     def find_lcm(self, one, two):
