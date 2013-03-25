@@ -52,11 +52,14 @@ if __name__ == "__main__":
     design_handler.first_stage_topology_test(top_handler, top_handler.top_matrix)
     design_handler.second_stage_topology_test(top_handler, top_handler.top_matrix)
 
-    source_list = design_handler.find_sources(design_handler.second_top_matrix, design_handler.second_blocks_list)
-    design_handler.set_rate_consistency(source_list, design_handler.second_top_matrix, design_handler.second_blocks_list)
+
     #par_node = design_handler.find_parent_node(14, design_handler.second_top_matrix, design_handler.second_blocks_list)
     #print "PAR NODE= ", par_node
     print "Final TOP MAtrix= "
     print design_handler.second_top_matrix
+    design_handler.set_gnuradio_top_matrix()
+    design_handler.set_gnuradio_firing_vector()
+    design_handler.print_gnuradio_top_matrix()
+    design_handler.print_gnuradio_firing_vector()
     
     

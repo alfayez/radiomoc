@@ -16,13 +16,22 @@ from ptolemy_gen  import *
 from gnuradio_gen import *
 from lp_gen       import *
 from occam_parser import *
-import occam_parser as o
+import occam_parser as occam
 
 TUP_COND = 0
 TUP_RATE = 1
 TUP_ID   = 2
 TUP_ARC  = 3
 TUP_INIT = (False, 0.0, 0, 0)
+
+ALLOC_DEF = 0
+ALLOC_TOP = 1
+
+INT       = 4
+DOUBLE    = 4
+SHORT     = 2
+CHAR      = 1
+IMAG      = 2*2 # short*2
 #IMPORTANT: This is the final gnuradio file that will be generated.
 #It must be here so you can import and reload eventually after
 #regenerating the code
@@ -75,13 +84,17 @@ class graph_check:
         for i in range(len_chans):
             chan_name      = graph_handler.chan_list[i]            
             proc_out       = graph_handler.chan_dict[chan_name][0]
-            proc_out_index = graph_handler.proc_dict[proc_out][o.PROC_LIST_IND]
+            proc_out_index = graph_handler.proc_dict[proc_out][occam.PROC_LIST_IND]
             self.top_impl_info["memory"][proc_out] = 0
         mem_cur_chan = 0
         for i in range(len_chans):
             chan_name = graph_handler.chan_list[i]    
             proc_out  = graph_handler.chan_dict[chan_name][0]
-            proc_out_index  = graph_handler.proc_dict[proc_out][o.PROC_LIST_IND]
+            proc_out_index  = graph_handler.proc_dict[proc_out][occam.PROC_LIST_IND]
+            # Finds the total data element size ... e.g. imag = 2*2,
+            # double=4, char=1
+            data_size       = graph_handler.block_io_rates[proc_out][occam.IO_TYPE_SIZE]
+            print "proc= ", proc_out, " data_size= ", data_size
             mem_cur_chan    = top_matrix[i][proc_out_index]*self.token_size
             self.top_impl_info["memory"][proc_out] = self.top_impl_info["memory"][proc_out]+mem_cur_chan
             self.top_impl_info["memory_total"]     = self.top_impl_info["memory_total"]+ mem_cur_chan
@@ -92,7 +105,7 @@ class graph_check:
         print self.design_constraints
     def first_stage_topology_test(self, graph_handler, top_matrix):
         # calculate the 1st level topology matrix and constraints
-        errorCond = self.calculate_schedule(top_matrix)
+        [errorCond, self.second_sched] = self.calculate_schedule(top_matrix)
         self.setup_gnuradio_handle()
         self.first_is_consistent = self.is_consistent(top_matrix)
         self.memory_usage(graph_handler, top_matrix)
@@ -110,11 +123,13 @@ class graph_check:
             self.print_top_impl_info()
     def second_stage_topology_test(self, graph_handler, top_matrix):
         self.gnuradio_tb.prealloc()
-        self.second_top_matrix = self.get_top_matrix()
+        self.second_top_matrix = self.get_gnuradio_top_matrix()
         self.setup_visited_matrix()
         self.second_blocks_list = self.get_blocks_list()
+        source_list             = self.find_sources(self.second_top_matrix, self.second_blocks_list)
+        self.set_rate_consistency(source_list, self.second_top_matrix, self.second_blocks_list)
         self.second_is_consistent = self.is_consistent(self.second_top_matrix)
-        errorCond = self.calculate_schedule(self.second_top_matrix)
+        [errorCond, self.second_sched] = self.calculate_schedule(self.second_top_matrix)
         if self.DEBUG:
             print "GNURADIO top matrix= "
             print self.second_top_matrix
@@ -129,7 +144,7 @@ class graph_check:
             elif errorCond == INTEGER_NO_SOL:
                 print "Integer problem has no soluion"
         self.print_schedule(self.first_sched)
-        self.gnuradio_tb.alloc(self.cur_bufer_size)
+        self.gnuradio_tb.alloc(self.cur_bufer_size, ALLOC_DEF)
         if self.DEBUG:
             print "Before Go"
         self.gnuradio_tb.go()
@@ -142,8 +157,9 @@ class graph_check:
     def print_schedule(self, sched):
         print sched
     def calculate_schedule(self, top_matrix):
-        [errorCond, self.first_sched] = setup_sched_lp(top_matrix)
-        return errorCond
+        #[errorCond, self.first_sched] = setup_sched_lp(top_matrix)
+        return setup_sched_lp(top_matrix)
+        #return errorCond
     def is_consistent(self, top_matrix):
         # TODO: add consistency for BDF type blocks ... such as packet decoders
         self.rankVal = np.linalg.matrix_rank(top_matrix)
@@ -269,12 +285,6 @@ class graph_check:
                 for k in xrange(arc_len):
                     source_node[TUP_ARC] = arc_list[k]
                     next_list.append(source_node)
-        #node_id     = node[TUP_ID]
-        #node_arc    = node[TUP_ARC]
-        #source_node = self.get_next_node(node_arc, top_matrix, block_list)      
-        #next_list.append(source_node)
-        #next_list = self.get_next_node(node_arc, top_matrix, block_list)      
-        print "next_list= ", next_list
         return next_list
     def get_prev_nodes(self, node, top_matrix, block_list):
         row         = len(top_matrix)
@@ -457,19 +467,36 @@ class graph_check:
     # GNURADIO specific methods
     #######################################################################
     #######################################################################
+    def print_gnuradio_top_matrix(self):
+        self.gnuradio_tb.print_top_matrix()
+    def print_gnuradio_firing_vector(self):
+        self.gnuradio_tb.print_blocks_firing()
     def get_work_time(self):
             tinfo = self.gnuradio_tb.blocks_add_xx_0.pc_work_time()
             print "tinfo= ", tinfo
     def get_buffer_full(self):
             print "Buffer Full perc="
             print self.gnuradio_tb.blocks_add_xx_0.pc_output_buffers_full()
-    def get_top_matrix(self):
+    def get_gnuradio_top_matrix(self):
             row = self.gnuradio_tb.top_get_number_of_edges()
             col = self.gnuradio_tb.top_get_number_of_blocks()
             matrix_loc = np.zeros((row, col))
             for i in range(row):
                     for j in range(col):
                             matrix_loc[i][j] = self.gnuradio_tb.top_matrix_top(i, j)
+            return copy.deepcopy(matrix_loc)
+    def set_gnuradio_firing_vector(self):
+            col = self.gnuradio_tb.top_get_number_of_blocks()
+            for i in range(col):
+                val_temp = self.second_sched[i]
+                self.gnuradio_tb.set_blocks_firing(i, int(val_temp))
+    def set_gnuradio_top_matrix(self):
+            row = self.gnuradio_tb.top_get_number_of_edges()
+            col = self.gnuradio_tb.top_get_number_of_blocks()
+            matrix_loc = np.zeros((row, col))
+            for i in range(row):
+                    for j in range(col):
+                        self.gnuradio_tb.set_top_matrix(i, j, self.second_top_matrix[i][j])
             return copy.deepcopy(matrix_loc)
     def setup_visited_matrix(self):
             row = self.gnuradio_tb.top_get_number_of_edges()

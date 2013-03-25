@@ -35,6 +35,15 @@ IGNORE_PROC = ["parameterGen"]
 IGNORE_CHAN = ["setupC", "setupC2", "setupC3"]
 INIT_PROC = "parameterGen"
 
+INT       = 4
+DOUBLE    = 4
+SHORT     = 2
+CHAR      = 1
+IMAG      = 2*2 # short*2
+
+IO_IN_RATE   = 0
+IO_OUT_RATE  = 1
+IO_TYPE_SIZE = 2
 # Code Generation Modes
 
 PTOLEMY       = 0
@@ -231,23 +240,23 @@ class graph_handler:
                            'add'             :["None"]
                             }
         self.block_io_rates = {
-                             'rfOut'           :["samplingRate2", "samplingRate2"],
-                             'channelFilter'   :["samplingRate",  "samplingRate2"],
-                             'channelFilter2'  :["samplingRate2", "samplingRate" ],
-                             'basebandScale'   :["samplingRate2", "samplingRate2"],
-                             'basebandScale2'  :["samplingRate2", "samplingRate2"],
-                             'dataSrc'         :["samplingRate",  "samplingRate" ],
-                             'carrierScale'    :["samplingRate2", "samplingRate2"],
-                             'carrier'         :["samplingRate2", "samplingRate2"],
-                             'dbpskMod'        :["samplingRate",  "samplingRate" ],
-                             'dbpskEnc'        :["samplingRate",  "samplingRate" ],
-                             'rfIn'            :["samplingRate2", "samplingRate2"],
-                             'dbpskDemod'      :["samplingRate",  "samplingRate" ],
-                             'dbpskDec'        :["samplingRate",  "samplingRate" ],
-                             'dataOut'         :["samplingRate",  "samplingRate" ],
-                             'gauss'           :["samplingRate2", "samplingRate2"],
-                             'gaussScale'      :["samplingRate2", "samplingRate2"], 
-                             'add'             :["samplingRate2", "samplingRate2"]
+                             'rfOut'           :["samplingRate2", "samplingRate2",IMAG],
+                             'channelFilter'   :["samplingRate",  "samplingRate2",IMAG],
+                             'channelFilter2'  :["samplingRate2", "samplingRate", IMAG ],
+                             'basebandScale'   :["samplingRate2", "samplingRate2",IMAG],
+                             'basebandScale2'  :["samplingRate2", "samplingRate2",IMAG],
+                             'dataSrc'         :["samplingRate",  "samplingRate", DOUBLE],
+                             'carrierScale'    :["samplingRate2", "samplingRate2",IMAG],
+                             'carrier'         :["samplingRate2", "samplingRate2",IMAG],
+                             'dbpskMod'        :["samplingRate",  "samplingRate", IMAG],
+                             'dbpskEnc'        :["samplingRate",  "samplingRate", CHAR],
+                             'rfIn'            :["samplingRate2", "samplingRate2",IMAG],
+                             'dbpskDemod'      :["samplingRate",  "samplingRate", CHAR],
+                             'dbpskDec'        :["samplingRate",  "samplingRate", DOUBLE],
+                             'dataOut'         :["samplingRate",  "samplingRate", DOUBLE],
+                             'gauss'           :["samplingRate2", "samplingRate2",DOUBLE],
+                             'gaussScale'      :["samplingRate2", "samplingRate2",DOUBLE], 
+                             'add'             :["samplingRate2", "samplingRate2",DOUBLE]
                            }
 
     def __del__(self):
@@ -563,8 +572,8 @@ class graph_handler:
                                     #Get the parameter name indicating
                                     #the I/O data rate then get the
                                     #physical value from the parameter dictionary
-                                    rate_in  = self.param_dict[self.block_io_rates[proc_name][0]]
-                                    rate_out = self.param_dict[self.block_io_rates[proc_name][1]]
+                                    rate_in  = self.param_dict[self.block_io_rates[proc_name][IO_IN_RATE]]
+                                    rate_out = self.param_dict[self.block_io_rates[proc_name][IO_OUT_RATE]]
                                     self.proc_dict[proc_name][PROC_RATE_IN]  = int(float(rate_in))
                                     self.proc_dict[proc_name][PROC_RATE_OUT] = int(float(rate_out))
                                     self.append_rate(int(float(rate_in)))
