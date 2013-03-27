@@ -16,6 +16,9 @@ from gnuradio_gen import *
 from lp_gen       import *
 from occam_parser import *
 
+ALLOC_DEF = 0
+ALLOC_TOP = 1
+
 if __name__ == "__main__":
     infile_name_list = ["csp-sdf-rx.occ", "csp-sdf-tx.occ", "csp-sdf-sim.occ"]
     # the input occam program which we will be processing
@@ -44,11 +47,11 @@ if __name__ == "__main__":
     top_handler.generate_code(GNURADIO, infile_name)
 
     design_handler.setup_design_constraint("memory", [1024, 2048])
-    design_handler.print_design_constraints();
     ##########################################3
     
     # Observe the first level system resource and consistency check on
-    # the topology matrix and firing vector 
+    # the topology matrix and firing vector
+    design_handler.gnu_mem_alloc_policy = ALLOC_DEF
     design_handler.first_stage_topology_test(top_handler, top_handler.top_matrix)
     design_handler.second_stage_topology_test(top_handler, top_handler.top_matrix)
 
@@ -61,5 +64,9 @@ if __name__ == "__main__":
     design_handler.set_gnuradio_firing_vector()
     design_handler.print_gnuradio_top_matrix()
     design_handler.print_gnuradio_firing_vector()
-    
+
+    ###########################################
+    ## Prints final design resource utilization
+    design_handler.print_design_constraints();
+    ###########################################
     

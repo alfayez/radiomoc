@@ -32,6 +32,12 @@ DOUBLE    = 4
 SHORT     = 2
 CHAR      = 1
 IMAG      = 2*2 # short*2
+MEM_GNU_DEF = 32*1024
+
+MEM        = 'memory'
+MEM_TOT    = 'memory_total'
+EXE        = 'execution_time'
+CONSISTENT = 'consistent'
 #IMPORTANT: This is the final gnuradio file that will be generated.
 #It must be here so you can import and reload eventually after
 #regenerating the code
@@ -55,16 +61,19 @@ class graph_check:
         self.second_blocks_list   = []
         self.second_is_consistent = False
         self.second_sched         = []
-        
+        self.gnu_mem_alloc_policy = ALLOC_DEF
         self.top_impl_info = {# whether a graph is consistent or not
-                              'consistent'      : False,
+                              CONSISTENT   : False,
                               #Dictionary with each block output
                               #buffer memory usage
-                              'memory'          : {},
+                              MEM          : {},
                               #total output buffer memory consumption
-                              'memory_total'    : 0,
+                              MEM_TOT      : 0,
                               
                           }
+        self.top_impl_info_mem = {
+            MEM : {}
+            }
         self.DEBUG = False
     def setup_gnuradio_handle(self):
             import OCCAM_generated
@@ -78,37 +87,50 @@ class graph_check:
     #Calculates the memory usage of each block and accumulate the
     #total memory usage for reference
     def memory_usage(self, graph_handler, top_matrix):
-        len_chans = len(graph_handler.chan_list)
-        self.top_impl_info["memory_total"] = 0
+        len_chans = len(top_matrix)
+        self.top_impl_info[MEM_TOT] = 0
         # initialize the memory utilization for each block as 0
-        for i in range(len_chans):
-            chan_name      = graph_handler.chan_list[i]            
-            proc_out       = graph_handler.chan_dict[chan_name][0]
-            proc_out_index = graph_handler.proc_dict[proc_out][occam.PROC_LIST_IND]
-            self.top_impl_info["memory"][proc_out] = 0
-        mem_cur_chan = 0
-        for i in range(len_chans):
-            chan_name = graph_handler.chan_list[i]    
-            proc_out  = graph_handler.chan_dict[chan_name][0]
-            proc_out_index  = graph_handler.proc_dict[proc_out][occam.PROC_LIST_IND]
-            # Finds the total data element size ... e.g. imag = 2*2,
-            # double=4, char=1
-            data_size       = graph_handler.block_io_rates[proc_out][occam.IO_TYPE_SIZE]
-            print "proc= ", proc_out, " data_size= ", data_size
-            mem_cur_chan    = top_matrix[i][proc_out_index]*self.token_size
-            self.top_impl_info["memory"][proc_out] = self.top_impl_info["memory"][proc_out]+mem_cur_chan
-            self.top_impl_info["memory_total"]     = self.top_impl_info["memory_total"]+ mem_cur_chan
+        for block in self.second_blocks_list:
+            self.top_impl_info_mem[MEM][block] = 0
+        j = 0
+        for block in self.second_blocks_list:
+            mem_cur_chan = 0
+            for i in xrange(len_chans):
+                data_size       = graph_handler.gnuradio_block_io_rates[block][occam.IO_TYPE_SIZE]
+                matrix_val      = top_matrix[i][j]                
+                if self.gnu_mem_alloc_policy == ALLOC_DEF:
+                    if matrix_val > 0:
+                        mem_cur_chan    = MEM_GNU_DEF
+                    else:
+                        mem_cur_chan    = 0
+                        matrix_val      = 0                        
+                elif self.gnu_mem_alloc_policy == ALLOC_TOP:
+                    if matrix_val > 0:
+                        mem_cur_chan    = matrix_val*self.token_size
+                    else:
+                        mem_cur_chan    = 0
+                        matrix_val      = 0
+                self.top_impl_info_mem[MEM][block] = self.top_impl_info_mem[MEM][block]+mem_cur_chan
+                self.top_impl_info[MEM_TOT]     = self.top_impl_info[MEM_TOT]+ mem_cur_chan
+            j = j + 1
+    def get_avg_exe_time(self, graph_handler):
+        print "HEY BLOCK_LIST= ", self.blocks_list
+        #for block in self.second_blocks_list:
+        #    print "BLOCK= ", block
+        #    #self.top_impl_info[EXE][block] = self.gnuradio_tb.block.pc_work_time()
+        #    self.top_impl_info[EXE][block] = self.gnuradio_tb.file_source0.pc_work_time()
     def setup_design_constraint(self, name_val, range_val):
         self.design_constraints[name_val] = range_val
     def print_design_constraints(self):
         print "Design Constraints= "
         print self.design_constraints
+        self.print_top_impl_info()
     def first_stage_topology_test(self, graph_handler, top_matrix):
         # calculate the 1st level topology matrix and constraints
         [errorCond, self.second_sched] = self.calculate_schedule(top_matrix)
         self.setup_gnuradio_handle()
         self.first_is_consistent = self.is_consistent(top_matrix)
-        self.memory_usage(graph_handler, top_matrix)
+        #self.memory_usage(graph_handler, top_matrix)
         if self.DEBUG:
             print "First Stage"
             if errorCond == OK:
@@ -120,7 +142,6 @@ class graph_check:
             print "First Schedule= "
             self.print_schedule(self.first_sched)
             print "1st Stage topology matrix consistency= ", self.first_is_consistent
-            self.print_top_impl_info()
     def second_stage_topology_test(self, graph_handler, top_matrix):
         self.gnuradio_tb.prealloc()
         self.second_top_matrix = self.get_gnuradio_top_matrix()
@@ -144,7 +165,12 @@ class graph_check:
             elif errorCond == INTEGER_NO_SOL:
                 print "Integer problem has no soluion"
         self.print_schedule(self.first_sched)
-        self.gnuradio_tb.alloc(self.cur_bufer_size, ALLOC_DEF)
+        ############################################################
+        ## GET PERFORMANCE MEASUREMENTS
+        self.memory_usage(graph_handler, self.second_top_matrix)
+        self.get_avg_exe_time(graph_handler)
+        
+        self.gnuradio_tb.alloc(self.cur_bufer_size, self.gnu_mem_alloc_policy)
         if self.DEBUG:
             print "Before Go"
         self.gnuradio_tb.go()
@@ -165,9 +191,9 @@ class graph_check:
         self.rankVal = np.linalg.matrix_rank(top_matrix)
         num_actors   = len(top_matrix[0])
         if self.rankVal < num_actors:
-            self.top_impl_info["consistent"] = True
+            self.top_impl_info[CONSISTENT] = True
         else:
-            self.top_impl_info["consistent"] = False
+            self.top_impl_info[CONSISTENT] = False
     def find_sinks(self, top_matrix, block_list):
         row = len(top_matrix)
         col = len(top_matrix[0])
