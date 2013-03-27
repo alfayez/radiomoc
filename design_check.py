@@ -38,6 +38,10 @@ MEM        = 'memory'
 MEM_TOT    = 'memory_total'
 EXE        = 'execution_time'
 CONSISTENT = 'consistent'
+
+EXE_TIME=0
+TOT_PERF=1
+
 #IMPORTANT: This is the final gnuradio file that will be generated.
 #It must be here so you can import and reload eventually after
 #regenerating the code
@@ -69,11 +73,9 @@ class graph_check:
                               MEM          : {},
                               #total output buffer memory consumption
                               MEM_TOT      : 0,
+                              EXE          : {}
                               
                           }
-        self.top_impl_info_mem = {
-            MEM : {}
-            }
         self.DEBUG = False
     def setup_gnuradio_handle(self):
             import OCCAM_generated
@@ -83,7 +85,14 @@ class graph_check:
             self.gnuradio_tb = OCCAM_generated()
     def print_top_impl_info(self):
         for item in self.top_impl_info.keys():
-            print item, "= ", self.top_impl_info[item]    
+            print "\n", item, "\n"
+            if item is MEM or item is EXE:
+                for block in self.top_impl_info[item]:
+                    #print '{0:10} ==> {1:30d}'.format(name, phone)
+                    print '\t', '{0:30} = {1:10}'.format(block, self.top_impl_info[item][block])
+                    #print repr(" ").rjust(1), repr(block).rjust(2), repr("= ").rjust(9), repr(self.top_impl_info[item][block]).rjust(10)
+            else:
+                print item, "= ", self.top_impl_info[item]    
     #Calculates the memory usage of each block and accumulate the
     #total memory usage for reference
     def memory_usage(self, graph_handler, top_matrix):
@@ -91,7 +100,8 @@ class graph_check:
         self.top_impl_info[MEM_TOT] = 0
         # initialize the memory utilization for each block as 0
         for block in self.second_blocks_list:
-            self.top_impl_info_mem[MEM][block] = 0
+            self.top_impl_info[MEM][block] = 0
+            self.top_impl_info[EXE][block] = 0
         j = 0
         for block in self.second_blocks_list:
             mem_cur_chan = 0
@@ -110,11 +120,24 @@ class graph_check:
                     else:
                         mem_cur_chan    = 0
                         matrix_val      = 0
-                self.top_impl_info_mem[MEM][block] = self.top_impl_info_mem[MEM][block]+mem_cur_chan
+                self.top_impl_info[MEM][block] = self.top_impl_info[MEM][block]+mem_cur_chan
                 self.top_impl_info[MEM_TOT]     = self.top_impl_info[MEM_TOT]+ mem_cur_chan
             j = j + 1
     def get_avg_exe_time(self, graph_handler):
-        print "HEY BLOCK_LIST= ", self.blocks_list
+        i=0
+        for block in self.second_blocks_list:
+            self.top_impl_info[EXE][block] = self.gnuradio_tb.get_performance_measure(i,EXE_TIME)
+            print "Block = ", self.second_blocks_list[i], " time= ", self.top_impl_info[EXE][block]
+            i = i + 1
+            #print "WORK_TIME= ", self.gnuradio_tb.message_sink0.pc_work_time()
+
+            #print "PROC_OUT= ", proc_out
+        #print "HEY BLOCK_LIST= ", self.blocks_list
+        #chan_name      = graph_handler.chan_list[i]
+        #proc_out       = graph_handler.chan_dict[chan_name][0]
+        #proc_out_index = graph_handler.proc_dict[proc_out][occam.PROC_LIST_IND]
+        #self.top_impl_info[EXE][block] = self.gnuradio_tb.block.pc_work_time()
+        #print "PROC_DICT= ", graph_handler.proc_dict
         #for block in self.second_blocks_list:
         #    print "BLOCK= ", block
         #    #self.top_impl_info[EXE][block] = self.gnuradio_tb.block.pc_work_time()
@@ -168,8 +191,6 @@ class graph_check:
         ############################################################
         ## GET PERFORMANCE MEASUREMENTS
         self.memory_usage(graph_handler, self.second_top_matrix)
-        self.get_avg_exe_time(graph_handler)
-        
         self.gnuradio_tb.alloc(self.cur_bufer_size, self.gnu_mem_alloc_policy)
         if self.DEBUG:
             print "Before Go"
@@ -177,9 +198,11 @@ class graph_check:
         if self.DEBUG:
             print "Before Sleep"
         time.sleep(2)
+        time.sleep(2)
         if self.DEBUG:
             print "GOODBUY"
         self.gnuradio_tb.stop()
+        self.get_avg_exe_time(graph_handler)
     def print_schedule(self, sched):
         print sched
     def calculate_schedule(self, top_matrix):
