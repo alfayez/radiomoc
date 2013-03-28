@@ -34,13 +34,32 @@ CHAR      = 1
 IMAG      = 2*2 # short*2
 MEM_GNU_DEF = 32*1024
 
-MEM        = 'memory'
-MEM_TOT    = 'memory_total'
-EXE        = 'execution_time'
-CONSISTENT = 'consistent'
+MEM            = 'memory'
+MEM_TOT        = 'memory_total'
+CONSISTENT     = 'consistent'
+LATENCY        = 'latency'
+THRU           = 'throughput'
+EXE            = 'execution_time'
+EXE_VAR        = 'execution_time_var'
+PRODUCED       = 'produced'
+PRODUCED_VAR   = 'produced_var'
+NOUTPUT        = 'noutput'
+NOUTPUT_VAR    = 'noutput_var'
+IBUFF_FULL     = 'input_buffer_fullness'
+IBUFF_FULL_VAR = 'input_buffer_fullness_var'
+OBUFF_FULL     = 'output_buffer_fullness'
+OBUFF_FULL_VAR = 'output_buffer_fullness_var'
 
-EXE_TIME=0
-TOT_PERF=1
+EXE_TIME_ENUM      = 0
+EXE_TIME_VAR_ENUM  = 1
+PRODUCED_ENUM      = 2
+PRODUCED_VAR_ENUM  = 3
+NOUTPUT_ENUM       = 4
+NOUTPUT_VAR_ENUM   = 5
+IBUFF_FULL_ENUM    = 6
+IBUFF_FULL_VAR_ENUM= 7
+OBUFF_FULL_ENUM    = 8
+OBUFF_FULL_VAR_ENUM= 9
 
 #IMPORTANT: This is the final gnuradio file that will be generated.
 #It must be here so you can import and reload eventually after
@@ -66,15 +85,26 @@ class graph_check:
         self.second_is_consistent = False
         self.second_sched         = []
         self.gnu_mem_alloc_policy = ALLOC_DEF
-        self.top_impl_info = {# whether a graph is consistent or not
-                              CONSISTENT   : False,
+        self.top_impl_info = {
+                              # whether a graph is consistent or not
+                              CONSISTENT     : False,
                               #Dictionary with each block output
                               #buffer memory usage
-                              MEM          : {},
+                              MEM            : {},
                               #total output buffer memory consumption
-                              MEM_TOT      : 0,
-                              EXE          : {}
-                              
+                              MEM_TOT        : 0,
+                              EXE            : {},
+                              EXE_VAR        : {},
+                              PRODUCED       : {},
+                              PRODUCED_VAR   : {},
+                              NOUTPUT        : {},
+                              NOUTPUT_VAR    : {},
+                              IBUFF_FULL     : {},
+                              IBUFF_FULL_VAR : {},
+                              OBUFF_FULL     : {},
+                              OBUFF_FULL_VAR : {},
+                              LATENCY        : {},
+                              THRU           : {}
                           }
         self.DEBUG = False
     def setup_gnuradio_handle(self):
@@ -86,13 +116,13 @@ class graph_check:
     def print_top_impl_info(self):
         for item in self.top_impl_info.keys():
             print "\n", item, "\n"
-            if item is MEM or item is EXE:
+            if item is not MEM_TOT and item is not CONSISTENT and item is not LATENCY:
                 for block in self.top_impl_info[item]:
                     #print '{0:10} ==> {1:30d}'.format(name, phone)
                     print '\t', '{0:30} = {1:10}'.format(block, self.top_impl_info[item][block])
                     #print repr(" ").rjust(1), repr(block).rjust(2), repr("= ").rjust(9), repr(self.top_impl_info[item][block]).rjust(10)
             else:
-                print item, "= ", self.top_impl_info[item]    
+                print '\t', '{0:30} = {1:10}'.format(item, self.top_impl_info[item])
     #Calculates the memory usage of each block and accumulate the
     #total memory usage for reference
     def memory_usage(self, graph_handler, top_matrix):
@@ -126,22 +156,23 @@ class graph_check:
     def get_avg_exe_time(self, graph_handler):
         i=0
         for block in self.second_blocks_list:
-            self.top_impl_info[EXE][block] = self.gnuradio_tb.get_performance_measure(i,EXE_TIME)
-            print "Block = ", self.second_blocks_list[i], " time= ", self.top_impl_info[EXE][block]
+            self.top_impl_info[EXE][block]            = self.gnuradio_tb.get_performance_measure(i,EXE_TIME_ENUM)
+            self.top_impl_info[EXE_VAR][block]        = self.gnuradio_tb.get_performance_measure(i,EXE_TIME_VAR_ENUM)
+            self.top_impl_info[PRODUCED][block]       = self.gnuradio_tb.get_performance_measure(i,PRODUCED_ENUM)
+            self.top_impl_info[PRODUCED_VAR][block]   = self.gnuradio_tb.get_performance_measure(i,PRODUCED_VAR_ENUM)
+            self.top_impl_info[NOUTPUT][block]        = self.gnuradio_tb.get_performance_measure(i,NOUTPUT_ENUM)
+            self.top_impl_info[NOUTPUT_VAR][block]    = self.gnuradio_tb.get_performance_measure(i,NOUTPUT_VAR_ENUM)
+            self.top_impl_info[IBUFF_FULL][block]     = self.gnuradio_tb.get_performance_measure(i,IBUFF_FULL_ENUM)
+            self.top_impl_info[IBUFF_FULL_VAR][block] = self.gnuradio_tb.get_performance_measure(i,IBUFF_FULL_VAR_ENUM)
+            self.top_impl_info[OBUFF_FULL][block]     = self.gnuradio_tb.get_performance_measure(i,OBUFF_FULL_VAR_ENUM)
+            self.top_impl_info[OBUFF_FULL_VAR][block] = self.gnuradio_tb.get_performance_measure(i,OBUFF_FULL_VAR_ENUM)
             i = i + 1
-            #print "WORK_TIME= ", self.gnuradio_tb.message_sink0.pc_work_time()
-
-            #print "PROC_OUT= ", proc_out
-        #print "HEY BLOCK_LIST= ", self.blocks_list
-        #chan_name      = graph_handler.chan_list[i]
-        #proc_out       = graph_handler.chan_dict[chan_name][0]
-        #proc_out_index = graph_handler.proc_dict[proc_out][occam.PROC_LIST_IND]
-        #self.top_impl_info[EXE][block] = self.gnuradio_tb.block.pc_work_time()
-        #print "PROC_DICT= ", graph_handler.proc_dict
-        #for block in self.second_blocks_list:
-        #    print "BLOCK= ", block
-        #    #self.top_impl_info[EXE][block] = self.gnuradio_tb.block.pc_work_time()
-        #    self.top_impl_info[EXE][block] = self.gnuradio_tb.file_source0.pc_work_time()
+        # Calculate and print out Throughput and Latency
+        tot_latency = 0
+        for block in self.top_impl_info[EXE]:
+            tot_latency = tot_latency + self.top_impl_info[EXE][block]
+            self.top_impl_info[THRU][block] = self.top_impl_info[PRODUCED][block]/self.top_impl_info[EXE][block]
+            print "tot_lantecy block= ", tot_latency
     def setup_design_constraint(self, name_val, range_val):
         self.design_constraints[name_val] = range_val
     def print_design_constraints(self):
