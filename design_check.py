@@ -12,17 +12,17 @@ import scipy
 import fractions
 import subprocess
 
+from pylab        import *
 from ptolemy_gen  import *
 from gnuradio_gen import *
 from lp_gen       import *
-from occam_parser import *
 import occam_parser as occam
 
 TUP_COND = 0
 TUP_RATE = 1
 TUP_ID   = 2
 TUP_ARC  = 3
-TUP_INIT = (False, 0.0, 0, 0)
+TUP_INIT = [False, 0.0, 0, 0]
 
 ALLOC_DEF = 0
 ALLOC_TOP = 1
@@ -69,19 +69,20 @@ OBUFF_FULL_VAR_ENUM= 9
 class graph_check:
     def __init__(self):
         # gnuradio Top Block Handler
-        self.gnuradio_tb         = {}
+        #self.gnuradio_tb         = {}
         # Dictionary holding the users desired design constraints
         self.design_constraints  = {}        
-        self.default_buffer_size = 32*1024
-        self.cur_bufer_size      = 32*1024
-        self.token_size   = 1024
-
+        self.default_buffer_size  = 32*1024
+        self.cur_buffer_size      = 32*1024
+        self.token_size_orig      = 1024
+        self.token_size           = 1
         self.first_is_consistent = False        
         self.first_sched         = []
         
         self.second_top_matrix    = np.zeros((1,1))
         self.visited_matrix       = np.zeros((1,1))
         self.second_blocks_list   = []
+        self.blocks_io            = []
         self.second_is_consistent = False
         self.second_sched         = []
         self.gnu_mem_alloc_policy = ALLOC_DEF
@@ -106,13 +107,23 @@ class graph_check:
                               LATENCY        : {},
                               THRU           : {}
                           }
+
+#        self.mem_vect   = []
+#        self.alloc_vect = []
+#        self.throughput_def = -1
+#        self.latency_def    = -1
+#        self.mem_def        = -1
+#        self.throughput_top = []
+#        self.latency_top    = []
+#        self.mem_top        = []
+        
         self.DEBUG = False
-    def setup_gnuradio_handle(self):
-            import OCCAM_generated
-            reload(OCCAM_generated)
-            from OCCAM_generated import OCCAM_generated
-            # set the gnuradio top block handler to the one generated
-            self.gnuradio_tb = OCCAM_generated()
+#    def setup_gnuradio_handle(self):
+#            import OCCAM_generated
+#            reload(OCCAM_generated)
+#            from OCCAM_generated import OCCAM_generated
+#            # set the gnuradio top block handler to the one generated
+#            self.gnuradio_tb = OCCAM_generated()
     def print_top_impl_info(self):
         for item in self.top_impl_info.keys():
             print "\n", item, "\n"
@@ -125,54 +136,60 @@ class graph_check:
                 print '\t', '{0:30} = {1:10}'.format(item, self.top_impl_info[item])
     #Calculates the memory usage of each block and accumulate the
     #total memory usage for reference
-    def memory_usage(self, graph_handler, top_matrix):
-        len_chans = len(top_matrix)
-        self.top_impl_info[MEM_TOT] = 0
-        # initialize the memory utilization for each block as 0
-        for block in self.second_blocks_list:
-            self.top_impl_info[MEM][block] = 0
-            self.top_impl_info[EXE][block] = 0
-        j = 0
-        for block in self.second_blocks_list:
-            mem_cur_chan = 0
-            for i in xrange(len_chans):
-                data_size       = graph_handler.gnuradio_block_io_rates[block][occam.IO_TYPE_SIZE]
-                matrix_val      = top_matrix[i][j]                
-                if self.gnu_mem_alloc_policy == ALLOC_DEF:
-                    if matrix_val > 0:
-                        mem_cur_chan    = MEM_GNU_DEF
-                    else:
-                        mem_cur_chan    = 0
-                        matrix_val      = 0                        
-                elif self.gnu_mem_alloc_policy == ALLOC_TOP:
-                    if matrix_val > 0:
-                        mem_cur_chan    = matrix_val*self.token_size
-                    else:
-                        mem_cur_chan    = 0
-                        matrix_val      = 0
-                self.top_impl_info[MEM][block] = self.top_impl_info[MEM][block]+mem_cur_chan
-                self.top_impl_info[MEM_TOT]     = self.top_impl_info[MEM_TOT]+ mem_cur_chan
-            j = j + 1
-    def get_avg_exe_time(self, graph_handler):
-        i=0
-        for block in self.second_blocks_list:
-            self.top_impl_info[EXE][block]            = self.gnuradio_tb.get_performance_measure(i,EXE_TIME_ENUM)
-            self.top_impl_info[EXE_VAR][block]        = self.gnuradio_tb.get_performance_measure(i,EXE_TIME_VAR_ENUM)
-            self.top_impl_info[PRODUCED][block]       = self.gnuradio_tb.get_performance_measure(i,PRODUCED_ENUM)
-            self.top_impl_info[PRODUCED_VAR][block]   = self.gnuradio_tb.get_performance_measure(i,PRODUCED_VAR_ENUM)
-            self.top_impl_info[NOUTPUT][block]        = self.gnuradio_tb.get_performance_measure(i,NOUTPUT_ENUM)
-            self.top_impl_info[NOUTPUT_VAR][block]    = self.gnuradio_tb.get_performance_measure(i,NOUTPUT_VAR_ENUM)
-            self.top_impl_info[IBUFF_FULL][block]     = self.gnuradio_tb.get_performance_measure(i,IBUFF_FULL_ENUM)
-            self.top_impl_info[IBUFF_FULL_VAR][block] = self.gnuradio_tb.get_performance_measure(i,IBUFF_FULL_VAR_ENUM)
-            self.top_impl_info[OBUFF_FULL][block]     = self.gnuradio_tb.get_performance_measure(i,OBUFF_FULL_VAR_ENUM)
-            self.top_impl_info[OBUFF_FULL_VAR][block] = self.gnuradio_tb.get_performance_measure(i,OBUFF_FULL_VAR_ENUM)
-            i = i + 1
-        # Calculate and print out Throughput and Latency
-        tot_latency = 0
-        for block in self.top_impl_info[EXE]:
-            tot_latency = tot_latency + self.top_impl_info[EXE][block]
-            self.top_impl_info[THRU][block] = self.top_impl_info[PRODUCED][block]/self.top_impl_info[EXE][block]
-            print "tot_lantecy block= ", tot_latency
+#    def memory_usage(self, graph_handler, top_matrix):
+#        len_chans = len(top_matrix)
+#        self.top_impl_info[MEM_TOT] = 0
+#        # initialize the memory utilization for each block as 0
+#        for block in self.second_blocks_list:
+#            self.top_impl_info[MEM][block] = 0
+#            self.top_impl_info[EXE][block] = 0
+#        j = 0
+#        #print "second_blocks_list= ", self.second_blocks_list
+#        for block in self.second_blocks_list:
+#            mem_cur_chan = 0
+#            for i in xrange(len_chans):
+#                #data_size       = graph_handler.gnuradio_block_io_rates[block][occam.IO_TYPE_SIZE]
+#                data_size       = self.blocks_io[j]
+#                matrix_val      = top_matrix[i][j]                
+#                if self.gnu_mem_alloc_policy == ALLOC_DEF:
+#                    if matrix_val > 0:
+#                        mem_cur_chan    = MEM_GNU_DEF
+#                    else:
+#                        mem_cur_chan    = 0
+#                        matrix_val      = 0                        
+#                elif self.gnu_mem_alloc_policy == ALLOC_TOP:
+#                    if matrix_val > 0:
+#                        mem_cur_chan    = matrix_val*self.token_size
+#                    else:
+#                        mem_cur_chan    = 0
+#                        matrix_val      = 0
+#                self.top_impl_info[MEM][block] = self.top_impl_info[MEM][block]+mem_cur_chan
+#                self.top_impl_info[MEM_TOT]     = self.top_impl_info[MEM_TOT]+ mem_cur_chan
+#            j = j + 1
+#    def get_avg_exe_time(self, graph_handler):
+#        i=0
+#        for block in self.second_blocks_list:
+#            self.top_impl_info[EXE][block]            = self.gnuradio_tb.get_performance_measure(i,EXE_TIME_ENUM)
+#            self.top_impl_info[EXE_VAR][block]        = self.gnuradio_tb.get_performance_measure(i,EXE_TIME_VAR_ENUM)
+#            self.top_impl_info[PRODUCED][block]       = self.gnuradio_tb.get_performance_measure(i,PRODUCED_ENUM)
+#            self.top_impl_info[PRODUCED_VAR][block]   = self.gnuradio_tb.get_performance_measure(i,PRODUCED_VAR_ENUM)
+#            self.top_impl_info[NOUTPUT][block]        = self.gnuradio_tb.get_performance_measure(i,NOUTPUT_ENUM)
+#            self.top_impl_info[NOUTPUT_VAR][block]    = self.gnuradio_tb.get_performance_measure(i,NOUTPUT_VAR_ENUM)
+#            self.top_impl_info[IBUFF_FULL][block]     = self.gnuradio_tb.get_performance_measure(i,IBUFF_FULL_ENUM)
+#            self.top_impl_info[IBUFF_FULL_VAR][block] = self.gnuradio_tb.get_performance_measure(i,IBUFF_FULL_VAR_ENUM)
+#            self.top_impl_info[OBUFF_FULL][block]     = self.gnuradio_tb.get_performance_measure(i,OBUFF_FULL_VAR_ENUM)
+#            self.top_impl_info[OBUFF_FULL_VAR][block] = self.gnuradio_tb.get_performance_measure(i,OBUFF_FULL_VAR_ENUM)
+#            i = i + 1
+#        # Calculate and print out Throughput and Latency
+#        tot_latency = 0
+#        for block in self.top_impl_info[EXE]:
+#            tot_latency = tot_latency + self.top_impl_info[EXE][block]
+#            denom = self.top_impl_info[EXE][block]
+#            if denom > 0:
+#                self.top_impl_info[THRU][block] = self.top_impl_info[PRODUCED][block]/denom
+#            else:
+#                self.top_impl_info[THRU][block] = float("infinity")
+#        self.top_impl_info[LATENCY] = tot_latency
     def setup_design_constraint(self, name_val, range_val):
         self.design_constraints[name_val] = range_val
     def print_design_constraints(self):
@@ -182,7 +199,7 @@ class graph_check:
     def first_stage_topology_test(self, graph_handler, top_matrix):
         # calculate the 1st level topology matrix and constraints
         [errorCond, self.second_sched] = self.calculate_schedule(top_matrix)
-        self.setup_gnuradio_handle()
+        #self.setup_gnuradio_handle()
         self.first_is_consistent = self.is_consistent(top_matrix)
         #self.memory_usage(graph_handler, top_matrix)
         if self.DEBUG:
@@ -193,25 +210,34 @@ class graph_check:
                 print "Relaxed LP has no solution"
             elif errorCond == INTEGER_NO_SOL:
                 print "Integer problem has no soluion"        
-            print "First Schedule= "
-            self.print_schedule(self.first_sched)
-            print "1st Stage topology matrix consistency= ", self.first_is_consistent
-    def second_stage_topology_test(self, graph_handler, top_matrix):
-        self.gnuradio_tb.prealloc()
-        self.second_top_matrix = self.get_gnuradio_top_matrix()
-        self.setup_visited_matrix()
-        self.second_blocks_list = self.get_blocks_list()
+            #print "First Schedule= "
+            #self.print_schedule(self.first_sched)
+            #print "1st Stage topology matrix consistency= ", self.first_is_consistent
+    def find_block_name(self, block_find, block_list):
+        search_len = len(block_find)
+        block_len  = len(block_list)
+        for i in xrange(search_len):
+            for j in xrange(block_len):
+                if block_find[i] in block_list[j]:
+                    return block_list[j]
+        return "None"
+    def second_stage_topology_test(self, graph_handler, top_matrix, gnuradio_handler):
+        gnuradio_handler.gnuradio_tb.prealloc()
+        self.second_top_matrix = gnuradio_handler.get_gnuradio_top_matrix()
+        self.setup_visited_matrix(gnuradio_handler)
+        self.second_blocks_list = gnuradio_handler.get_blocks_list()
         source_list             = self.find_sources(self.second_top_matrix, self.second_blocks_list)
         self.set_rate_consistency(source_list, self.second_top_matrix, self.second_blocks_list)
         self.second_is_consistent = self.is_consistent(self.second_top_matrix)
         [errorCond, self.second_sched] = self.calculate_schedule(self.second_top_matrix)
         if self.DEBUG:
-            print "GNURADIO top matrix= "
-            print self.second_top_matrix
-            print "GNURADIO blocks_list= "
-            print self.second_blocks_list
-            print "2nd Stage topology matrix consistency= ", self.second_is_consistent        
             print "Second Stage"
+            #print "GNURADIO top matrix= "
+            #print self.second_top_matrix
+            #print "GNURADIO blocks_list= "
+            #print self.second_blocks_list
+            #print "2nd Stage topology matrix consistency= ", self.second_is_consistent        
+            #print "Second Stage"
             if errorCond == OK:
                 print "Found Schedule"
             elif errorCond == RELAXED_NO_SOL:
@@ -219,21 +245,84 @@ class graph_check:
             elif errorCond == INTEGER_NO_SOL:
                 print "Integer problem has no soluion"
         self.print_schedule(self.first_sched)
-        ############################################################
-        ## GET PERFORMANCE MEASUREMENTS
-        self.memory_usage(graph_handler, self.second_top_matrix)
-        self.gnuradio_tb.alloc(self.cur_bufer_size, self.gnu_mem_alloc_policy)
+
+        gnuradio_handler.set_gnuradio_top_matrix(self)
+        gnuradio_handler.set_gnuradio_firing_vector(self)
+
+        if self.gnu_mem_alloc_policy is ALLOC_DEF:
+            self.cur_buffer_size = self.default_buffer_size
+        else:
+            self.cur_buffer_size = self.token_size
+        gnuradio_handler.gnuradio_tb.alloc(self.cur_buffer_size, self.gnu_mem_alloc_policy)
         if self.DEBUG:
             print "Before Go"
-        self.gnuradio_tb.go()
+        gnuradio_handler.gnuradio_tb.go()
         if self.DEBUG:
             print "Before Sleep"
-        time.sleep(2)
-        time.sleep(2)
+        time.sleep(6)
         if self.DEBUG:
             print "GOODBUY"
-        self.gnuradio_tb.stop()
-        self.get_avg_exe_time(graph_handler)
+        gnuradio_handler.gnuradio_tb.stop()
+        gnuradio_handler.gnuradio_tb.wait()
+        time.sleep(3)
+        self.blocks_io          = gnuradio_handler.get_blocks_io(self)
+        ############################################################
+        ## GET PERFORMANCE MEASUREMENTS
+        gnuradio_handler.memory_usage(graph_handler, self, self.second_top_matrix)
+        gnuradio_handler.get_avg_exe_time(graph_handler, self)
+#    def collect_data(self, top_handler):
+        # total amount of memory used in bytes
+        #self.mem_vect   = []
+        # the buffer allocation policy
+        #self.alloc_vect = []
+        
+        # Throughput using default gnuradio allocation
+        #self.throughput_def = -1
+        # Latency of the graph using default gnuradio allocation
+        #self.latency_def    = -1
+        # Memory used with default gnuradio allocation
+        #self.mem_def        = -1
+
+        # throughput using memory topology allocation
+        #self.throughput_top = []
+        # latency using topology allocation
+        #self.latency_top    = []
+        # total memory consumption using topology allocation
+        #self.mem_top        = []
+#        start_vect = 1
+#        end_vect   = 4
+#        run_len    = 0
+#        
+#        self.mem_vect = range(start_vect, end_vect)
+#        run_len       = len(self.mem_vect)
+#        self.alloc_vect = [ALLOC_TOP]
+#        self.alloc_vect.extend([ALLOC_TOP]*(run_len-1))
+#        
+#        for i in xrange(run_len):
+#            print "Iteration= ", i
+#            self.gnu_mem_alloc_policy = self.alloc_vect[i]
+#            self.token_size           = self.mem_vect[i]*self.token_size_orig
+#            self.first_stage_topology_test (top_handler, top_handler.top_matrix)
+#            self.second_stage_topology_test(top_handler, top_handler.top_matrix)
+#            sink_block = 'file_sink0'
+#            print "sink_block= ", sink_block
+#            if self.gnu_mem_alloc_policy == ALLOC_DEF:
+#                #self.throughput_def = self.top_impl_info[THRU][sink_block]
+#                self.latency_def    = self.top_impl_info[LATENCY]
+#                self.mem_def        = self.top_impl_info[MEM_TOT]
+#            else:
+#                #self.throughput_top = self.top_impl_info[THRU][sink_block]
+#                self.latency_top    = self.top_impl_info[LATENCY]
+#                self.mem_top        = self.top_impl_info[MEM_TOT]
+#
+#        print "thru def   = ", self.throughput_def
+#        print "latency def= ", self.latency_def
+#        print "mem def    = ", self.mem_def
+#        
+#        print "thru top   = ", self.throughput_top
+#        print "latency top= ", self.latency_top
+#        print "mem top    = ", self.mem_top
+        
     def print_schedule(self, sched):
         print sched
     def calculate_schedule(self, top_matrix):
@@ -506,7 +595,7 @@ class graph_check:
                         for i in xrange(list_len2):
                             self.set_rev_rate_consistency_helper(prev_nodes[i], top_matrix,block_list, cf_1)
                     if cf_2 != 1:
-                        print self.second_top_matrix
+                        #print self.second_top_matrix
                         self.set_rev_rate_consistency_helper([prev_path], top_matrix,block_list, cf_2)
                 
         #next_node = self.get_next_node(self, arc, top_matrix, block_list)
@@ -547,6 +636,12 @@ class graph_check:
     # GNURADIO specific methods
     #######################################################################
     #######################################################################
+    def setup_visited_matrix(self, gnuradio_handler):
+            row = gnuradio_handler.gnuradio_tb.top_get_number_of_edges()
+            col = gnuradio_handler.gnuradio_tb.top_get_number_of_blocks()
+            self.visited_matrix = np.zeros((row, col))
+
+'''
     def print_gnuradio_top_matrix(self):
         self.gnuradio_tb.print_top_matrix()
     def print_gnuradio_firing_vector(self):
@@ -589,10 +684,23 @@ class graph_check:
             block_name = self.gnuradio_tb.blocks_list_top(i)
             block_loc.append(block_name)
         return copy.deepcopy(block_loc)
-
+    def get_blocks_io(self):
+        block_loc = []
+        col = self.gnuradio_tb.top_get_number_of_blocks()
+        i = 0
+        for i in xrange(col):
+            ret_val = self.is_sink(i, self.second_top_matrix, self.second_blocks_list)
+            if ret_val[TUP_COND]:
+                block_io = 0
+            else:
+                block_io = self.gnuradio_tb.get_block_io(i, 0)
+            block_loc.append(block_io)
+        return copy.deepcopy(block_loc)        
     def get_number_of_blocks(self):
             print "gnuradio num blocks= "
             print self.gnuradio_tb.top_get_number_of_blocks()
     def get_number_of_edges(self):
             print "gnuradio num edges= "
             print self.gnuradio_tb.top_get_number_of_edges()
+
+'''
