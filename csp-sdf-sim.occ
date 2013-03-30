@@ -1219,7 +1219,7 @@ PROC main(CHAN BYTE out!)
     dbpskEnc         (encToModC!,       DEncC!,          throttToEncC?)
     dbpskMod         (txToChanFiltC!,   DModulatorC!,    encToModC?)
     channelFilter    (filterToScaleC!,  DRrcFiltC!,      txToChanFiltC?)
-    basebandScale    (scaleToAddC!,     DBasebandScaleC!,filterToScaleC?)
+    basebandScale    (scaleToAddC!,     DBasebandScaleC!, filterToScaleC?)
 
     gauss            (gaussToScaleC!,     DGaussC!,        setup3C?)
     gaussScale       (gaussScaleToAddC!, DGaussScaleC!,    gaussToScaleC?)

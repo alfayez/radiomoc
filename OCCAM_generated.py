@@ -3,7 +3,7 @@
 # Gnuradio Python Flow Graph
 # Title: Occam Generated
 # Author: Almohanad Fayez
-# Generated: Tue Mar 26 23:33:53 2013
+# Generated: Fri Mar 29 20:37:19 2013
 ##################################################
 
 from gnuradio import analog
@@ -48,6 +48,7 @@ class OCCAM_generated(grc_wxgui.top_block_gui):
 		##################################################
 		# Blocks
 		##################################################
+		self.throttle = gr.throttle(gr.sizeof_float*1, samplingRate)
 		self.gaussScale = blocks.multiply_const_vcc((gaussGain, ))
 		self.gauss = analog.noise_source_c(analog.GR_GAUSSIAN, 0.3, 0)
 		self.dbpskMod = digital.dbpsk_mod(
@@ -93,6 +94,8 @@ class OCCAM_generated(grc_wxgui.top_block_gui):
 		##################################################
 		# Connections
 		##################################################
+		self.connect((self.dataSrc, 0), (self.throttle, 0))
+		self.connect((self.throttle, 0), (self.dbpskEnc, 0))
 		self.connect((self.dbpskMod, 0), (self.channelFilter, 0))
 		self.connect((self.dbpskDemod, 0), (self.dbpskDec, 0))
 		self.connect((self.basebandScale, 0), (self.add, 0))
@@ -100,7 +103,6 @@ class OCCAM_generated(grc_wxgui.top_block_gui):
 		self.connect((self.basebandScale2, 0), (self.channelFilter2, 0))
 		self.connect((self.add, 0), (self.basebandScale2, 0))
 		self.connect((self.dbpskDec, 0), (self.dataOut, 0))
-		self.connect((self.dataSrc, 0), (self.dbpskEnc, 0))
 		self.connect((self.dbpskEnc, 0), (self.dbpskMod, 0))
 		self.connect((self.gaussScale, 0), (self.add, 1))
 		self.connect((self.channelFilter, 0), (self.basebandScale, 0))
@@ -130,6 +132,7 @@ class OCCAM_generated(grc_wxgui.top_block_gui):
 
 	def set_samplingRate(self, samplingRate):
 		self.samplingRate = samplingRate
+		self.throttle.set_sample_rate(self.samplingRate)
 
 	def get_rfGain2(self):
 		return self.rfGain2

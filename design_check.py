@@ -232,8 +232,8 @@ class graph_check:
         [errorCond, self.second_sched] = self.calculate_schedule(self.second_top_matrix)
         if self.DEBUG:
             print "Second Stage"
-            #print "GNURADIO top matrix= "
-            #print self.second_top_matrix
+            print "GNURADIO top matrix= "
+            print self.second_top_matrix
             #print "GNURADIO blocks_list= "
             #print self.second_blocks_list
             #print "2nd Stage topology matrix consistency= ", self.second_is_consistent        
@@ -265,7 +265,7 @@ class graph_check:
         gnuradio_handler.gnuradio_tb.stop()
         gnuradio_handler.gnuradio_tb.wait()
         time.sleep(3)
-        self.blocks_io          = gnuradio_handler.get_blocks_io(self)
+        self.blocks_io          = gnuradio_handler.get_blocks_io(self, graph_handler)
         ############################################################
         ## GET PERFORMANCE MEASUREMENTS
         gnuradio_handler.memory_usage(graph_handler, self, self.second_top_matrix)

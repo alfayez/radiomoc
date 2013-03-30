@@ -39,7 +39,7 @@ INT       = 4
 DOUBLE    = 4
 SHORT     = 2
 CHAR      = 1
-IMAG      = 2*2 # short*2
+IMAG      = 4*2 # FLOAT*2
 
 IO_IN_RATE   = 0
 IO_OUT_RATE  = 1
@@ -268,33 +268,34 @@ class graph_handler:
                              'throttle'        :["samplingRate", "samplingRate", DOUBLE]
                            }
          # BAD ASSUMPTION GET THESE VALUES FROM GNURADIO
-#        self.gnuradio_block_io_rates = {
-#             'file_source0'              :["samplingRate", "samplingRate",DOUBLE],
-#             'message_sink0'             :["samplingRate", "samplingRate",DOUBLE],
-#             'message_source1'           :["samplingRate", "samplingRate",DOUBLE],
-#             'file_sink0'                :["samplingRate", "samplingRate",DOUBLE],
-#             'message_source0'           :["samplingRate", "samplingRate",DOUBLE],
-#             'packed_to_unpacked_bb0'    :["samplingRate",  "samplingRate", INT],
-#             'map_bb0'                   :["samplingRate2", "samplingRate2",CHAR],
-#             'diff_encoder_bb0'          :["samplingRate2", "samplingRate2",CHAR],
-#             'constellation_receiver_cb0':["samplingRate",  "samplingRate2",CHAR],
-#             'diff_decoder_bb0'          :["samplingRate",  "samplingRate2",CHAR],
-#             'unpack_k_bits_bb0'         :["samplingRate",  "samplingRate2",CHAR],
-#             'correlate_access_code_bb0' :["samplingRate",  "samplingRate2",CHAR],
-#             'framer_sink_10'            :["samplingRate",  "samplingRate2",CHAR],
-#             'chunks_to_symbols_bc0'     :["samplingRate",  "samplingRate", IMAG],
-#             'pfb_arb_resampler_ccf0'    :["samplingRate",  "samplingRate", IMAG],
-#             'multiply_const_vcc2'       :["samplingRate2", "samplingRate2",IMAG],
-#             'multiply_const_vcc4'       :["samplingRate",  "samplingRate", IMAG],
-#             'noise_source_c0'           :["samplingRate",  "samplingRate", IMAG],
-#             'multiply_const_vcc0'       :["samplingRate",  "samplingRate", IMAG],
-#             'add_cc0'                   :["samplingRate2", "samplingRate2",IMAG],
-#             'multiply_const_vcc3'       :["samplingRate2", "samplingRate2",IMAG], 
-#             'multiply_const_vcc1'       :["samplingRate2", "samplingRate2",IMAG],
-#             'gr_agc2_cc0'               :["samplingRate",  "samplingRate2",IMAG],
-#             'fll_band_edge_cc0'         :["samplingRate",  "samplingRate2",IMAG],
-#             'pfb_clock_sync_ccf0'       :["samplingRate",  "samplingRate2",IMAG]
-#                           }
+        self.gnuradio_block_io_rates = {
+             'file_source'              :["samplingRate", "samplingRate",DOUBLE],
+             'message_sink'             :["samplingRate", "samplingRate",DOUBLE],
+             'message_source'           :["samplingRate", "samplingRate",DOUBLE],
+             'file_sink'                :["samplingRate", "samplingRate",DOUBLE],
+             'message_source'           :["samplingRate", "samplingRate",DOUBLE],
+             'packed_to_unpacked_bb'    :["samplingRate",  "samplingRate", CHAR],
+             'map_bb'                   :["samplingRate2", "samplingRate2",CHAR],
+             'diff_encoder_bb'          :["samplingRate2", "samplingRate2",CHAR],
+             'constellation_receiver_cb':["samplingRate",  "samplingRate2",CHAR],
+             'diff_decoder_bb'          :["samplingRate",  "samplingRate2",CHAR],
+             'unpack_k_bits_bb'         :["samplingRate",  "samplingRate2",CHAR],
+             'correlate_access_code_bb' :["samplingRate",  "samplingRate2",CHAR],
+             'framer_sink_1'            :["samplingRate",  "samplingRate2",CHAR],
+             'chunks_to_symbols_bc'     :["samplingRate",  "samplingRate", IMAG],
+             'pfb_arb_resampler_ccf'    :["samplingRate",  "samplingRate", IMAG],
+             'multiply_const_vcc'       :["samplingRate2", "samplingRate2",IMAG],
+             'multiply_const_vcc'       :["samplingRate",  "samplingRate", IMAG],
+             'noise_source_c'           :["samplingRate",  "samplingRate", IMAG],
+             'multiply_const_vcc'       :["samplingRate",  "samplingRate", IMAG],
+             'add_cc'                   :["samplingRate2", "samplingRate2",IMAG],
+             'multiply_const_vcc'       :["samplingRate2", "samplingRate2",IMAG], 
+             'multiply_const_vcc'       :["samplingRate2", "samplingRate2",IMAG],
+             'gr_agc2_cc'               :["samplingRate",  "samplingRate2",IMAG],
+             'fll_band_edge_cc'         :["samplingRate",  "samplingRate2",IMAG],
+             'pfb_clock_sync_ccf'       :["samplingRate",  "samplingRate2",IMAG],
+            'throttle'                  :["samplingRate", "samplingRate",DOUBLE]
+                           }
 
     def __del__(self):
         self.outfile.close()

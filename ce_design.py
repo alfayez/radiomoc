@@ -22,6 +22,9 @@ ALLOC_DEF = 0
 ALLOC_TOP = 1
 
 if __name__ == "__main__":
+    print 'Blocked waiting for GDB attach (pid = %d)' % (os.getpid(),)
+    raw_input ('Press Enter to continue: ')
+     
     infile_name_list = ["csp-sdf-rx.occ", "csp-sdf-tx.occ", "csp-sdf-sim.occ"]
     # the input occam program which we will be processing
     infile_name = infile_name_list[2]
@@ -60,23 +63,43 @@ if __name__ == "__main__":
 
 
 
+    start_vect = 1
+    end_vect   = 2
+    run_len    = 0
 
-    data_handler.collect_data(top_handler, design_handler, infile_name)
+    thru_vect = []
+    lat_vect  = []
+    mem_vect  = []
+    
+    mem_vect = range(start_vect, end_vect)
+    run_len       = len(mem_vect)
+    alloc_vect = [ALLOC_TOP]
+    alloc_vect.extend([ALLOC_TOP]*(run_len-1))
+    print "Total Iterations= ", run_len
+    #print "mem_vect= ", self.mem_vect, " alloc_vect= ", self.alloc_vect
+    i=0
+    #for i in xrange(run_len):
+    if 1:
+        [thru, lat, mem] = data_handler.collect_data(top_handler, design_handler, infile_name, mem_vect[i], alloc_vect[i])
+        thru_vect.append(thru)
+        lat_vect.append(lat)
+        #mem_vect.append(mem)
+        print "thru= ", thru, " lat= ", lat, " mem= ", mem
 
-
-
+    print "Thru Vect= ", thru_vect
+    print "lat_vect = ", lat_vect
+    #print "mem_vect = ", mem_vect
 
 
 
 
     #par_node = design_handler.find_parent_node(14, design_handler.second_top_matrix, design_handler.second_blocks_list)
     #print "PAR NODE= ", par_node
-    print "Final TOP MAtrix= "
-    print design_handler.second_top_matrix
+
     #design_handler.set_gnuradio_top_matrix()
     #design_handler.set_gnuradio_firing_vector()
-    design_handler.print_gnuradio_top_matrix()
-    design_handler.print_gnuradio_firing_vector()
+    #design_handler.print_gnuradio_top_matrix()
+    #design_handler.print_gnuradio_firing_vector()
 
     ###########################################
     ## Prints final design resource utilization

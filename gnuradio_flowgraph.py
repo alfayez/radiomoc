@@ -23,6 +23,7 @@ class gnuradio_tb_handler:
         self.gnuradio_tb = OCCAM_generated()
     def get_avg_exe_time(self, graph_handler, design_handler):
         i=0
+        '''
         for block in design_handler.second_blocks_list:
             design_handler.top_impl_info[EXE][block]            = self.gnuradio_tb.get_performance_measure(i,EXE_TIME_ENUM)
             design_handler.top_impl_info[EXE_VAR][block]        = self.gnuradio_tb.get_performance_measure(i,EXE_TIME_VAR_ENUM)
@@ -45,6 +46,7 @@ class gnuradio_tb_handler:
             else:
                 design_handler.top_impl_info[THRU][block] = float("infinity")
         design_handler.top_impl_info[LATENCY] = tot_latency
+        '''
     def memory_usage(self, graph_handler, design_handler, top_matrix):
         len_chans = len(top_matrix)
         design_handler.top_impl_info[MEM_TOT] = 0
@@ -122,16 +124,21 @@ class gnuradio_tb_handler:
             block_name = self.gnuradio_tb.blocks_list_top(i)
             block_loc.append(block_name)
         return copy.deepcopy(block_loc)
-    def get_blocks_io(self, design_handler):
+    def get_blocks_io(self, design_handler, graph_handler):
         block_loc = []
         col = self.gnuradio_tb.top_get_number_of_blocks()
         i = 0
+        block_find = ['frame_sink']
         for i in xrange(col):
+            print 
             ret_val = design_handler.is_sink(i, design_handler.second_top_matrix, design_handler.second_blocks_list)
             if ret_val[TUP_COND]:
                 block_io = 0
             else:
-                block_io = self.gnuradio_tb.get_block_io(i, 0)
+                #block_name =  design_handler.find_block_name(design_handler.second_blocks_list[i], design_handler.second_blocks_list)
+                block_name = self.get_block_key_name(design_handler.second_blocks_list[i],graph_handler.gnuradio_block_io_rates)
+                #block_io = self.gnuradio_tb.get_block_io(i, 0)
+                block_io  = graph_handler.gnuradio_block_io_rates[block_name][2]
             block_loc.append(block_io)
         return copy.deepcopy(block_loc)        
     def get_number_of_blocks(self):
@@ -140,3 +147,8 @@ class gnuradio_tb_handler:
     def get_number_of_edges(self):
             print "gnuradio num edges= "
             print self.gnuradio_tb.top_get_number_of_edges()
+    def get_block_key_name(self, block_name, block_dict):
+        for key in block_dict:
+            if key in block_name:
+                return key
+        return "None"
