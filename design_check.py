@@ -153,9 +153,11 @@ class graph_check:
             j = j + 1
     def get_avg_exe_time(self, graph_handler):
         i=0
+        self.top_impl_info[EXE] = {}
         for block in self.second_blocks_list:
-            self.top_impl_info[EXE][block]            = self.gnuradio_tb.get_pc_performance_metric(EXE_TIME_ENUM, i)
-            self.top_impl_info[EXE_VAR][block]        = self.gnuradio_tb.get_pc_performance_metric(EXE_TIME_VAR_ENUM, i)
+            self.top_impl_info[EXE][block]            = self.gnuradio_tb.get_pc_performance_metric(WORK_TIME_ENUM, i)
+            #print "Python block= ", block, " EXE_TIME= ", self.top_impl_info[EXE][block]
+            self.top_impl_info[EXE_VAR][block]        = self.gnuradio_tb.get_pc_performance_metric(WORK_TIME_VAR_ENUM, i)
             self.top_impl_info[PRODUCED][block]       = self.gnuradio_tb.get_pc_performance_metric(NPRODUCED_ENUM, i)
             self.top_impl_info[PRODUCED_VAR][block]   = self.gnuradio_tb.get_pc_performance_metric(NPRODUCED_VAR_ENUM, i)
             self.top_impl_info[NOUTPUT][block]        = self.gnuradio_tb.get_pc_performance_metric(NOUTPUT_ENUM, i)
@@ -165,10 +167,10 @@ class graph_check:
             i = i + 1
         # Calculate and print out Throughput and Latency
         tot_latency = 0
-        for block in self.top_impl_info[EXE]:
-            tot_latency = tot_latency + self.top_impl_info[EXE][block]
-            self.top_impl_info[THRU][block] = self.top_impl_info[PRODUCED][block]/self.top_impl_info[EXE][block]
-            print "tot_lantecy block= ", tot_latency
+        #for block in self.top_impl_info[EXE]:
+        #    tot_latency = tot_latency + self.top_impl_info[EXE][block]
+        #    self.top_impl_info[THRU][block] = self.top_impl_info[PRODUCED][block]/self.top_impl_info[EXE][block]
+        #    print "tot_lantecy block= ", tot_latency
     def setup_design_constraint(self, name_val, range_val):
         self.design_constraints[name_val] = range_val
     def print_design_constraints(self):
@@ -214,24 +216,27 @@ class graph_check:
                 print "Relaxed LP has no solution"
             elif errorCond == INTEGER_NO_SOL:
                 print "Integer problem has no soluion"
-        self.print_schedule(self.first_sched)
+        #self.print_schedule(self.first_sched)
         ############################################################
         ## GET PERFORMANCE MEASUREMENTS
         self.memory_usage(graph_handler, self.second_top_matrix)
         self.gnuradio_tb.alloc(self.cur_bufer_size, self.gnu_mem_alloc_policy)
         if self.DEBUG:
             print "Before Go"
+        self.gnuradio_tb.reset_pc_performance_metric()
+        time.sleep(1)
         self.gnuradio_tb.go()
         if self.DEBUG:
             print "Before Sleep"
-        time.sleep(2)
+        time.sleep(20)
         self.gnuradio_tb.set_pc_performance_metric()
         time.sleep(2)
         if self.DEBUG:
             print "GOODBUY"
         self.gnuradio_tb.stop()
         self.gnuradio_tb.wait()
-        #self.get_avg_exe_time(graph_handler)
+        self.get_avg_exe_time(graph_handler)
+        time.sleep(2)
     def print_schedule(self, sched):
         print sched
     def calculate_schedule(self, top_matrix):
@@ -504,7 +509,7 @@ class graph_check:
                         for i in xrange(list_len2):
                             self.set_rev_rate_consistency_helper(prev_nodes[i], top_matrix,block_list, cf_1)
                     if cf_2 != 1:
-                        print self.second_top_matrix
+                        #print self.second_top_matrix
                         self.set_rev_rate_consistency_helper([prev_path], top_matrix,block_list, cf_2)
                 
         #next_node = self.get_next_node(self, arc, top_matrix, block_list)

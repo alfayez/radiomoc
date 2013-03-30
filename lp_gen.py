@@ -63,7 +63,7 @@ def setup_sched_lp(mat):
     #################################################
     ## IMPORTANT RETURN INFO
     stat = lp.status
-    print "obj val= ", lp.obj.value
+    #print "obj val= ", lp.obj.value
 
     # setup the LP as a MIP
     for c in lp.cols:

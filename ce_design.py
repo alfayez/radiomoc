@@ -29,14 +29,14 @@ if __name__ == "__main__":
     top_handler    = graph_handler(infile_name)
     design_handler = graph_check()
     
-    design_handler.DEBUG = True
+    design_handler.DEBUG = False
     top_handler.set_fcn_interest(fcn_list)
     # peforms initial parameter parsing of the occam file
     top_handler.parse_input_file_param()
     top_handler.set_param_values()
     top_handler.parse_input_file_channels()
     top_handler.parse_proc_connection()
-    top_handler.print_top_matrix()
+    #top_handler.print_top_matrix()
 
     
     print "Genertaing Ptolemy simulation ..."
@@ -53,16 +53,16 @@ if __name__ == "__main__":
     # the topology matrix and firing vector
     design_handler.gnu_mem_alloc_policy = ALLOC_DEF
     design_handler.first_stage_topology_test(top_handler, top_handler.top_matrix)
-    for i in xrange(20):
+    for i in xrange(1):
         design_handler.second_stage_topology_test(top_handler, top_handler.top_matrix)
         # par_node = design_handler.find_parent_node(14, design_handler.second_top_matrix, design_handler.second_blocks_list)
         # print "PAR NODE= ", par_node
-        print "Final TOP MAtrix= "
-        print design_handler.second_top_matrix
+        #print "Final TOP MAtrix= "
+        #print design_handler.second_top_matrix
         design_handler.set_gnuradio_top_matrix()
         design_handler.set_gnuradio_firing_vector()
-        design_handler.print_gnuradio_top_matrix()
-        design_handler.print_gnuradio_firing_vector()
+        #design_handler.print_gnuradio_top_matrix()
+        #design_handler.print_gnuradio_firing_vector()
 
     ###########################################
     ## Prints final design resource utilization
