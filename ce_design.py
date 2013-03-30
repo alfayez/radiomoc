@@ -53,17 +53,16 @@ if __name__ == "__main__":
     # the topology matrix and firing vector
     design_handler.gnu_mem_alloc_policy = ALLOC_DEF
     design_handler.first_stage_topology_test(top_handler, top_handler.top_matrix)
-    design_handler.second_stage_topology_test(top_handler, top_handler.top_matrix)
-
-
-    #par_node = design_handler.find_parent_node(14, design_handler.second_top_matrix, design_handler.second_blocks_list)
-    #print "PAR NODE= ", par_node
-    print "Final TOP MAtrix= "
-    print design_handler.second_top_matrix
-    design_handler.set_gnuradio_top_matrix()
-    design_handler.set_gnuradio_firing_vector()
-    design_handler.print_gnuradio_top_matrix()
-    design_handler.print_gnuradio_firing_vector()
+    for i in xrange(20):
+        design_handler.second_stage_topology_test(top_handler, top_handler.top_matrix)
+        # par_node = design_handler.find_parent_node(14, design_handler.second_top_matrix, design_handler.second_blocks_list)
+        # print "PAR NODE= ", par_node
+        print "Final TOP MAtrix= "
+        print design_handler.second_top_matrix
+        design_handler.set_gnuradio_top_matrix()
+        design_handler.set_gnuradio_firing_vector()
+        design_handler.print_gnuradio_top_matrix()
+        design_handler.print_gnuradio_firing_vector()
 
     ###########################################
     ## Prints final design resource utilization

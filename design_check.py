@@ -50,16 +50,14 @@ IBUFF_FULL_VAR = 'input_buffer_fullness_var'
 OBUFF_FULL     = 'output_buffer_fullness'
 OBUFF_FULL_VAR = 'output_buffer_fullness_var'
 
-EXE_TIME_ENUM      = 0
-EXE_TIME_VAR_ENUM  = 1
-PRODUCED_ENUM      = 2
-PRODUCED_VAR_ENUM  = 3
-NOUTPUT_ENUM       = 4
-NOUTPUT_VAR_ENUM   = 5
-IBUFF_FULL_ENUM    = 6
-IBUFF_FULL_VAR_ENUM= 7
-OBUFF_FULL_ENUM    = 8
-OBUFF_FULL_VAR_ENUM= 9
+NOUTPUT_ENUM            = 0
+NOUTPUT_VAR_ENUM        = 1
+NPRODUCED_ENUM          = 2
+NPRODUCED_VAR_ENUM      = 3
+OUTPUT_BUFF_ENUM        = 4
+OUTPUT_BUFF_VAR_ENUM    = 5
+WORK_TIME_ENUM          = 6
+WORK_TIME_VAR_ENUM      = 7
 
 #IMPORTANT: This is the final gnuradio file that will be generated.
 #It must be here so you can import and reload eventually after
@@ -156,16 +154,14 @@ class graph_check:
     def get_avg_exe_time(self, graph_handler):
         i=0
         for block in self.second_blocks_list:
-            self.top_impl_info[EXE][block]            = self.gnuradio_tb.get_performance_measure(i,EXE_TIME_ENUM)
-            self.top_impl_info[EXE_VAR][block]        = self.gnuradio_tb.get_performance_measure(i,EXE_TIME_VAR_ENUM)
-            self.top_impl_info[PRODUCED][block]       = self.gnuradio_tb.get_performance_measure(i,PRODUCED_ENUM)
-            self.top_impl_info[PRODUCED_VAR][block]   = self.gnuradio_tb.get_performance_measure(i,PRODUCED_VAR_ENUM)
-            self.top_impl_info[NOUTPUT][block]        = self.gnuradio_tb.get_performance_measure(i,NOUTPUT_ENUM)
-            self.top_impl_info[NOUTPUT_VAR][block]    = self.gnuradio_tb.get_performance_measure(i,NOUTPUT_VAR_ENUM)
-            self.top_impl_info[IBUFF_FULL][block]     = self.gnuradio_tb.get_performance_measure(i,IBUFF_FULL_ENUM)
-            self.top_impl_info[IBUFF_FULL_VAR][block] = self.gnuradio_tb.get_performance_measure(i,IBUFF_FULL_VAR_ENUM)
-            self.top_impl_info[OBUFF_FULL][block]     = self.gnuradio_tb.get_performance_measure(i,OBUFF_FULL_VAR_ENUM)
-            self.top_impl_info[OBUFF_FULL_VAR][block] = self.gnuradio_tb.get_performance_measure(i,OBUFF_FULL_VAR_ENUM)
+            self.top_impl_info[EXE][block]            = self.gnuradio_tb.get_pc_performance_metric(EXE_TIME_ENUM, i)
+            self.top_impl_info[EXE_VAR][block]        = self.gnuradio_tb.get_pc_performance_metric(EXE_TIME_VAR_ENUM, i)
+            self.top_impl_info[PRODUCED][block]       = self.gnuradio_tb.get_pc_performance_metric(NPRODUCED_ENUM, i)
+            self.top_impl_info[PRODUCED_VAR][block]   = self.gnuradio_tb.get_pc_performance_metric(NPRODUCED_VAR_ENUM, i)
+            self.top_impl_info[NOUTPUT][block]        = self.gnuradio_tb.get_pc_performance_metric(NOUTPUT_ENUM, i)
+            self.top_impl_info[NOUTPUT_VAR][block]    = self.gnuradio_tb.get_pc_performance_metric(NOUTPUT_VAR_ENUM, i)
+            self.top_impl_info[OBUFF_FULL][block]     = self.gnuradio_tb.get_pc_performance_metric(OUTPUT_BUFF_ENUM, i)
+            self.top_impl_info[OBUFF_FULL_VAR][block] = self.gnuradio_tb.get_pc_performance_metric(OUTPUT_BUFF_VAR_ENUM, i)
             i = i + 1
         # Calculate and print out Throughput and Latency
         tot_latency = 0
@@ -229,11 +225,13 @@ class graph_check:
         if self.DEBUG:
             print "Before Sleep"
         time.sleep(2)
+        self.gnuradio_tb.set_pc_performance_metric()
         time.sleep(2)
         if self.DEBUG:
             print "GOODBUY"
         self.gnuradio_tb.stop()
-        self.get_avg_exe_time(graph_handler)
+        self.gnuradio_tb.wait()
+        #self.get_avg_exe_time(graph_handler)
     def print_schedule(self, sched):
         print sched
     def calculate_schedule(self, top_matrix):
