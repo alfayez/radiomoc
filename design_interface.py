@@ -78,8 +78,8 @@ if __name__ == "__main__":
     design_handler.second_stage_topology_test(top_handler, top_handler.top_matrix)
     # par_node = design_handler.find_parent_node(14, design_handler.second_top_matrix, design_handler.second_blocks_list)
     # print "PAR NODE= ", par_node
-    print "Final TOP MAtrix= "
-    print design_handler.second_top_matrix
+    #print "Final TOP MAtrix= "
+    #print design_handler.second_top_matrix
     #design_handler.print_gnuradio_top_matrix()
     #design_handler.print_gnuradio_firing_vector()
 

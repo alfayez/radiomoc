@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import sys, string, types, os, copy, time
 import getopt
 import numpy as np
@@ -22,4 +24,13 @@ class ce_interface:
         self.vect_range
     
 if __name__ == "__main__":
-    
+    print "Before system call"
+    out_file_name = "temp.dat"
+    in_file_name  = "csp-sdf-sim.occ"
+    alloc_policy  = str(1)
+    token_size    = str(4096)
+    vect_fact     = str(1)
+    run_time      = str(5)
+    command_str = "./design_interface.py -t "+token_size+" -l "+vect_fact+" -a "+alloc_policy+ " -r "+run_time+" -o "+out_file_name+" -i "+in_file_name
+    os.system(command_str)
+    print "Done with CE INTERFACE"

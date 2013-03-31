@@ -240,8 +240,8 @@ class graph_check:
         self.second_top_matrix = self.get_gnuradio_top_matrix()
         self.setup_visited_matrix()
         self.second_blocks_list = self.get_blocks_list()
-        print "second blocks_list= "
-        print self.second_blocks_list
+        #print "second blocks_list= "
+        #print self.second_blocks_list
         source_list             = self.find_sources(self.second_top_matrix, self.second_blocks_list)
         self.set_rate_consistency(source_list, self.second_top_matrix, self.second_blocks_list)
         self.second_is_consistent = self.is_consistent(self.second_top_matrix)
