@@ -59,31 +59,6 @@ class ce_interface:
             # same exact moment
             folder_name = folder_name+folder_name
         os.makedirs(dir_name+folder_name)
-        #print "dir_name+folder_name= ", dir_name+folder_name
-        #ofile_handler = open("data.dat", 'w')
-        #data_str      = self.infile_name+"\n"
-        #ofile_handler.write(data_str)
-        #data_str      = str(datetime.datetime.now())+"\n"
-        #ofile_handler.write(data_str)
-        #data_str      = "mem_tot_def" + " = \n" + str(self.mem_vect_def) + "\n"
-        #ofile_handler.write(data_str)
-        #data_str      = "lat_def" + " = \n" + str(self.lat_vect_def) + "\n"
-        #ofile_handler.write(data_str)
-        #data_str      = "through_def" + " = \n" + str(self.thru_vect_def) + "\n"
-        #ofile_handler.write(data_str)
-        #data_str      = "config_def" + " = \n" + str(self.config_vect_def) + "\n"
-        #ofile_handler.write(data_str)
-
-        #data_str      = "mem_tot_top" + " = \n" + str(self.mem_vect_top) + "\n"
-        #ofile_handler.write(data_str)
-        #data_str      = "lat_top" + " = \n" + str(self.lat_vect_top) + "\n"
-        #ofile_handler.write(data_str)
-        #data_str      = "thru_top" + " = \n" + str(self.thru_vect_top) + "\n"
-        #ofile_handler.write(data_str)
-        #data_str      = "config_top" + " = \n" + str(self.config_vect_top) + "\n"
-        #ofile_handler.write(data_str)
-        #ofile_handler.close()
-
         # make copies of raw data files for future use
         for fname in self.out_file_vect:
             os.system("cp"+" "+fname+" "+final_folder_name)
@@ -157,12 +132,12 @@ class ce_interface:
         max_top = ceil(max(self.thru_vect_top))
         max_def = ceil(max(self.thru_vect_def))
         max_both = max(max_top, max_def)
-        max_both = max_both*1.1
+        max_both = max_both*1.5
         min_top = ceil(max(self.thru_vect_top))
         min_def = ceil(max(self.thru_vect_def))
         min_both = min(min_top, min_def)
-        min_both = min_both/1.1
-        ylim(min_both, max_both)
+        min_both = min_both/1.3
+        ylim(0.0, max_both)
         pic_name = "throughput.png"
         savefig(pic_name, dpi=300)
         os.system("mv"+" "+pic_name+" "+final_folder_name)
