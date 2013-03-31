@@ -50,7 +50,7 @@ class ce_interface:
         vect_vect_loc.extend([self.vect_vect[len_vect]])
 
         # save data to special folder
-        save_file   = "data.dat"
+        #save_file   = "data.dat"
         dir_name    = '/home/alfayez/workspace/dissertation_data/'
         folder_name = str(datetime.date.today())+str(time.time())
         final_folder_name = dir_name+folder_name+"/"
@@ -60,30 +60,33 @@ class ce_interface:
             folder_name = folder_name+folder_name
         os.makedirs(dir_name+folder_name)
         #print "dir_name+folder_name= ", dir_name+folder_name
-        ofile_handler = open("data.dat", 'w')
-        data_str      = self.infile_name+"\n"
-        ofile_handler.write(data_str)
-        data_str      = str(datetime.datetime.now())+"\n"
-        ofile_handler.write(data_str)
-        data_str      = "mem_tot_def" + " = \n" + str(self.mem_vect_def) + "\n"
-        ofile_handler.write(data_str)
-        data_str      = "lat_def" + " = \n" + str(self.lat_vect_def) + "\n"
-        ofile_handler.write(data_str)
-        data_str      = "through_def" + " = \n" + str(self.thru_vect_def) + "\n"
-        ofile_handler.write(data_str)
-        data_str      = "config_def" + " = \n" + str(self.config_vect_def) + "\n"
-        ofile_handler.write(data_str)
+        #ofile_handler = open("data.dat", 'w')
+        #data_str      = self.infile_name+"\n"
+        #ofile_handler.write(data_str)
+        #data_str      = str(datetime.datetime.now())+"\n"
+        #ofile_handler.write(data_str)
+        #data_str      = "mem_tot_def" + " = \n" + str(self.mem_vect_def) + "\n"
+        #ofile_handler.write(data_str)
+        #data_str      = "lat_def" + " = \n" + str(self.lat_vect_def) + "\n"
+        #ofile_handler.write(data_str)
+        #data_str      = "through_def" + " = \n" + str(self.thru_vect_def) + "\n"
+        #ofile_handler.write(data_str)
+        #data_str      = "config_def" + " = \n" + str(self.config_vect_def) + "\n"
+        #ofile_handler.write(data_str)
 
-        data_str      = "mem_tot_top" + " = \n" + str(self.mem_vect_top) + "\n"
-        ofile_handler.write(data_str)
-        data_str      = "lat_top" + " = \n" + str(self.lat_vect_top) + "\n"
-        ofile_handler.write(data_str)
-        data_str      = "thru_top" + " = \n" + str(self.thru_vect_top) + "\n"
-        ofile_handler.write(data_str)
-        data_str      = "config_top" + " = \n" + str(self.config_vect_top) + "\n"
-        ofile_handler.write(data_str)
-        ofile_handler.close()
-        os.system("mv"+" "+save_file+" "+final_folder_name)
+        #data_str      = "mem_tot_top" + " = \n" + str(self.mem_vect_top) + "\n"
+        #ofile_handler.write(data_str)
+        #data_str      = "lat_top" + " = \n" + str(self.lat_vect_top) + "\n"
+        #ofile_handler.write(data_str)
+        #data_str      = "thru_top" + " = \n" + str(self.thru_vect_top) + "\n"
+        #ofile_handler.write(data_str)
+        #data_str      = "config_top" + " = \n" + str(self.config_vect_top) + "\n"
+        #ofile_handler.write(data_str)
+        #ofile_handler.close()
+
+        # make copies of raw data files for future use
+        for fname in self.out_file_vect:
+            os.system("cp"+" "+fname+" "+final_folder_name)
         #############################################################################
         # Latency Plot
         #############################################################################
@@ -119,7 +122,7 @@ class ce_interface:
         plot(vect_vect_loc, self.mem_vect_top, linewidth=2.0, color='green', label='Topology Allocation')
         scatter(vect_vect_loc, self.mem_vect_top, linewidth=2.0, color='green')
         xlabel('Vectorization Factor')
-        ylabel('Memory (bytes)')
+        ylabel('Memory (KB)')
         legend(loc= 'upper left')
         # set X-ticks
         set_xticks = np.linspace(vect_vect_loc[0], vect_vect_loc[len_vect-1], len_vect, endpoint=True)
@@ -144,7 +147,7 @@ class ce_interface:
         plot(vect_vect_loc, self.thru_vect_top, linewidth=2.0, color='green', label='Topology Allocation')
         scatter(vect_vect_loc, self.thru_vect_top, linewidth=2.0, color='green')
         xlabel('Vectorization Factor')
-        ylabel('Throughput (bytes/sec)')
+        ylabel('Throughput (KB/sec)')
         legend(loc= 'upper left')
         # set X-ticks
         set_xticks = np.linspace(vect_vect_loc[0], vect_vect_loc[len_vect-1], len_vect, endpoint=True)
@@ -204,13 +207,15 @@ class ce_interface:
         while line:
             if "memory_total" in line:
                 sanity_check = sanity_check + 1
-                mem_vect_local.extend([float(tokens[2])])
+                # divide by 1024 to make into KB
+                mem_vect_local.extend([float(tokens[2])/1024])
             elif "latency" in line:
                 sanity_check = sanity_check + 1
                 lat_vect_local.extend([float(tokens[2])])
             elif "throughput" in line:
+                # divide by 1024 to make into KB/s
                 sanity_check = sanity_check + 1
-                thru_vect_local.extend([float(tokens[2])])
+                thru_vect_local.extend([float(tokens[2])/1024])
             elif "configuration_time" in line:
                 sanity_check = sanity_check + 1
                 config_vect_local.extend([float(tokens[2])])                
