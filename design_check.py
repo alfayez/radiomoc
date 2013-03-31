@@ -50,7 +50,7 @@ IBUFF_FULL     = 'input_buffer_fullness'
 IBUFF_FULL_VAR = 'input_buffer_fullness_var'
 OBUFF_FULL     = 'output_buffer_fullness'
 OBUFF_FULL_VAR = 'output_buffer_fullness_var'
-
+CONFIG_TIME    = 'configuration_time'
 NOUTPUT_ENUM            = 0
 NOUTPUT_VAR_ENUM        = 1
 NPRODUCED_ENUM          = 2
@@ -115,7 +115,8 @@ class graph_check:
                               OBUFF_FULL     : {},
                               OBUFF_FULL_VAR : {},
                               LATENCY        : 0,
-                              THRU           : 0
+                              THRU           : 0,
+                              CONFIG_TIME    : 0
                           }
         self.DEBUG = False
     def setup_gnuradio_handle(self):
@@ -135,6 +136,8 @@ class graph_check:
         data_str      = "vect_factor = " + str(self.vect_factor)+"\n"
         ofile_handler.write(data_str)
         data_str      = "run_time = " + str(self.run_time)+"\n"
+        ofile_handler.write(data_str)
+        data_str      = CONFIG_TIME + " = " + str(self.top_impl_info[CONFIG_TIME])+"\n"
         ofile_handler.write(data_str)
         data_str      = MEM_TOT + " = " + str(self.top_impl_info[MEM_TOT]) + "\n"
         ofile_handler.write(data_str)
@@ -238,7 +241,12 @@ class graph_check:
             self.print_schedule(self.first_sched)
             print "1st Stage topology matrix consistency= ", self.first_is_consistent
     def second_stage_topology_test(self, graph_handler, top_matrix):
+        #self.top_impl_info[CONFIG_TIME]
+        start_time = 0.0
+        elapse_time = 0.0
+        start_time = time.time()
         self.gnuradio_tb.prealloc()
+        elapse_time = time.time()-start_time
         self.second_top_matrix = self.get_gnuradio_top_matrix()
         self.setup_visited_matrix()
         self.second_blocks_list = self.get_blocks_list()
@@ -266,12 +274,16 @@ class graph_check:
         ## GET PERFORMANCE MEASUREMENTS
         self.set_gnuradio_top_matrix()
         self.set_gnuradio_firing_vector()
+        start_time = time.time()
         self.gnuradio_tb.alloc(self.cur_bufer_size, self.gnu_mem_alloc_policy)
+        elapse_time = elapse_time+time.time()-start_time
         if self.DEBUG:
             print "Before Go"
         self.gnuradio_tb.reset_pc_performance_metric()
         time.sleep(1)
+        start_time = time.time()
         self.gnuradio_tb.go()
+        elapse_time = elapse_time+time.time()-start_time
         if self.DEBUG:
             print "Before Sleep"
         time.sleep(self.run_time)
@@ -279,8 +291,11 @@ class graph_check:
         time.sleep(2)
         if self.DEBUG:
             print "GOODBUY"
+        start_time = time.time()
         self.gnuradio_tb.stop()
         self.gnuradio_tb.wait()
+        elapse_time = elapse_time+time.time()-start_time
+        self.top_impl_info[CONFIG_TIME]=elapse_time
         self.get_avg_exe_time(graph_handler)
         #time.sleep(2)
     def print_schedule(self, sched):

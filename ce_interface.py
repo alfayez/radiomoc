@@ -26,9 +26,14 @@ class ce_interface:
         self.mem_vect_top      = []
         self.lat_vect_top      = []
         self.thru_vect_top     = []
+        self.config_vect_top   = []
+        
         self.mem_vect_def      = []
         self.lat_vect_def      = []
         self.thru_vect_def     = []
+        self.config_vect_def   = []
+        
+        self.infile_name       = ""
         
         self.i_cur         = 0 
 
@@ -36,41 +41,49 @@ class ce_interface:
         len_vect      = len(self.thru_vect_top)
         vect_vect_loc = []
         for i in xrange(len_vect-1):
-            self.lat_vect_def.extend([self.lat_vect_def[i]])
-            self.mem_vect_def.extend([self.mem_vect_def[i]])
-            self.thru_vect_def.extend([self.thru_vect_def[i]])
+            self.lat_vect_def.extend([self.lat_vect_def[0]])
+            self.mem_vect_def.extend([self.mem_vect_def[0]])
+            self.thru_vect_def.extend([self.thru_vect_def[0]])
+            self.config_vect_def.extend([self.config_vect_def[0]])
             vect_vect_loc.extend([self.vect_vect[i+1]])
 
         vect_vect_loc.extend([self.vect_vect[len_vect]])
 
         # save data to special folder
-        '''
-        folder_name = str(datetime.datetime.now())
-        if os.path.exsists(folder_name):
+        save_file   = "data.dat"
+        dir_name    = '/home/alfayez/workspace/dissertation_data/'
+        folder_name = str(datetime.date.today())+str(time.time())
+        final_folder_name = dir_name+folder_name+"/"
+        if os.path.exists(dir_name+folder_name):
             # in the off chance another directory was created at the
             # same exact moment
             folder_name = folder_name+folder_name
-        os.path.mkdir(folder_name)
-
-        ofile_handler = open(self.ofile_name, 'w')
+        os.makedirs(dir_name+folder_name)
+        #print "dir_name+folder_name= ", dir_name+folder_name
+        ofile_handler = open("data.dat", 'w')
         data_str      = self.infile_name+"\n"
         ofile_handler.write(data_str)
         data_str      = str(datetime.datetime.now())+"\n"
         ofile_handler.write(data_str)
-        data_str      = "token_size_orig = " + str(self.token_size_orig)+"\n"
+        data_str      = "mem_tot_def" + " = \n" + str(self.mem_vect_def) + "\n"
         ofile_handler.write(data_str)
-        data_str      = "vect_factor = " + str(self.vect_factor)+"\n"
+        data_str      = "lat_def" + " = \n" + str(self.lat_vect_def) + "\n"
         ofile_handler.write(data_str)
-        data_str      = "run_time = " + str(self.run_time)+"\n"
+        data_str      = "through_def" + " = \n" + str(self.thru_vect_def) + "\n"
         ofile_handler.write(data_str)
-        data_str      = MEM_TOT + " = " + str(self.top_impl_info[MEM_TOT]) + "\n"
+        data_str      = "config_def" + " = \n" + str(self.config_vect_def) + "\n"
         ofile_handler.write(data_str)
-        data_str      = LATENCY + " = " + str(self.top_impl_info[LATENCY]) + "\n"
+
+        data_str      = "mem_tot_top" + " = \n" + str(self.mem_vect_top) + "\n"
         ofile_handler.write(data_str)
-        data_str      = THRU + " = " + str(self.top_impl_info[THRU]) + "\n"
+        data_str      = "lat_top" + " = \n" + str(self.lat_vect_top) + "\n"
+        ofile_handler.write(data_str)
+        data_str      = "thru_top" + " = \n" + str(self.thru_vect_top) + "\n"
+        ofile_handler.write(data_str)
+        data_str      = "config_top" + " = \n" + str(self.config_vect_top) + "\n"
         ofile_handler.write(data_str)
         ofile_handler.close()
-        '''
+        os.system("mv"+" "+save_file+" "+final_folder_name)
         #############################################################################
         # Latency Plot
         #############################################################################
@@ -90,9 +103,10 @@ class ce_interface:
         max_top = ceil(max(self.lat_vect_top))
         max_def = ceil(max(self.lat_vect_def))
         max_both = max(max_top, max_def)
-        ylim(0.0, max_both)        
-        savefig("latency.png", dpi=300)
-        
+        ylim(0.0, max_both)
+        pic_name = "latency.png"
+        savefig(pic_name, dpi=300)
+        os.system("mv"+" "+pic_name+" "+final_folder_name)
         #############################################################################
         # Memory Plot
         #############################################################################
@@ -118,7 +132,9 @@ class ce_interface:
         min_def = ceil(min(self.mem_vect_def))
         min_both = min(min_top, min_def)
         ylim(0, max_both)
-        savefig("memory.png", dpi=300)
+        pic_name = "memory.png"
+        savefig(pic_name, dpi=300)
+        os.system("mv"+" "+pic_name+" "+final_folder_name)        
         #############################################################################
         # Throughput Plot
         #############################################################################
@@ -137,17 +153,50 @@ class ce_interface:
         max_top = ceil(max(self.thru_vect_top))
         max_def = ceil(max(self.thru_vect_def))
         max_both = max(max_top, max_def)
-        max_both = max_both*1.3
+        max_both = max_both*1.1
         min_top = ceil(max(self.thru_vect_top))
         min_def = ceil(max(self.thru_vect_def))
         min_both = min(min_top, min_def)
-        min_both = min_both/1.3
+        min_both = min_both/1.1
         ylim(min_both, max_both)
-        savefig("throughput.png", dpi=300)
+        pic_name = "throughput.png"
+        savefig(pic_name, dpi=300)
+        os.system("mv"+" "+pic_name+" "+final_folder_name)
+        #############################################################################
+        # Reconfiguration Time Plot
+        #############################################################################
+        figure(3)
+        plot(vect_vect_loc, self.config_vect_def, linewidth=2.0, color='blue', label='Default Allocation')
+        scatter(vect_vect_loc, self.config_vect_def, linewidth=2.0, color='blue')
+        plot(vect_vect_loc, self.config_vect_top, linewidth=2.0, color='green', label='Topology Allocation')
+        scatter(vect_vect_loc, self.config_vect_top, linewidth=2.0, color='green')
+        xlabel('Vectorization Factor')
+        ylabel('Reconfiguration Time (sec)')
+        legend(loc= 'upper left')
+        # set X-ticks
+        set_xticks = np.linspace(vect_vect_loc[0], vect_vect_loc[len_vect-1], len_vect, endpoint=True)
+        xticks(set_xticks)
+        # set y limit
+        max_top = max(self.config_vect_top)
+        max_def = max(self.config_vect_def)
+        max_both = max(max_top, max_def)
+        max_both = max_both*1.3
+        min_top = max(self.config_vect_top)
+        min_def = max(self.config_vect_def)
+        min_both = min(min_top, min_def)
+        min_both = min_both/1.3
+        print "max_both= ", max_both
+        print "self.config_vect_top= ", self.config_vect_top
+        print "self.config_vect_def= ", self.config_vect_def
+        ylim(0, max_both)
+        pic_name = "reconfiguration.png"
+        savefig(pic_name, dpi=300)
+        os.system("mv"+" "+pic_name+" "+final_folder_name)
+
         show()        
     def set_ranges(self, vect_range):
         self.vect_range
-    def add_data_point(self, file_name, mem_vect_local, lat_vect_local, thru_vect_local):
+    def add_data_point(self, file_name, mem_vect_local,lat_vect_local, thru_vect_local, config_vect_local):
         sanity_check  = 0
         ifile_handler = open(file_name, 'r')
         line          = ifile_handler.readline()
@@ -162,10 +211,13 @@ class ce_interface:
             elif "throughput" in line:
                 sanity_check = sanity_check + 1
                 thru_vect_local.extend([float(tokens[2])])
+            elif "configuration_time" in line:
+                sanity_check = sanity_check + 1
+                config_vect_local.extend([float(tokens[2])])                
             line   = ifile_handler.readline()
             tokens = line.split()
         ifile_handler.close()
-        if sanity_check == 3:
+        if sanity_check == 4:
             self.i_cur = self.i_cur + 1
             return True
         else:
@@ -174,8 +226,8 @@ class ce_interface:
     
 if __name__ == "__main__":
     print "Before system call"
-    vectorization_times = 5
-    run_time_duration   = 60
+    vectorization_times = 3
+    run_time_duration   = 3
     token_size_size     = 2048
 
     ce_handler    = ce_interface()
@@ -193,17 +245,20 @@ if __name__ == "__main__":
     in_file_name  = "csp-sdf-sim.occ"
     run_time      = str(run_time_duration)
     for i in xrange(len_range):
-        out_file_name = ce_handler.out_file_vect[i]
-        vect_fact = str(ce_handler.vect_vect[i])
-        alloc_policy = str(ce_handler.alloc_vect[i])
+        ce_handler.infile_name = in_file_name
+        out_file_name    = ce_handler.out_file_vect[i]
+        vect_fact        = str(ce_handler.vect_vect[i])
+        alloc_policy     = str(ce_handler.alloc_vect[i])
         
         command_str = "./design_interface.py -t "+token_size+" -l "+vect_fact+" -a "+alloc_policy+ " -r "+run_time+" -o "+out_file_name+" -i "+in_file_name
-        #os.system(command_str)
+        os.system(command_str)
 
         if i is 0:
-            ce_handler.add_data_point(out_file_name, ce_handler.mem_vect_def, ce_handler.lat_vect_def, ce_handler.thru_vect_def)
+            ce_handler.add_data_point(out_file_name, ce_handler.mem_vect_def, ce_handler.lat_vect_def,
+                                      ce_handler.thru_vect_def, ce_handler.config_vect_def)
         else:
-            ce_handler.add_data_point(out_file_name, ce_handler.mem_vect_top, ce_handler.lat_vect_top, ce_handler.thru_vect_top)
+            ce_handler.add_data_point(out_file_name, ce_handler.mem_vect_top, ce_handler.lat_vect_top,
+                                      ce_handler.thru_vect_top, ce_handler.config_vect_top)
 
     ce_handler.visualize_performance_results()
     
