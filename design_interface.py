@@ -87,5 +87,6 @@ if __name__ == "__main__":
     ## Prints final design resource utilization
     #design_handler.print_design_constraints();
     design_handler.print_top_impl_info_file()
+    #print design_handler.second_blocks_list
     ###########################################
     

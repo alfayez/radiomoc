@@ -210,6 +210,20 @@
       <key>_rotation</key><value>0</value>
     </param>
   </block><block>
+    <key>gr_throttle</key><param>
+      <key>id</key><value>throttle</value>
+    </param><param>
+      <key>_enabled</key><value>True</value>
+    </param><param>
+      <key>type</key><value>float</value>
+    </param><param>
+      <key>samples_per_second</key><value>samplingRate</value>
+    </param><param>
+      <key>_coordinate</key><value>(460, 200)</value>
+    </param><param>
+      <key>_rotation</key><value>0</value>
+    </param>
+  </block><block>
     <key>blks2_packet_encoder</key><param>
       <key>id</key><value>dbpskEnc</value>
     </param><param>
@@ -227,7 +241,7 @@
     </param><param>
       <key>payload_length</key><value>0</value>
     </param><param>
-      <key>_coordinate</key><value>(460, 200)</value>
+      <key>_coordinate</key><value>(690, 200)</value>
     </param><param>
       <key>_rotation</key><value>0</value>
     </param>
@@ -249,7 +263,7 @@
     </param><param>
       <key>log</key><value>False</value>
     </param><param>
-      <key>_coordinate</key><value>(690, 200)</value>
+      <key>_coordinate</key><value>(920, 200)</value>
     </param><param>
       <key>_rotation</key><value>0</value>
     </param>
@@ -265,7 +279,7 @@
     </param><param>
       <key>vlen</key><value>1</value>
     </param><param>
-      <key>_coordinate</key><value>(920, 200)</value>
+      <key>_coordinate</key><value>(1150, 200)</value>
     </param><param>
       <key>_rotation</key><value>0</value>
     </param>
@@ -281,7 +295,7 @@
     </param><param>
       <key>vlen</key><value>1</value>
     </param><param>
-      <key>_coordinate</key><value>(1150, 200)</value>
+      <key>_coordinate</key><value>(1380, 200)</value>
     </param><param>
       <key>_rotation</key><value>0</value>
     </param>
@@ -299,7 +313,7 @@
     </param><param>
       <key>seed</key><value>0</value>
     </param><param>
-      <key>_coordinate</key><value>(1380, 250)</value>
+      <key>_coordinate</key><value>(1610, 250)</value>
     </param><param>
       <key>_rotation</key><value>0</value>
     </param>
@@ -315,7 +329,7 @@
     </param><param>
       <key>vlen</key><value>1</value>
     </param><param>
-      <key>_coordinate</key><value>(1610, 250)</value>
+      <key>_coordinate</key><value>(1840, 250)</value>
     </param><param>
       <key>_rotation</key><value>0</value>
     </param>
@@ -329,7 +343,7 @@
     </param><param>
       <key>type</key><value>2</value>
     </param><param>
-      <key>_coordinate</key><value>(1840, 200)</value>
+      <key>_coordinate</key><value>(2070, 200)</value>
     </param><param>
       <key>_rotation</key><value>0</value>
     </param>
@@ -345,7 +359,7 @@
     </param><param>
       <key>vlen</key><value>1</value>
     </param><param>
-      <key>_coordinate</key><value>(2070, 200)</value>
+      <key>_coordinate</key><value>(2300, 200)</value>
     </param><param>
       <key>_rotation</key><value>0</value>
     </param>
@@ -361,7 +375,7 @@
     </param><param>
       <key>vlen</key><value>1</value>
     </param><param>
-      <key>_coordinate</key><value>(2300, 200)</value>
+      <key>_coordinate</key><value>(2530, 200)</value>
     </param><param>
       <key>_rotation</key><value>0</value>
     </param>
@@ -391,7 +405,7 @@
     </param><param>
       <key>sync_out</key><value>False</value>
     </param><param>
-      <key>_coordinate</key><value>(2530, 200)</value>
+      <key>_coordinate</key><value>(2760, 200)</value>
     </param><param>
       <key>_rotation</key><value>0</value>
     </param>
@@ -407,7 +421,7 @@
     </param><param>
       <key>threshold</key><value>-1</value>
     </param><param>
-      <key>_coordinate</key><value>(2760, 200)</value>
+      <key>_coordinate</key><value>(2990, 200)</value>
     </param><param>
       <key>_rotation</key><value>0</value>
     </param>
@@ -423,11 +437,15 @@
     </param><param>
       <key>vlen</key><value>1</value>
     </param><param>
-      <key>_coordinate</key><value>(2990, 200)</value>
+      <key>_coordinate</key><value>(3220, 200)</value>
     </param><param>
       <key>_rotation</key><value>0</value>
     </param>
   </block><connection>
+    <source_block_id>dataSrc</source_block_id><sink_block_id>throttle</sink_block_id><source_key>0</source_key><sink_key>0</sink_key>
+  </connection><connection>
+    <source_block_id>throttle</source_block_id><sink_block_id>dbpskEnc</sink_block_id><source_key>0</source_key><sink_key>0</sink_key>
+  </connection><connection>
     <source_block_id>dbpskMod</source_block_id><sink_block_id>channelFilter</sink_block_id><source_key>0</source_key><sink_key>0</sink_key>
   </connection><connection>
     <source_block_id>dbpskDemod</source_block_id><sink_block_id>dbpskDec</sink_block_id><source_key>0</source_key><sink_key>0</sink_key>
@@ -441,8 +459,6 @@
     <source_block_id>add</source_block_id><sink_block_id>basebandScale2</sink_block_id><source_key>0</source_key><sink_key>0</sink_key>
   </connection><connection>
     <source_block_id>dbpskDec</source_block_id><sink_block_id>dataOut</sink_block_id><source_key>0</source_key><sink_key>0</sink_key>
-  </connection><connection>
-    <source_block_id>dataSrc</source_block_id><sink_block_id>dbpskEnc</sink_block_id><source_key>0</source_key><sink_key>0</sink_key>
   </connection><connection>
     <source_block_id>dbpskEnc</source_block_id><sink_block_id>dbpskMod</sink_block_id><source_key>0</source_key><sink_key>0</sink_key>
   </connection><connection>

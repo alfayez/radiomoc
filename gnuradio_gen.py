@@ -196,7 +196,17 @@ class gnuradio_writer:
                 node1.appendChild(node2)                
                 node2 = self.write_element(PARAM_GNU, ROTATION, "0")
                 node1.appendChild(node2)                
-                infile_temp.close()                
+                infile_temp.close()
+            elif class_str is CLASS_THROTT_GNU:
+                loc_str = self.gnuradio_location_update(BLOCK_GNU, offset)
+                node2 = self.write_element(PARAM_GNU, "type", value[0])
+                node1.appendChild(node2)
+                node2 = self.write_element(PARAM_GNU, "samples_per_second", value[1])
+                node1.appendChild(node2)
+                node2 = self.write_element(PARAM_GNU, COORDINATE, loc_str)
+                node1.appendChild(node2)
+                node2 = self.write_element(PARAM_GNU, ROTATION, "0")
+                node1.appendChild(node2)
             elif class_str is CLASS_FIR_GNU:
                 # set location for block
                 loc_str = self.gnuradio_location_update(BLOCK_GNU, offset)                

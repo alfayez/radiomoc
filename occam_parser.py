@@ -101,7 +101,8 @@ class graph_handler:
                                'dataOut'          :[CLASS_USER_OUTPUT, CLASS_FILE_SINK_GNU, 0, 0],
                                'gauss'            :[CLASS_GAUSS,       CLASS_NOISE_GNU, 0, 0],
                                'gaussScale'       :[CLASS_SCALE,       CLASS_MULT_CONST_GNU, 0, 0],
-                               'add'              :[CLASS_ADDSUB,      CLASS_ADD_GNU, 0, 0]
+                               'add'              :[CLASS_ADDSUB,      CLASS_ADD_GNU, 0, 0],
+                               'throttle'         :[CLASS_SCALE,       CLASS_THROTT_GNU, 0, 0]
                               }
         ###################################################
         ## Provides port names for the respective blocks ##
@@ -121,7 +122,8 @@ class graph_handler:
                                'dbpskDec'        :[".input"],
                                'dataOut'         :[".input"],
                                'gaussScale'      :[".input"],
-                               'add'             :[".plus"]
+                               'add'             :[".plus"],
+                               'throttle'        :[".input"]
                               }
         self.block_port_dict_input_gnu = {'rfOut'    :["0"],
                                'channelFilter'   :["0"],
@@ -138,7 +140,8 @@ class graph_handler:
                                'dbpskDec'        :["0"],
                                'dataOut'         :["0"],
                                'gaussScale'      :["0"],
-                               'add'             :["0", "1"]
+                               'add'             :["0", "1"],
+                               'throttle'        :["0"]
                               }        
         self.block_port_dict_output = {'rfOut'   :[".output"],
                                'channelFilter'   :[".output"],
@@ -156,7 +159,8 @@ class graph_handler:
                                'dataOut'         :[".output"],
                                'gauss'           :[".output"],
                                'gaussScale'      :[".output"],
-                               'add'             :[".output"]
+                               'add'             :[".output"],
+                               'throttle'        :[".output"]
                               }
         self.block_port_dict_output_gnu = {'rfOut'   :["0"],
                                'channelFilter'   :["0"],
@@ -174,7 +178,8 @@ class graph_handler:
                                'dataOut'         :["0"],
                                'gauss'           :["0"],
                                'gaussScale'      :["0"],
-                               'add'             :["0"]
+                               'add'             :["0"],
+                               'throttle'        :["0"]
                               }
         ###################################################
         ## Provides offset in the x,y plane for blocks   ##
@@ -195,7 +200,8 @@ class graph_handler:
                              'dataOut'         :[0,  0],
                              'gauss'           :[50, 50],
                              'gaussScale'      :[50, 50], 
-                             'add'             :[0,  0]
+                             'add'             :[0,  0],
+                             'throttle'        :[0,  0]
                            }
         #######################################################
         ## Provides the initial value of blocks in ptolemy   ##
@@ -219,7 +225,8 @@ class graph_handler:
                            'dataOut'         :["None"],
                            'gauss'           :["None"],
                            'gaussScale'      :["None"],
-                           'add'             :["None"]
+                           'add'             :["None"],
+                           'throttle'        :["None"]
                             }
         self.value_dict_gnu = {'rfOut'       :["None"],
                            'channelFilter'   :["None"],
@@ -237,7 +244,8 @@ class graph_handler:
                            'dataOut'         :["None"],
                            'gauss'           :["None"],
                            'gaussScale'      :["None"],
-                           'add'             :["None"]
+                           'add'             :["None"],
+                           'throttle'        :["None"]
                             }
         self.block_io_rates = {
                              'rfOut'           :["samplingRate2", "samplingRate2",IMAG],
@@ -256,7 +264,8 @@ class graph_handler:
                              'dataOut'         :["samplingRate",  "samplingRate", DOUBLE],
                              'gauss'           :["samplingRate2", "samplingRate2",DOUBLE],
                              'gaussScale'      :["samplingRate2", "samplingRate2",DOUBLE], 
-                             'add'             :["samplingRate2", "samplingRate2",DOUBLE]
+                             'add'             :["samplingRate2", "samplingRate2",DOUBLE],
+                             'throttle'        :["samplingRate", "samplingRate", DOUBLE]
                            }
         self.gnuradio_block_io_rates = {
              'file_source0'              :["samplingRate", "samplingRate",DOUBLE],
@@ -283,7 +292,8 @@ class graph_handler:
              'diff_decoder_bb0'          :["samplingRate",  "samplingRate2",CHAR],
              'unpack_k_bits_bb0'         :["samplingRate",  "samplingRate2",CHAR],
              'correlate_access_code_bb0' :["samplingRate",  "samplingRate2",CHAR],
-             'framer_sink_10'            :["samplingRate",  "samplingRate2",CHAR]            
+             'framer_sink_10'            :["samplingRate",  "samplingRate2",CHAR],
+             'throttle'                  :["samplingRate", "samplingRate",DOUBLE]
                            }
 
     def __del__(self):
@@ -306,7 +316,8 @@ class graph_handler:
                            'gauss'            :["seedValG", "meanValG", "stdValG"],
                            'gaussScale'       :["gaussGain"],
                            'add'              :["None"],
-                           'basebandScale2'   :["rfGain2"]
+                           'basebandScale2'   :["rfGain2"],
+                           'throttle'         :["1"]
                             }
         self.value_dict_gnu = {'rfOut'        :["samplingRate2", "carrierFreq", "rfGain"],
                            'channelFilter'    :["complex", "1.0"],
@@ -324,7 +335,8 @@ class graph_handler:
                            'gauss'            :["complex", CLASS_GAUSS_GNU, "0.3", "0"],
                            'gaussScale'       :["complex", "gaussGain"],
                            'add'              :["complex", "2"],
-                           'basebandScale2'   :["complex", "bbGain2"]
+                           'basebandScale2'   :["complex", "bbGain2"],
+                           'throttle'         :["float", "samplingRate"]
                             }
     def is_process(self, line):
         if "PROC" in line:

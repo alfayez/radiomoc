@@ -25,7 +25,7 @@ CLASS_USRP_SINK_GNU      = "uhd_usrp_sink"
 CLASS_USRP_SRC_GNU       = "uhd_usrp_source"
 CLASS_FILE_SINK_GNU      = "gr_file_sink"
 CLASS_FILE_SRC_GNU       = "gr_file_source"
-
+CLASS_THROTT_GNU         = "gr_throttle"
 # Init Values
 XML_HEADER1 = "<?xml version=\"1.0\" standalone=\"no\"?>"
 XML_HEADER2 = ""
