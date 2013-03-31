@@ -100,9 +100,10 @@ class ce_interface:
         set_xticks = np.linspace(vect_vect_loc[0], vect_vect_loc[len_vect-1], len_vect, endpoint=True)
         xticks(set_xticks)
         # set y limit
-        max_top = ceil(max(self.lat_vect_top))
-        max_def = ceil(max(self.lat_vect_def))
+        max_top = max(self.lat_vect_top)
+        max_def = max(self.lat_vect_def)
         max_both = max(max_top, max_def)
+        max_both = max_both*1.3
         ylim(0.0, max_both)
         pic_name = "latency.png"
         savefig(pic_name, dpi=300)
