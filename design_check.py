@@ -126,6 +126,8 @@ class graph_check:
             self.gnuradio_tb = OCCAM_generated()
     def print_top_impl_info_file(self):
         ofile_handler = open(self.ofile_name, 'w')
+        data_str      = self.infile_name+"\n"
+        ofile_handler.write(data_str)
         data_str      = str(datetime.datetime.now())+"\n"
         ofile_handler.write(data_str)
         data_str      = "token_size_orig = " + str(self.token_size_orig)+"\n"
