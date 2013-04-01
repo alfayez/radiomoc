@@ -62,6 +62,8 @@ class ce_interface:
         # make copies of raw data files for future use
         for fname in self.out_file_vect:
             os.system("cp"+" "+fname+" "+final_folder_name)
+            os.system("cp"+" "+self.infile_name+" "+final_folder_name)
+            
         #############################################################################
         # Latency Plot
         #############################################################################
