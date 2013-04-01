@@ -145,7 +145,19 @@ class graph_check:
         ofile_handler.write(data_str)
         data_str      = THRU + " = " + str(self.top_impl_info[THRU]) + "\n"
         ofile_handler.write(data_str)
-        data_str      = "ALL" + " = " + str(self.top_impl_info) + "\n"
+        #data_str      = "ALL" + " = " + str(self.top_impl_info) + "\n"
+        data_str      = "ALL" + " = "+ "\n"
+        ofile_handler.write(data_str)
+        for item in self.top_impl_info.keys():
+            data_str = "\n"+item+"\n"
+            ofile_handler.write(data_str)
+            if item is not MEM_TOT and item is not CONSISTENT and item is not LATENCY and item is not THRU and item is not CONFIG_TIME:
+                for block in self.top_impl_info[item]:
+                    data_str = "\t " + block + " = " + str(self.top_impl_info[item][block])+"\n"
+                    ofile_handler.write(data_str)
+            else:
+                data_str = "\t " + block + " = " + str(self.top_impl_info[item])+"\n"
+                ofile_handler.write(data_str)
         ofile_handler.write(data_str)
         ofile_handler.close()
     def print_top_impl_info(self):
