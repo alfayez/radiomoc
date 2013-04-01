@@ -145,6 +145,8 @@ class graph_check:
         ofile_handler.write(data_str)
         data_str      = THRU + " = " + str(self.top_impl_info[THRU]) + "\n"
         ofile_handler.write(data_str)
+        data_str      = "ALL" + " = " + str(self.top_impl_info) + "\n"
+        ofile_handler.write(data_str)
         ofile_handler.close()
     def print_top_impl_info(self):
         for item in self.top_impl_info.keys():

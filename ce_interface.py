@@ -52,7 +52,7 @@ class ce_interface:
         # save data to special folder
         #save_file   = "data.dat"
         dir_name    = '/home/alfayez/workspace/dissertation_data/'
-        folder_name = str(datetime.date.today())+str(time.time())
+        folder_name = self.infile_name+"-"+str(datetime.date.today())+str(time.time())
         final_folder_name = dir_name+folder_name+"/"
         if os.path.exists(dir_name+folder_name):
             # in the off chance another directory was created at the
@@ -184,6 +184,7 @@ class ce_interface:
             if "memory_total" in line:
                 sanity_check = sanity_check + 1
                 # divide by 1024 to make into KB
+                print "tokens[2]= ", tokens[2]
                 mem_vect_local.extend([float(tokens[2])/1024])
             elif "latency" in line:
                 sanity_check = sanity_check + 1
@@ -194,7 +195,9 @@ class ce_interface:
                 thru_vect_local.extend([float(tokens[2])/1024])
             elif "configuration_time" in line:
                 sanity_check = sanity_check + 1
-                config_vect_local.extend([float(tokens[2])])                
+                config_vect_local.extend([float(tokens[2])])
+            if sanity_check == 4:
+                break
             line   = ifile_handler.readline()
             tokens = line.split()
         ifile_handler.close()
@@ -207,9 +210,11 @@ class ce_interface:
     
 if __name__ == "__main__":
     print "Before system call"
-    vectorization_times = 16
-    run_time_duration   = 900
-    token_size_size     = 4096
+    #vectorization_times = 16
+    #run_time_duration   = 900
+    vectorization_times = 2
+    run_time_duration   = 9
+    token_size_size     = 1024
 
     ce_handler    = ce_interface()
 
