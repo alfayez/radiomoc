@@ -173,7 +173,8 @@ class graph_check:
                 matrix_val      = top_matrix[i][j]                
                 if self.gnu_mem_alloc_policy == ALLOC_DEF:
                     if matrix_val > 0:
-                        mem_cur_chan    = MEM_GNU_DEF*data_size
+                        # GNU Radio allocates the buffers to be 2*32KB 
+                        mem_cur_chan    = MEM_GNU_DEF*2
                     else:
                         mem_cur_chan    = 0
                         matrix_val      = 0                        

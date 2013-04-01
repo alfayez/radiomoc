@@ -207,9 +207,9 @@ class ce_interface:
     
 if __name__ == "__main__":
     print "Before system call"
-    vectorization_times = 3
-    run_time_duration   = 3
-    token_size_size     = 2048
+    vectorization_times = 16
+    run_time_duration   = 900
+    token_size_size     = 4096
 
     ce_handler    = ce_interface()
 
