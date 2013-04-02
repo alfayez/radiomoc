@@ -186,7 +186,7 @@ class ce_interface:
             if "memory_total" in line:
                 sanity_check = sanity_check + 1
                 # divide by 1024 to make into KB
-                print "tokens[2]= ", tokens[2]
+                #print "tokens[2]= ", tokens[2]
                 mem_vect_local.extend([float(tokens[2])/1024])
             elif "latency" in line:
                 sanity_check = sanity_check + 1
@@ -212,11 +212,11 @@ class ce_interface:
     
 if __name__ == "__main__":
     print "Before system call"
-    #vectorization_times = 16
-    #run_time_duration   = 900
-    vectorization_times = 2
-    run_time_duration   = 9
-    token_size_size     = 1024
+    vectorization_times = 16
+    run_time_duration   = 900
+    #vectorization_times = 10
+    #run_time_duration   = 9
+    token_size_size     = 64
 
     ce_handler    = ce_interface()
 
