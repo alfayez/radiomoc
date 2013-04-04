@@ -269,6 +269,7 @@ class graph_handler:
                            }
          # BAD ASSUMPTION GET THESE VALUES FROM GNURADIO
         self.gnuradio_block_io_rates = {
+<<<<<<< HEAD
              'file_source'              :["samplingRate", "samplingRate",DOUBLE],
              'message_sink'             :["samplingRate", "samplingRate",DOUBLE],
              'message_source'           :["samplingRate", "samplingRate",DOUBLE],
@@ -295,6 +296,34 @@ class graph_handler:
              'fll_band_edge_cc'         :["samplingRate",  "samplingRate2",IMAG],
              'pfb_clock_sync_ccf'       :["samplingRate",  "samplingRate2",IMAG],
             'throttle'                  :["samplingRate", "samplingRate",DOUBLE]
+=======
+             'file_source0'              :["samplingRate", "samplingRate",DOUBLE],
+             'message_sink0'             :["samplingRate", "samplingRate",DOUBLE],
+             'message_source1'           :["samplingRate", "samplingRate",DOUBLE],
+             'file_sink0'                :["samplingRate", "samplingRate",DOUBLE],
+             'message_source0'           :["samplingRate", "samplingRate",DOUBLE],
+             'packed_to_unpacked_bb0'    :["samplingRate",  "samplingRate", INT],
+             'map_bb0'                   :["samplingRate2", "samplingRate2",CHAR],
+             'diff_encoder_bb0'          :["samplingRate2", "samplingRate2",CHAR],
+             'chunks_to_symbols_bc0'     :["samplingRate",  "samplingRate", IMAG],
+             'pfb_arb_resampler_ccf0'    :["samplingRate",  "samplingRate", IMAG],
+             'multiply_const_vcc2'       :["samplingRate2", "samplingRate2",IMAG],
+             'multiply_const_vcc4'       :["samplingRate",  "samplingRate", IMAG],
+             'noise_source_c0'           :["samplingRate",  "samplingRate", IMAG],
+             'multiply_const_vcc0'       :["samplingRate",  "samplingRate", IMAG],
+             'add_cc0'                   :["samplingRate2", "samplingRate2",IMAG],
+             'multiply_const_vcc3'       :["samplingRate2", "samplingRate2",IMAG], 
+             'multiply_const_vcc1'       :["samplingRate2", "samplingRate2",IMAG],
+             'gr_agc2_cc0'               :["samplingRate",  "samplingRate2",IMAG],
+             'fll_band_edge_cc0'         :["samplingRate",  "samplingRate2",IMAG],
+             'pfb_clock_sync_ccf0'       :["samplingRate",  "samplingRate2",IMAG],
+             'constellation_receiver_cb0':["samplingRate",  "samplingRate2",CHAR],
+             'diff_decoder_bb0'          :["samplingRate",  "samplingRate2",CHAR],
+             'unpack_k_bits_bb0'         :["samplingRate",  "samplingRate2",CHAR],
+             'correlate_access_code_bb0' :["samplingRate",  "samplingRate2",CHAR],
+             'framer_sink_10'            :["samplingRate",  "samplingRate2",CHAR],
+             'throttle'                  :["samplingRate", "samplingRate",DOUBLE]
+>>>>>>> a4640239af5646f13bb4328753aa0db58e43449b
                            }
 
     def __del__(self):
