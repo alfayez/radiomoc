@@ -1039,9 +1039,9 @@ PROC parameterGen(CHAN REAL32 paramOC!)
     carrierFreq   := 462562500.0
     rcFiltCoeff   := 1.0
     dataGain      := 10.0
-    rfGain        := 1.0
+    rfGain        := 0.2
     rfGain2       := 25.0
-    bbGain        := 1.3
+    bbGain        := 0.5
     bbGain2       := 1.0
     excessBw      := 0.35
     gaussGain     := 0.3
