@@ -248,11 +248,13 @@ class ce_interface:
     
 if __name__ == "__main__":
     print "Before system call"
-    #vectorization_times = 16
-    #run_time_duration   = 900
-    num_for_average     = 10
-    vectorization_times = 10
-    run_time_duration   = 60*5
+    num_for_average     = 1
+    vectorization_times = 3
+    run_time_duration   = 9
+
+    #num_for_average     = 10
+    #vectorization_times = 10
+    #run_time_duration   = 60*5
     token_size_size     = 128
 
     ce_handler    = ce_interface()
@@ -267,7 +269,9 @@ if __name__ == "__main__":
             ce_handler.alloc_vect.extend([1])
 
     token_size    = str(token_size_size)
-    in_file_name  = "csp-sdf-sim.occ"
+    #in_file_name  = "csp-sdf-tx.occ"
+    in_file_name  = "csp-sdf-rx.occ"
+    #in_file_name  = "csp-sdf-sim.occ"
     run_time      = str(run_time_duration)
     for i in xrange(len_range):
         for j in xrange(num_for_average):
@@ -277,7 +281,7 @@ if __name__ == "__main__":
             alloc_policy     = str(ce_handler.alloc_vect[i])
             print "Average Iteration= ", j        
             command_str = "./design_interface.py -t "+token_size+" -l "+vect_fact+" -a "+alloc_policy+ " -r "+run_time+" -o "+out_file_name+" -i "+in_file_name
-            #os.system(command_str)
+            os.system(command_str)
 
             if i is 0:
                 ce_handler.add_data_point(out_file_name, ce_handler.mem_vect_def, ce_handler.lat_vect_def,
