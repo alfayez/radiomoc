@@ -37,7 +37,7 @@ class ce_interface:
         
         self.i_cur         = 0 
 
-    def visualize_performance_results(self):
+    def visualize_performance_results(self, num_for_average):
         len_vect      = len(self.thru_vect_top)
         vect_vect_loc = []
         for i in xrange(len_vect-1):
@@ -61,7 +61,8 @@ class ce_interface:
         os.makedirs(dir_name+folder_name)
         # make copies of raw data files for future use
         for fname in self.out_file_vect:
-            os.system("cp"+" "+fname+" "+final_folder_name)
+            for i in xrange(num_for_average):
+                os.system("cp"+" "+fname+"-"+str(i)+".dat"+" "+final_folder_name)
             os.system("cp"+" "+self.infile_name+" "+final_folder_name)
             
         #############################################################################
@@ -177,27 +178,58 @@ class ce_interface:
         show()        
     def set_ranges(self, vect_range):
         self.vect_range
-    def add_data_point(self, file_name, mem_vect_local,lat_vect_local, thru_vect_local, config_vect_local):
+    def add_data_point(self, file_name, mem_vect_local,lat_vect_local, thru_vect_local, config_vect_local, run_num, run_len):
         sanity_check  = 0
         ifile_handler = open(file_name, 'r')
         line          = ifile_handler.readline()
         tokens        = line.split()
+        value         = -1
+        last_ind      = -1 
         while line:
+            last_ind = len(mem_vect_local)-1            
             if "memory_total" in line:
                 sanity_check = sanity_check + 1
                 # divide by 1024 to make into KB
                 #print "tokens[2]= ", tokens[2]
-                mem_vect_local.extend([float(tokens[2])/1024])
+                if(run_num is 0):
+                    value = float(tokens[2])/1024
+                    value = value/run_len
+                    mem_vect_local.extend([value])
+                else:
+                    value    = float(tokens[2])/1024
+                    value = value/run_len                    
+                    mem_vect_local[last_ind] = mem_vect_local[last_ind]+value
             elif "latency" in line:
                 sanity_check = sanity_check + 1
-                lat_vect_local.extend([float(tokens[2])])
+                if(run_num is 0):
+                    value = float(tokens[2])/1024
+                    value = value/run_len
+                    lat_vect_local.extend([value])
+                else:
+                    value = float(tokens[2])/1024
+                    value = value/run_len
+                    lat_vect_local[last_ind] = lat_vect_local[last_ind] + value
             elif "throughput" in line:
                 # divide by 1024 to make into KB/s
                 sanity_check = sanity_check + 1
-                thru_vect_local.extend([float(tokens[2])/1024])
+                if(run_num is 0):
+                    value = float(tokens[2])/1024
+                    value = value/run_len                    
+                    thru_vect_local.extend([value])
+                else:
+                    value = float(tokens[2])/1024
+                    value = value/run_len
+                    thru_vect_local[last_ind] = thru_vect_local[last_ind] + value                    
             elif "configuration_time" in line:
                 sanity_check = sanity_check + 1
-                config_vect_local.extend([float(tokens[2])])
+                if(run_num is 0):
+                    value = float(tokens[2])/1024
+                    value = value/run_len                    
+                    config_vect_local.extend([value])
+                else:
+                    value = float(tokens[2])/1024
+                    value = value/run_len
+                    config_vect_local[last_ind] = config_vect_local[last_ind] + value                    
             if sanity_check == 4:
                 break
             line   = ifile_handler.readline()
@@ -214,8 +246,9 @@ if __name__ == "__main__":
     print "Before system call"
     #vectorization_times = 16
     #run_time_duration   = 900
-    vectorization_times = 12
-    run_time_duration   = 12
+    num_for_average     = 3
+    vectorization_times = 3
+    run_time_duration   = 9
     token_size_size     = 512
 
     ce_handler    = ce_interface()
@@ -223,7 +256,7 @@ if __name__ == "__main__":
     ce_handler.vect_vect     = range(vectorization_times)
     len_range                = len(ce_handler.vect_vect)
     for i in xrange(len_range):
-        ce_handler.out_file_vect.extend(["temp"+str(i)+".dat"])
+        ce_handler.out_file_vect.extend(["temp"+str(i)])
         if i is 0:
             ce_handler.alloc_vect.extend([0])
         else:
@@ -233,21 +266,22 @@ if __name__ == "__main__":
     in_file_name  = "csp-sdf-sim.occ"
     run_time      = str(run_time_duration)
     for i in xrange(len_range):
-        ce_handler.infile_name = in_file_name
-        out_file_name    = ce_handler.out_file_vect[i]
-        vect_fact        = str(ce_handler.vect_vect[i])
-        alloc_policy     = str(ce_handler.alloc_vect[i])
-        
-        command_str = "./design_interface.py -t "+token_size+" -l "+vect_fact+" -a "+alloc_policy+ " -r "+run_time+" -o "+out_file_name+" -i "+in_file_name
-        #os.system(command_str)
+        for j in xrange(num_for_average):
+            ce_handler.infile_name = in_file_name
+            out_file_name    = ce_handler.out_file_vect[i]+"-"+str(j)+".dat"
+            vect_fact        = str(ce_handler.vect_vect[i])
+            alloc_policy     = str(ce_handler.alloc_vect[i])
+            print "Average Iteration= ", j        
+            command_str = "./design_interface.py -t "+token_size+" -l "+vect_fact+" -a "+alloc_policy+ " -r "+run_time+" -o "+out_file_name+" -i "+in_file_name
+            os.system(command_str)
 
-        if i is 0:
-            ce_handler.add_data_point(out_file_name, ce_handler.mem_vect_def, ce_handler.lat_vect_def,
-                                      ce_handler.thru_vect_def, ce_handler.config_vect_def)
-        else:
-            ce_handler.add_data_point(out_file_name, ce_handler.mem_vect_top, ce_handler.lat_vect_top,
-                                      ce_handler.thru_vect_top, ce_handler.config_vect_top)
+            if i is 0:
+                ce_handler.add_data_point(out_file_name, ce_handler.mem_vect_def, ce_handler.lat_vect_def,
+                                          ce_handler.thru_vect_def, ce_handler.config_vect_def, j, num_for_average)
+            else:
+                ce_handler.add_data_point(out_file_name, ce_handler.mem_vect_top, ce_handler.lat_vect_top,
+                                          ce_handler.thru_vect_top, ce_handler.config_vect_top, j, num_for_average)
 
-    ce_handler.visualize_performance_results()
+    ce_handler.visualize_performance_results(num_for_average)
     
     print "Done with CE INTERFACE"
