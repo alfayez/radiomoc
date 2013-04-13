@@ -6,12 +6,14 @@ import numpy as np
 import scipy
 import fractions
 import subprocess
+import matplotlib.pyplot as plt
 
 from pylab        import *
 from ptolemy_gen  import *
 from gnuradio_gen import *
 from lp_gen       import *
 from occam_parser import *
+
 
 import occam_parser as occam
 
@@ -75,7 +77,7 @@ class ce_interface:
         plot(vect_vect_loc, self.lat_vect_top, linewidth=2.0, color='green', label='Topology Allocation')
         scatter(vect_vect_loc, self.lat_vect_top, linewidth=2.0, color='green')
         xlabel('Vectorization Factor')
-        ylabel('Latency (sec)')
+        ylabel('Latency (ms)')
         legend(loc= 'upper left')
         # set X-ticks
         set_xticks = np.linspace(vect_vect_loc[0], vect_vect_loc[len_vect-1], len_vect, endpoint=True)
@@ -86,6 +88,7 @@ class ce_interface:
         max_both = max(max_top, max_def)
         max_both = max_both*1.3
         ylim(0.0, max_both)
+        #plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
         pic_name = "latency.png"
         savefig(pic_name, dpi=300)
         os.system("mv"+" "+pic_name+" "+final_folder_name)
@@ -153,7 +156,7 @@ class ce_interface:
         plot(vect_vect_loc, self.config_vect_top, linewidth=2.0, color='green', label='Topology Allocation')
         scatter(vect_vect_loc, self.config_vect_top, linewidth=2.0, color='green')
         xlabel('Vectorization Factor')
-        ylabel('Reconfiguration Time (sec)')
+        ylabel('Reconfiguration Time (ms)')
         legend(loc= 'upper left')
         # set X-ticks
         set_xticks = np.linspace(vect_vect_loc[0], vect_vect_loc[len_vect-1], len_vect, endpoint=True)
@@ -171,6 +174,7 @@ class ce_interface:
         print "self.config_vect_top= ", self.config_vect_top
         print "self.config_vect_def= ", self.config_vect_def
         ylim(0, max_both)
+        #plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
         pic_name = "reconfiguration.png"
         savefig(pic_name, dpi=300)
         os.system("mv"+" "+pic_name+" "+final_folder_name)
@@ -202,11 +206,11 @@ class ce_interface:
             elif "latency" in line:
                 sanity_check = sanity_check + 1
                 if(run_num is 0):
-                    value = float(tokens[2])/1024
+                    value = float(tokens[2])*1000 # make ms instead of second
                     value = value/run_len
                     lat_vect_local.extend([value])
                 else:
-                    value = float(tokens[2])/1024
+                    value = float(tokens[2])*1000
                     value = value/run_len
                     lat_vect_local[last_ind] = lat_vect_local[last_ind] + value
             elif "throughput" in line:
@@ -223,11 +227,11 @@ class ce_interface:
             elif "configuration_time" in line:
                 sanity_check = sanity_check + 1
                 if(run_num is 0):
-                    value = float(tokens[2])/1024
+                    value = float(tokens[2])*1000
                     value = value/run_len                    
                     config_vect_local.extend([value])
                 else:
-                    value = float(tokens[2])/1024
+                    value = float(tokens[2])*1000
                     value = value/run_len
                     config_vect_local[last_ind] = config_vect_local[last_ind] + value                    
             if sanity_check == 4:
@@ -273,7 +277,7 @@ if __name__ == "__main__":
             alloc_policy     = str(ce_handler.alloc_vect[i])
             print "Average Iteration= ", j        
             command_str = "./design_interface.py -t "+token_size+" -l "+vect_fact+" -a "+alloc_policy+ " -r "+run_time+" -o "+out_file_name+" -i "+in_file_name
-            os.system(command_str)
+            #os.system(command_str)
 
             if i is 0:
                 ce_handler.add_data_point(out_file_name, ce_handler.mem_vect_def, ce_handler.lat_vect_def,
