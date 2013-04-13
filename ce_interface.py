@@ -212,11 +212,11 @@ class ce_interface:
     
 if __name__ == "__main__":
     print "Before system call"
-    vectorization_times = 16
-    run_time_duration   = 900
-    #vectorization_times = 10
-    #run_time_duration   = 9
-    token_size_size     = 64
+    #vectorization_times = 16
+    #run_time_duration   = 900
+    vectorization_times = 12
+    run_time_duration   = 12
+    token_size_size     = 512
 
     ce_handler    = ce_interface()
 
@@ -239,7 +239,7 @@ if __name__ == "__main__":
         alloc_policy     = str(ce_handler.alloc_vect[i])
         
         command_str = "./design_interface.py -t "+token_size+" -l "+vect_fact+" -a "+alloc_policy+ " -r "+run_time+" -o "+out_file_name+" -i "+in_file_name
-        os.system(command_str)
+        #os.system(command_str)
 
         if i is 0:
             ce_handler.add_data_point(out_file_name, ce_handler.mem_vect_def, ce_handler.lat_vect_def,

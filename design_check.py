@@ -297,7 +297,8 @@ class graph_check:
         self.set_gnuradio_top_matrix()
         self.set_gnuradio_firing_vector()
         start_time = time.time()
-        self.gnuradio_tb.alloc(self.cur_bufer_size, self.gnu_mem_alloc_policy)
+        #self.gnuradio_tb.alloc(self.cur_bufer_size, self.gnu_mem_alloc_policy)
+        self.gnuradio_tb.alloc(self.token_size, self.gnu_mem_alloc_policy)
         elapse_time = elapse_time+time.time()-start_time
         if self.DEBUG:
             print "Before Go"
