@@ -3,7 +3,7 @@
 # Gnuradio Python Flow Graph
 # Title: Occam Generated
 # Author: Almohanad Fayez
-# Generated: Sat Apr 13 09:58:34 2013
+# Generated: Sat Apr 13 16:56:46 2013
 ##################################################
 
 from gnuradio import analog
@@ -62,7 +62,7 @@ class OCCAM_generated(grc_wxgui.top_block_gui):
 				samples_per_symbol=samplingRate2/samplingRate,
 				bits_per_symbol=1,
 				access_code="",
-				pad_for_usrp=True,
+				pad_for_usrp=False,
 			),
 			payload_length=0,
 		)

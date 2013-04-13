@@ -89,12 +89,15 @@ class graph_check:
         self.gnu_mem_alloc_policy = ALLOC_DEF
         # blocks to be excluded in latency calculation
         self.latency_ref          = {
-            'csp-sdf-sim.occ': ['noise_source0', 'multiply_const_vcc0']
-
+            'csp-sdf-sim.occ' : ['noise_source0', 'multiply_const_vcc0'],
+            'csp-sdf-rx.occ'  : [],
+            'csp-sdf-tx.occ'  : []
             }
         # block to be used in calculating flowgraph throughput
         self.throughput_ref       = {
-            'csp-sdf-sim.occ' : 'message_source1'
+            'csp-sdf-sim.occ' : 'message_source1',
+            'csp-sdf-rx.occ'  : 'multiply_const_vcc1',
+            'csp-sdf-tx.occ'  : 'multiply_const_vcc1'
             }
         self.top_impl_info = {
                               # whether a graph is consistent or not

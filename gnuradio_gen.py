@@ -983,7 +983,7 @@ class gnuradio_writer:
                 node1.appendChild(node2)
                 node2 = self.write_element(PARAM_GNU, "access_code", "")
                 node1.appendChild(node2)
-                node2 = self.write_element(PARAM_GNU, "pad_for_usrp", "True")
+                node2 = self.write_element(PARAM_GNU, "pad_for_usrp", "False")
                 node1.appendChild(node2)
                 node2 = self.write_element(PARAM_GNU, "payload_length", "0")
                 node1.appendChild(node2)
