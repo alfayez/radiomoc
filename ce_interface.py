@@ -248,7 +248,7 @@ class ce_interface:
     
 if __name__ == "__main__":
     print "Before system call"
-<<<<<<< HEAD
+
     num_for_average     = 1
     vectorization_times = 3
     run_time_duration   = 9
@@ -256,13 +256,7 @@ if __name__ == "__main__":
     #num_for_average     = 10
     #vectorization_times = 10
     #run_time_duration   = 60*5
-=======
-    #vectorization_times = 16
-    #run_time_duration   = 900
-    num_for_average     = 1
-    vectorization_times = 3
-    run_time_duration   = 9
->>>>>>> 2ea613051545a23f42a54488ebc000a95995db7a
+
     token_size_size     = 128
 
     ce_handler    = ce_interface()
@@ -277,15 +271,11 @@ if __name__ == "__main__":
             ce_handler.alloc_vect.extend([1])
 
     token_size    = str(token_size_size)
-<<<<<<< HEAD
-    #in_file_name  = "csp-sdf-tx.occ"
-    in_file_name  = "csp-sdf-rx.occ"
-    #in_file_name  = "csp-sdf-sim.occ"
-=======
+
     in_file_name  = "csp-sdf-sim.occ"
     #in_file_name  = "csp-sdf-tx.occ"
     #in_file_name  = "csp-sdf-rx.occ"    
->>>>>>> 2ea613051545a23f42a54488ebc000a95995db7a
+
     run_time      = str(run_time_duration)
     for i in xrange(len_range):
         for j in xrange(num_for_average):
