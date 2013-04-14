@@ -270,6 +270,7 @@ if __name__ == "__main__":
     #in_file_name  = "csp-sdf-sim.occ"
     in_file_name  = "csp-sdf-tx.occ"
     #in_file_name  = "csp-sdf-rx.occ"    
+
     run_time      = str(run_time_duration)
     for i in xrange(len_range):
         for j in xrange(num_for_average):
