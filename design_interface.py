@@ -76,6 +76,7 @@ if __name__ == "__main__":
     design_handler.first_stage_topology_test(top_handler, top_handler.top_matrix)
 
     design_handler.second_stage_topology_test(top_handler, top_handler.top_matrix)
+    design_handler.print_top_impl_info_file()
     # par_node = design_handler.find_parent_node(14, design_handler.second_top_matrix, design_handler.second_blocks_list)
     # print "PAR NODE= ", par_node
     #print "Final TOP MAtrix= "
@@ -86,7 +87,7 @@ if __name__ == "__main__":
     ###########################################
     ## Prints final design resource utilization
     #design_handler.print_design_constraints();
-    design_handler.print_top_impl_info_file()
+    #design_handler.print_top_impl_info_file()
     #print design_handler.second_blocks_list
     ###########################################
     

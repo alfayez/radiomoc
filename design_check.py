@@ -129,6 +129,7 @@ class graph_check:
             # set the gnuradio top block handler to the one generated
             self.gnuradio_tb = OCCAM_generated()
     def print_top_impl_info_file(self):
+        print "WRTITE TO FILE= ", self.ofile_name
         ofile_handler = open(self.ofile_name, 'w')
         data_str      = self.infile_name+"\n"
         ofile_handler.write(data_str)
@@ -161,7 +162,12 @@ class graph_check:
                 data_str = "\t " + block + " = " + str(self.top_impl_info[item])+"\n"
                 ofile_handler.write(data_str)
         ofile_handler.write(data_str)
-        
+       
+        j=0 
+        for block in self.second_blocks_list:
+             data_str=block+" IO-SIG= "+str(self.gnuradio_tb.get_block_io(j))
+             ofile_handler.write(data_str)
+             j = j + 1
         data_str      = "Second Topology Matrix= \n" + str(self.second_top_matrix)
         ofile_handler.write(data_str)
         data_str      = "\nSecond Blocks List= \n" + str(self.second_blocks_list)
@@ -267,6 +273,7 @@ class graph_check:
         start_time = 0.0
         elapse_time = 0.0
         start_time = time.time()
+        print "BEFORE PREALLOC"
         self.gnuradio_tb.prealloc()
         elapse_time = time.time()-start_time
         self.second_top_matrix = self.get_gnuradio_top_matrix()
@@ -290,10 +297,10 @@ class graph_check:
             print "Second Stage"
             if errorCond == OK:
                 print "Found Schedule"
-            elif errorCond == RELAXED_NO_SOL:
-                print "Relaxed LP has no solution"
-            elif errorCond == INTEGER_NO_SOL:
-                print "Integer problem has no soluion"
+        if errorCond == RELAXED_NO_SOL:
+            print "Relaxed LP has no solution"
+        elif errorCond == INTEGER_NO_SOL:
+            print "Integer problem has no soluion"
         #self.print_schedule(self.first_sched)
         ############################################################
         ## GET PERFORMANCE MEASUREMENTS
@@ -301,6 +308,7 @@ class graph_check:
         self.set_gnuradio_firing_vector()
         start_time = time.time()
         #self.gnuradio_tb.alloc(self.cur_bufer_size, self.gnu_mem_alloc_policy)
+        print "BEFORE ALLOC"
         self.gnuradio_tb.alloc(self.token_size, self.gnu_mem_alloc_policy)
         elapse_time = elapse_time+time.time()-start_time
         if self.DEBUG:
@@ -308,22 +316,28 @@ class graph_check:
         self.gnuradio_tb.reset_pc_performance_metric()
         time.sleep(1)
         start_time = time.time()
+        print "BEFORE GO"
         self.gnuradio_tb.go()
+        print "AFTER GO"
         elapse_time = elapse_time+time.time()-start_time
         if self.DEBUG:
             print "Before Sleep"
+	print "BEFORE SLEEP= ", self.run_time
         time.sleep(self.run_time)
+        print "BEFORE PERFRMANCE"
         self.gnuradio_tb.set_pc_performance_metric()
         time.sleep(2)
         if self.DEBUG:
             print "GOODBUY"
         start_time = time.time()
+        print "BEFORE STOP"
         self.gnuradio_tb.stop()
         self.gnuradio_tb.wait()
         elapse_time = elapse_time+time.time()-start_time
         self.top_impl_info[CONFIG_TIME]=elapse_time
         self.get_avg_exe_time(graph_handler)
         #time.sleep(2)
+        print "EXIT 2nd "
     def print_schedule(self, sched):
         print sched
     def calculate_schedule(self, top_matrix):

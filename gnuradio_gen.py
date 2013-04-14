@@ -101,7 +101,8 @@ class gnuradio_writer:
         elif req_type is DIRECT_GNU:
             loc_str = "(" + str(DIRECT_LOC[X_AXIS]) + ", " + str(DIRECT_LOC[Y_AXIS]) + ")"
         else:
-            exit("ERROR: Found in gnuradio_location_update method. Parameter passed is incompatible\n")
+            print "ERROR: Found in gnuradio_location_update method. Parameter passed is incompatible\n"
+            exit(1)
         return copy.deepcopy(loc_str)
     def convert_loc_to_str(self, loc):
         loc_str = "{" + str(loc[X_AXIS]) + ", " + str(loc[Y_AXIS]) + "}"
@@ -114,14 +115,16 @@ class gnuradio_writer:
         elif type_str == BLOCK_GNU:
             return copy.deepcopy(self.block_loc)
         else:
-            exit("ERROR: Found in current_location method.  Invalid request\n")
+            print "ERROR: Found in current_location method.  Invalid request\n"
+            exit(1)
     def set_location(self, type_str, loc):
         if type_str == PARAM_GNU:
             self.param_loc = copy.deepcopy(loc)
         elif type_str == BLOCK_GNU:
             self.block_loc = copy.deepcopy(loc)
         else:
-            exit("ERROR: Found in current_location method.  Invalid request\n")
+            print "ERROR: Found in current_location method.  Invalid request\n"
+            exit(1)
     def gnuradio_location_gen(self, offset):
 
         x_axis_temp = self.block_loc[X_AXIS] + BLOCK_STEP/2
@@ -1154,7 +1157,7 @@ class gnuradio_writer:
         #    print "port"            
         else:
             print "ERROR: Found in write_to_gnuradio method. Parameter passed is incompatible= ",  type_str
-            exit(-1)            
+            exit(1)            
         return node1
     def link_in_gnuradio_file(self, block_out, out_index, block_in, in_index):
         node1 = self.doc.createElement("connection")

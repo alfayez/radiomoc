@@ -146,7 +146,8 @@ class ptolemy_writer:
         elif req_type is DIRECT:
             loc_str = "{" + str(DIRECT_LOC[X_AXIS]) + ", " + str(DIRECT_LOC[Y_AXIS]) + "}"            
         else:
-            exit("ERROR: Found in ptolemy_location_update method. Parameter passed is incompatible\n")
+            print "ERROR: Found in ptolemy_location_update method. Parameter passed is incompatible\n"
+            exit(1)
         return copy.deepcopy(loc_str)
     def convert_loc_to_str(self, loc):
         loc_str = "{" + str(loc[X_AXIS]) + ", " + str(loc[Y_AXIS]) + "}"
@@ -160,14 +161,16 @@ class ptolemy_writer:
         elif type_str == BLOCK:
             return copy.deepcopy(self.block_loc)
         else:
-            exit("ERROR: Found in current_location method.  Invalid request\n")
+            print "ERROR: Found in current_location method.  Invalid request\n"
+            exit(1)
     def set_location(self, type_str, loc):
         if type_str == PARAM:
             self.param_loc = copy.deepcopy(loc)
         elif type_str == BLOCK:
             self.block_loc = copy.deepcopy(loc)
         else:
-            exit("ERROR: Found in current_location method.  Invalid request\n")
+            print "ERROR: Found in current_location method.  Invalid request\n"
+            exit(1)
     def ptolemy_location_gen(self, offset):
 
         x_axis_temp = self.block_loc[X_AXIS] + BLOCK_STEP/2
@@ -1558,7 +1561,7 @@ class ptolemy_writer:
                 return node0                
             else:
                print "ERROR: Found in write_to_ptolemy_file method. Unknown Block Class = ", class_str
-               exit(-1)
+               exit(1)
         
         elif type_str is CH:
             node1 = self.write_element(RELATION, name, class_str,"None")
@@ -1591,7 +1594,7 @@ class ptolemy_writer:
             return node1
         else:
             print "ERROR: Found in write_to_ptolemy method. Parameter passed is incompatible= ",  type_str
-            exit(-1)
+            exit(1)
 
         return node1
     def link_in_ptolemy_file(self, out_unit, in_unit, name_relation):

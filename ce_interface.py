@@ -248,40 +248,48 @@ class ce_interface:
     
 if __name__ == "__main__":
     print "Before system call"
-    #vectorization_times = 16
-    #run_time_duration   = 900
-    num_for_average     = 10
-    vectorization_times = 16
-    run_time_duration   = 60*5
-    token_size_size     = 128
-
+    num_for_average     = 2 
+    vectorization_times = 10
+    #run_time_duration   = 60*5
+    run_time_duration   = 9 
+    token_size_size     = 1024
+    start_vect          = 5
     ce_handler    = ce_interface()
 
-    ce_handler.vect_vect     = range(vectorization_times)
+    ce_handler.vect_vect     = range(start_vect, vectorization_times)
     len_range                = len(ce_handler.vect_vect)
-    for i in xrange(len_range):
+    for i in range(start_vect, vectorization_times):
         ce_handler.out_file_vect.extend(["temp"+str(i)])
         if i is 0:
             ce_handler.alloc_vect.extend([0])
         else:
             ce_handler.alloc_vect.extend([1])
-
+    print "outfile_vect = ", ce_handler.out_file_vect
     token_size    = str(token_size_size)
     #in_file_name  = "csp-sdf-sim.occ"
     in_file_name  = "csp-sdf-tx.occ"
     #in_file_name  = "csp-sdf-rx.occ"    
-
+    print "outfile_vect= ", ce_handler.out_file_vect
     run_time      = str(run_time_duration)
-    for i in xrange(len_range):
-        for j in xrange(num_for_average):
+    for i in range(vectorization_times-start_vect):
+        for j in range(num_for_average):
+            i_vect = i + start_vect
             ce_handler.infile_name = in_file_name
             out_file_name    = ce_handler.out_file_vect[i]+"-"+str(j)+".dat"
             vect_fact        = str(ce_handler.vect_vect[i])
             alloc_policy     = str(ce_handler.alloc_vect[i])
             print "Average Iteration= ", j        
             command_str = "./design_interface.py -t "+token_size+" -l "+vect_fact+" -a "+alloc_policy+ " -r "+run_time+" -o "+out_file_name+" -i "+in_file_name
-            os.system(command_str)
-
+            print "CE Before Call"
+            
+            #result = os.system(command_str)
+            proc = subprocess.Popen(command_str, shell=True)
+            result = proc.wait()
+            out, err = proc.communicate()
+            print "Out= ", out, " ERROR= ", err
+            print "EXIT CODE= ", result 
+            print "PROC= ", proc
+            print "CE After Call"
             if i is 0:
                 ce_handler.add_data_point(out_file_name, ce_handler.mem_vect_def, ce_handler.lat_vect_def,
                                           ce_handler.thru_vect_def, ce_handler.config_vect_def, j, num_for_average)
