@@ -248,11 +248,11 @@ class ce_interface:
     
 if __name__ == "__main__":
     print "Before system call"
-    num_for_average     = 1 
+    num_for_average     = 10
     start_vect          = 0
-    vectorization_times = 10
-    #run_time_duration   = 60*5
-    run_time_duration   = 10 
+    vectorization_times = 16
+    run_time_duration   = 60*5
+    #run_time_duration   = 10 
     token_size_size     = 256 
     token_mode          = "linear"
     ce_handler    = ce_interface()
