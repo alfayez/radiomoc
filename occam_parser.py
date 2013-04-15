@@ -701,8 +701,8 @@ class graph_handler:
             pgen = gnuradio_writer(filename, model_name)
             # Run the gnuradio-companion parser to generate the python
             # file from the grc file
-            proc = subprocess.Popen(["grcc", "-d", os.getcwd(), filename])
-            proc.wait()
+            #proc = subprocess.Popen(["grcc", "-d", os.getcwd(), filename])
+            #proc.wait()
         else:
             print "ERROR in generate_code: UNKNOW code generation mode= ", mode
 
