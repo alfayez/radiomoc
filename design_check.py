@@ -185,6 +185,14 @@ class graph_check:
                 print '\t', '{0:30} = {1:10}'.format(item, self.top_impl_info[item])
     #Calculates the memory usage of each block and accumulate the
     #total memory usage for reference
+    def is_uhd_channel(self, top_matrix, channel_id):
+        num_blocks = len(top_matrix[0])
+        for i in xrange(num_blocks):
+            if np.abs(top_matrix[channel_id][i]) > 0.0:
+                if 'uhd' in self.second_blocks_list[i]:
+                    print "INSIDE UHD CHAN= ", self.second_blocks_list[i], " matrix[",channel_id,",",i,"]= ", top_matrix[channel_id][i]
+                    return 1
+        return 0
     def memory_usage(self, graph_handler, top_matrix):
         len_chans = len(top_matrix)
         self.top_impl_info[MEM_TOT] = 0
@@ -207,7 +215,13 @@ class graph_check:
                         matrix_val      = 0                        
                 elif self.gnu_mem_alloc_policy == ALLOC_TOP:
                     if matrix_val > 0:
-                        mem_cur_chan    = matrix_val*self.token_size*data_size
+                        if self.is_uhd_channel(top_matrix, i):
+                            print 'UHD CHAN= ', i
+                            temp_mem = matrix_val*self.token_size*data_size
+                            temp_mem = np.ceil(np.log(temp_mem)/np.log(2))
+                            mem_cur_chan    = 2**temp_mem
+                        else:
+                            mem_cur_chan    = matrix_val*self.token_size*data_size
                     else:
                         mem_cur_chan    = 0
                         matrix_val      = 0
@@ -273,7 +287,6 @@ class graph_check:
         start_time = 0.0
         elapse_time = 0.0
         start_time = time.time()
-        print "BEFORE PREALLOC"
         self.gnuradio_tb.prealloc()
         elapse_time = time.time()-start_time
         self.second_top_matrix = self.get_gnuradio_top_matrix()
@@ -308,36 +321,29 @@ class graph_check:
         self.set_gnuradio_firing_vector()
         start_time = time.time()
         #self.gnuradio_tb.alloc(self.cur_bufer_size, self.gnu_mem_alloc_policy)
-        print "BEFORE ALLOC"
         self.gnuradio_tb.alloc(self.token_size, self.gnu_mem_alloc_policy)
         elapse_time = elapse_time+time.time()-start_time
         if self.DEBUG:
             print "Before Go"
         self.gnuradio_tb.reset_pc_performance_metric()
-        time.sleep(1)
+        time.sleep(2)
         start_time = time.time()
-        print "BEFORE GO"
         self.gnuradio_tb.go()
-        print "AFTER GO"
         elapse_time = elapse_time+time.time()-start_time
         if self.DEBUG:
             print "Before Sleep"
-	print "BEFORE SLEEP= ", self.run_time
         time.sleep(self.run_time)
-        print "BEFORE PERFRMANCE"
         self.gnuradio_tb.set_pc_performance_metric()
         time.sleep(2)
         if self.DEBUG:
             print "GOODBUY"
         start_time = time.time()
-        print "BEFORE STOP"
         self.gnuradio_tb.stop()
         self.gnuradio_tb.wait()
         elapse_time = elapse_time+time.time()-start_time
         self.top_impl_info[CONFIG_TIME]=elapse_time
         self.get_avg_exe_time(graph_handler)
-        #time.sleep(2)
-        print "EXIT 2nd "
+        time.sleep(2)
     def print_schedule(self, sched):
         print sched
     def calculate_schedule(self, top_matrix):
