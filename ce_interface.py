@@ -253,7 +253,7 @@ if __name__ == "__main__":
     vectorization_times = 16
     run_time_duration   = 60*5
     #run_time_duration   = 10 
-    token_size_size     = 256 
+    token_size_size     = 128 
     token_mode          = "linear"
     ce_handler    = ce_interface()
 
@@ -267,8 +267,8 @@ if __name__ == "__main__":
             ce_handler.alloc_vect.extend([1])
     #print "outfile_vect = ", ce_handler.out_file_vect
     token_size    = token_size_size
-    #in_file_name  = "csp-sdf-sim.occ"
-    in_file_name  = "csp-sdf-tx.occ"
+    in_file_name  = "csp-sdf-sim.occ"
+    #in_file_name  = "csp-sdf-tx.occ"
     #in_file_name  = "csp-sdf-rx.occ"    
     run_time      = str(run_time_duration)
     for i in range(vectorization_times-start_vect):
