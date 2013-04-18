@@ -249,11 +249,11 @@ class ce_interface:
 if __name__ == "__main__":
     print "Before system call"
     num_for_average     = 10
-    start_vect          = 0 
+    start_vect          = 0
     vectorization_times = 16 
     run_time_duration   = 60*5
     #run_time_duration   = 10 
-    token_size_size     = 128 
+    token_size_size     = 256 
     token_mode          = "linear"
     ce_handler    = ce_interface()
 
@@ -284,9 +284,11 @@ if __name__ == "__main__":
             
             #result = os.system(command_str)
             #print "command= ", command_str2
+
             proc = subprocess.Popen(command_str2, shell=False)
-            #proc = os.popen(command_str)
             result = proc.wait()
+
+
             #out, err = proc.communicate()
             #print "Out= ", out, " ERROR= ", err
             

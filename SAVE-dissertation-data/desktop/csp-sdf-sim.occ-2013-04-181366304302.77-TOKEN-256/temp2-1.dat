@@ -1,0 +1,331 @@
+csp-sdf-sim.occ
+2013-04-17 13:55:01.220162
+token_size_orig = 256
+vect_factor = 2
+run_time = 300
+configuration_time = 0.00622224807739
+memory_total = 756224.0
+latency = 0.0293970390811
+throughput = 26642.7547942
+ALL = 
+
+output_buffer_fullness_var
+	 message_sink0 = 0.0
+	 framer_sink_10 = 0.0
+	 unpack_k_bits_bb0 = 0.00509540625435
+	 multiply_const_vcc0 = 0.0111209260087
+	 multiply_const_vcc1 = 0.00181605925295
+	 multiply_const_vcc2 = 0.00998299510459
+	 multiply_const_vcc3 = 0.00308185273951
+	 multiply_const_vcc4 = 0.00748509299146
+	 diff_encoder_bb0 = 0.015577018762
+	 correlate_access_code_bb0 = 0.00124762441403
+	 file_source0 = 0.0126304319727
+	 gr_agc2_cc0 = 0.000550020361737
+	 noise_source_c0 = 0.0473127648733
+	 file_sink0 = 0.0
+	 chunks_to_symbols_bc0 = 0.0156488604878
+	 packed_to_unpacked_bb0 = 0.0154370158708
+	 map_bb0 = 0.0154479225708
+	 constellation_receiver_cb0 = 0.0398990960162
+	 message_source0 = 0.000877279477223
+	 message_source1 = 0.0
+	 add_cc0 = 0.0155713352306
+	 pfb_arb_resampler_ccf0 = 0.0302244158466
+	 diff_decoder_bb0 = 0.0016980876758
+	 pfb_clock_sync_ccf0 = 0.0543737742646
+	 fll_band_edge_cc0 = 8.04871021239e-05
+	 throttle0 = 0.0132422028109
+
+output_buffer_fullness
+	 message_sink0 = 0.0
+	 framer_sink_10 = 0.0
+	 unpack_k_bits_bb0 = 0.0128047503531
+	 multiply_const_vcc0 = 0.507232546806
+	 multiply_const_vcc1 = 0.499573051929
+	 multiply_const_vcc2 = 0.491143584251
+	 multiply_const_vcc3 = 0.497547835112
+	 multiply_const_vcc4 = 0.496961981058
+	 diff_encoder_bb0 = 0.602886795998
+	 correlate_access_code_bb0 = 0.00486935256049
+	 file_source0 = 0.476655811071
+	 gr_agc2_cc0 = 0.501962125301
+	 noise_source_c0 = 0.385272026062
+	 file_sink0 = 0.0
+	 chunks_to_symbols_bc0 = 0.604462444782
+	 packed_to_unpacked_bb0 = 0.597459793091
+	 map_bb0 = 0.599869072437
+	 constellation_receiver_cb0 = 0.302166253328
+	 message_source0 = 0.948618352413
+	 message_source1 = 0.0009765625
+	 add_cc0 = 0.513062953949
+	 pfb_arb_resampler_ccf0 = 0.554007530212
+	 diff_decoder_bb0 = 0.005637712311
+	 pfb_clock_sync_ccf0 = 0.160415932536
+	 fll_band_edge_cc0 = 0.0030688745901
+	 throttle0 = 0.475147157907
+
+noutput_var
+	 message_sink0 = 13200.4557613
+	 framer_sink_10 = 3874.83205052
+	 unpack_k_bits_bb0 = 284466.233657
+	 multiply_const_vcc0 = 676575.436846
+	 multiply_const_vcc1 = 42112.6000466
+	 multiply_const_vcc2 = 295588.401
+	 multiply_const_vcc3 = 97386.6567718
+	 multiply_const_vcc4 = 274852.029197
+	 diff_encoder_bb0 = 256048.277975
+	 correlate_access_code_bb0 = 212716.734765
+	 file_source0 = 127.507180495
+	 gr_agc2_cc0 = 23357.5232314
+	 noise_source_c0 = 64878.6171004
+	 file_sink0 = 0.0
+	 chunks_to_symbols_bc0 = 257897.567256
+	 packed_to_unpacked_bb0 = 253502.621315
+	 map_bb0 = 253986.95505
+	 constellation_receiver_cb0 = 403709.772478
+	 message_source0 = 8788.9279451
+	 message_source1 = 0.0
+	 add_cc0 = 1273120.21048
+	 pfb_arb_resampler_ccf0 = 976653.083203
+	 diff_decoder_bb0 = 347320.503083
+	 pfb_clock_sync_ccf0 = 915368.569526
+	 fll_band_edge_cc0 = 15378.1659266
+	 throttle0 = 127.754753113
+
+produced_var
+	 message_sink0 = 13200.4557613
+	 framer_sink_10 = 3874.83205052
+	 unpack_k_bits_bb0 = 284466.233657
+	 multiply_const_vcc0 = 676575.436846
+	 multiply_const_vcc1 = 42112.6000466
+	 multiply_const_vcc2 = 295588.401
+	 multiply_const_vcc3 = 97386.6567718
+	 multiply_const_vcc4 = 274852.029197
+	 diff_encoder_bb0 = 256048.277975
+	 correlate_access_code_bb0 = 212716.734765
+	 file_source0 = 638.507675439
+	 gr_agc2_cc0 = 23357.5232314
+	 noise_source_c0 = 64878.6171004
+	 file_sink0 = 0.0
+	 chunks_to_symbols_bc0 = 257897.567256
+	 packed_to_unpacked_bb0 = 253502.621315
+	 map_bb0 = 253986.95505
+	 constellation_receiver_cb0 = 403709.772478
+	 message_source0 = 4232.90240183
+	 message_source1 = 0.0
+	 add_cc0 = 1273120.21048
+	 pfb_arb_resampler_ccf0 = 977307.402929
+	 diff_decoder_bb0 = 347320.503083
+	 pfb_clock_sync_ccf0 = 905055.345489
+	 fll_band_edge_cc0 = 19298.9726572
+	 throttle0 = 127.754753113
+
+latency
+	 throttle0 = 0.0293970390811
+
+execution_time
+	 message_sink0 = 0.019981328
+	 framer_sink_10 = 6.12121337891e-07
+	 unpack_k_bits_bb0 = 1.6269875e-05
+	 multiply_const_vcc0 = 7.81229765625e-05
+	 multiply_const_vcc1 = 8.065821875e-05
+	 multiply_const_vcc2 = 7.87538125e-05
+	 multiply_const_vcc3 = 8.15383984375e-05
+	 multiply_const_vcc4 = 7.98110859375e-05
+	 diff_encoder_bb0 = 1.36900410156e-05
+	 correlate_access_code_bb0 = 4.75277851563e-05
+	 file_source0 = 2.93940527344e-06
+	 gr_agc2_cc0 = 0.00020188134375
+	 noise_source_c0 = 0.00106107025
+	 file_sink0 = 2.47263208008e-06
+	 chunks_to_symbols_bc0 = 1.81717167969e-05
+	 packed_to_unpacked_bb0 = 8.01343212891e-06
+	 map_bb0 = 2.32174291992e-06
+	 constellation_receiver_cb0 = 9.1910484375e-05
+	 message_source0 = 1.97325390625e-06
+	 message_source1 = 0.004804308
+	 add_cc0 = 3.21499394531e-05
+	 pfb_arb_resampler_ccf0 = 0.00042804978125
+	 diff_decoder_bb0 = 2.84878574219e-05
+	 pfb_clock_sync_ccf0 = 0.000231223359375
+	 fll_band_edge_cc0 = 0.0020993345
+	 throttle0 = 2.54204418945e-06
+
+consistent
+	 throttle0 = True
+
+configuration_time
+	 throttle0 = 0.00622224807739
+
+memory_total
+	 throttle0 = 756224.0
+
+produced
+	 message_sink0 = 537.285949707
+	 framer_sink_10 = 42.4607658386
+	 unpack_k_bits_bb0 = 1834.21728516
+	 multiply_const_vcc0 = 3877.01025391
+	 multiply_const_vcc1 = 4052.10522461
+	 multiply_const_vcc2 = 3954.93334961
+	 multiply_const_vcc3 = 4034.2565918
+	 multiply_const_vcc4 = 3968.46972656
+	 diff_encoder_bb0 = 1624.85681152
+	 correlate_access_code_bb0 = 1886.32702637
+	 file_source0 = 510.001953125
+	 gr_agc2_cc0 = 4061.57470703
+	 noise_source_c0 = 4045.56518555
+	 file_sink0 = 128.0
+	 chunks_to_symbols_bc0 = 1618.20544434
+	 packed_to_unpacked_bb0 = 1643.58544922
+	 map_bb0 = 1635.85839844
+	 constellation_receiver_cb0 = 467.229858398
+	 message_source0 = 207.197402954
+	 message_source1 = 128.0
+	 add_cc0 = 3691.00317383
+	 pfb_arb_resampler_ccf0 = 2711.09570312
+	 diff_decoder_bb0 = 1787.47583008
+	 pfb_clock_sync_ccf0 = 1379.40649414
+	 fll_band_edge_cc0 = 4066.32055664
+	 throttle0 = 511.0
+
+input_buffer_fullness
+
+throughput
+	 throttle0 = 26642.7547942
+
+execution_time_var
+	 message_sink0 = 2.49121801109e+13
+	 framer_sink_10 = 3604207.15857
+	 unpack_k_bits_bb0 = 55846629.547
+	 multiply_const_vcc0 = 1035044370.82
+	 multiply_const_vcc1 = 364572417.252
+	 multiply_const_vcc2 = 421169852.668
+	 multiply_const_vcc3 = 835300274.108
+	 multiply_const_vcc4 = 696188509.431
+	 diff_encoder_bb0 = 18579096.3661
+	 correlate_access_code_bb0 = 179655054.851
+	 file_source0 = 6180199.29825
+	 gr_agc2_cc0 = 8918583723.01
+	 noise_source_c0 = 3.55789149546e+11
+	 file_sink0 = 16432893.7478
+	 chunks_to_symbols_bc0 = 124360881.938
+	 packed_to_unpacked_bb0 = 5844754.38246
+	 map_bb0 = 490932.938123
+	 constellation_receiver_cb0 = 15938996803.7
+	 message_source0 = 216102299.083
+	 message_source1 = 7.48953355858e+11
+	 add_cc0 = 133666658.261
+	 pfb_arb_resampler_ccf0 = 87110792665.2
+	 diff_decoder_bb0 = 282652215.767
+	 pfb_clock_sync_ccf0 = 29706485604.1
+	 fll_band_edge_cc0 = 1.63347209468e+11
+	 throttle0 = 177287888.0
+
+memory
+	 message_sink0 = 0
+	 framer_sink_10 = 0
+	 unpack_k_bits_bb0 = 4096.0
+	 multiply_const_vcc0 = 65536.0
+	 multiply_const_vcc1 = 65536.0
+	 multiply_const_vcc2 = 65536.0
+	 multiply_const_vcc3 = 65536.0
+	 multiply_const_vcc4 = 65536.0
+	 diff_encoder_bb0 = 4096.0
+	 correlate_access_code_bb0 = 4096.0
+	 file_source0 = 2048.0
+	 gr_agc2_cc0 = 65536.0
+	 noise_source_c0 = 65536.0
+	 file_sink0 = 0
+	 chunks_to_symbols_bc0 = 32768.0
+	 packed_to_unpacked_bb0 = 4096.0
+	 map_bb0 = 4096.0
+	 constellation_receiver_cb0 = 4096.0
+	 message_source0 = 512.0
+	 message_source1 = 2048.0
+	 add_cc0 = 65536.0
+	 pfb_arb_resampler_ccf0 = 65536.0
+	 diff_decoder_bb0 = 4096.0
+	 pfb_clock_sync_ccf0 = 32768.0
+	 fll_band_edge_cc0 = 65536.0
+	 throttle0 = 2048.0
+
+input_buffer_fullness_var
+
+noutput
+	 message_sink0 = 537.285949707
+	 framer_sink_10 = 42.4607658386
+	 unpack_k_bits_bb0 = 1834.21728516
+	 multiply_const_vcc0 = 3877.01025391
+	 multiply_const_vcc1 = 4052.10522461
+	 multiply_const_vcc2 = 3954.93334961
+	 multiply_const_vcc3 = 4034.2565918
+	 multiply_const_vcc4 = 3968.46972656
+	 diff_encoder_bb0 = 1624.85681152
+	 correlate_access_code_bb0 = 1886.32702637
+	 file_source0 = 511.001953125
+	 gr_agc2_cc0 = 4061.57470703
+	 noise_source_c0 = 4045.56518555
+	 file_sink0 = 128.0
+	 chunks_to_symbols_bc0 = 1618.20544434
+	 packed_to_unpacked_bb0 = 1643.58544922
+	 map_bb0 = 1635.85839844
+	 constellation_receiver_cb0 = 467.229858398
+	 message_source0 = 209.315917969
+	 message_source1 = 512.0
+	 add_cc0 = 3691.00317383
+	 pfb_arb_resampler_ccf0 = 2711.09594727
+	 diff_decoder_bb0 = 1787.47583008
+	 pfb_clock_sync_ccf0 = 1388.22937012
+	 fll_band_edge_cc0 = 4066.32055664
+	 throttle0 = 511.0
+	 throttle0 = 511.0
+file_source0 IO-SIG= 4throttle0 IO-SIG= 4message_sink0 IO-SIG= 0message_source1 IO-SIG= 4file_sink0 IO-SIG= 0message_source0 IO-SIG= 1packed_to_unpacked_bb0 IO-SIG= 1map_bb0 IO-SIG= 1diff_encoder_bb0 IO-SIG= 1chunks_to_symbols_bc0 IO-SIG= 8pfb_arb_resampler_ccf0 IO-SIG= 8multiply_const_vcc2 IO-SIG= 8multiply_const_vcc4 IO-SIG= 8noise_source_c0 IO-SIG= 8multiply_const_vcc0 IO-SIG= 8add_cc0 IO-SIG= 8multiply_const_vcc3 IO-SIG= 8multiply_const_vcc1 IO-SIG= 8gr_agc2_cc0 IO-SIG= 8fll_band_edge_cc0 IO-SIG= 8pfb_clock_sync_ccf0 IO-SIG= 8constellation_receiver_cb0 IO-SIG= 1diff_decoder_bb0 IO-SIG= 1unpack_k_bits_bb0 IO-SIG= 1correlate_access_code_bb0 IO-SIG= 1framer_sink_10 IO-SIG= 0Second Topology Matrix= 
+[[  1.  -1.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.
+    0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.]
+ [  0.   1.  -1.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.
+    0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.]
+ [  0.   0.   0.   1.  -1.   0.   0.   0.   0.   0.   0.   0.   0.   0.
+    0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.]
+ [  0.   0.   0.   0.   0.   1.  -1.   0.   0.   0.   0.   0.   0.   0.
+    0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.]
+ [  0.   0.   0.   0.   0.   0.   8.  -8.   0.   0.   0.   0.   0.   0.
+    0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.]
+ [  0.   0.   0.   0.   0.   0.   0.   8.  -8.   0.   0.   0.   0.   0.
+    0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.]
+ [  0.   0.   0.   0.   0.   0.   0.   0.   8.  -8.   0.   0.   0.   0.
+    0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.]
+ [  0.   0.   0.   0.   0.   0.   0.   0.   0.   8.  -8.   0.   0.   0.
+    0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.]
+ [  0.   0.   0.   0.   0.   0.   0.   0.   0.   0.  16. -16.   0.   0.
+    0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.]
+ [  0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.  16. -16.   0.
+    0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.]
+ [  0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.  16.
+  -16.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.]
+ [  0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.  16.   0.
+    0. -16.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.]
+ [  0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.
+   16. -16.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.]
+ [  0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.
+    0.  16. -16.   0.   0.   0.   0.   0.   0.   0.   0.   0.]
+ [  0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.
+    0.   0.  16. -16.   0.   0.   0.   0.   0.   0.   0.   0.]
+ [  0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.
+    0.   0.   0.  16. -16.   0.   0.   0.   0.   0.   0.   0.]
+ [  0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.
+    0.   0.   0.   0.  16. -16.   0.   0.   0.   0.   0.   0.]
+ [  0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.
+    0.   0.   0.   0.   0.  16. -16.   0.   0.   0.   0.   0.]
+ [  0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.
+    0.   0.   0.   0.   0.   0.   8.  -8.   0.   0.   0.   0.]
+ [  0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.
+    0.   0.   0.   0.   0.   0.   0.   8.  -8.   0.   0.   0.]
+ [  0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.
+    0.   0.   0.   0.   0.   0.   0.   0.   8.  -8.   0.   0.]
+ [  0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.
+    0.   0.   0.   0.   0.   0.   0.   0.   0.   8.  -8.   0.]
+ [  0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.
+    0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   8.  -8.]]
+Second Blocks List= 
+['file_source0', 'throttle0', 'message_sink0', 'message_source1', 'file_sink0', 'message_source0', 'packed_to_unpacked_bb0', 'map_bb0', 'diff_encoder_bb0', 'chunks_to_symbols_bc0', 'pfb_arb_resampler_ccf0', 'multiply_const_vcc2', 'multiply_const_vcc4', 'noise_source_c0', 'multiply_const_vcc0', 'add_cc0', 'multiply_const_vcc3', 'multiply_const_vcc1', 'gr_agc2_cc0', 'fll_band_edge_cc0', 'pfb_clock_sync_ccf0', 'constellation_receiver_cb0', 'diff_decoder_bb0', 'unpack_k_bits_bb0', 'correlate_access_code_bb0', 'framer_sink_10']
