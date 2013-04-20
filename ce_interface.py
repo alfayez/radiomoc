@@ -248,10 +248,10 @@ class ce_interface:
     
 if __name__ == "__main__":
     print "Before system call"
-    num_for_average     = 10
+    num_for_average     = 1
     start_vect          = 0
-    vectorization_times = 16 
-    run_time_duration   = 60*5
+    vectorization_times = 10
+    run_time_duration   = 10
     #run_time_duration   = 10 
     token_size_size     = 256 
     token_mode          = "linear"
@@ -267,9 +267,9 @@ if __name__ == "__main__":
             ce_handler.alloc_vect.extend([1])
     #print "outfile_vect = ", ce_handler.out_file_vect
     token_size    = token_size_size
-    in_file_name  = "csp-sdf-sim.occ"
+    #in_file_name  = "csp-sdf-sim.occ"
     #in_file_name  = "csp-sdf-tx.occ"
-    #in_file_name  = "csp-sdf-rx.occ"    
+    in_file_name  = "csp-sdf-rx.occ"    
     run_time      = str(run_time_duration)
     for i in range(vectorization_times-start_vect):
         for j in range(num_for_average):
