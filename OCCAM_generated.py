@@ -3,14 +3,14 @@
 # Gnuradio Python Flow Graph
 # Title: Occam Generated
 # Author: Almohanad Fayez
-# Generated: Sat Apr 20 15:04:57 2013
+# Generated: Sat Apr 20 15:47:14 2013
 ##################################################
 
-from gnuradio import analog
 from gnuradio import blocks
 from gnuradio import digital
 from gnuradio import eng_notation
 from gnuradio import gr
+from gnuradio import uhd
 from gnuradio.eng_option import eng_option
 from gnuradio.gr import firdes
 from grc_gnuradio import blks2 as grc_blks2
@@ -48,6 +48,18 @@ class OCCAM_generated(grc_wxgui.top_block_gui):
 		##################################################
 		# Blocks
 		##################################################
+		self.rfIn = uhd.usrp_source(
+			device_addr="",
+			stream_args=uhd.stream_args(
+				cpu_format="fc32",
+				channels=range(1),
+			),
+		)
+		self.rfIn.set_subdev_spec("A:0", 0)
+		self.rfIn.set_samp_rate(samplingRate2)
+		self.rfIn.set_center_freq(carrierFreq, 0)
+		self.rfIn.set_gain(rfGain2, 0)
+		self.rfIn.set_antenna("TX/RX", 0)
 		self.dbpskDemod = digital.dbpsk_demod(
 			samples_per_symbol=samplingRate2/samplingRate,
 			excess_bw=0.35,
@@ -68,16 +80,15 @@ class OCCAM_generated(grc_wxgui.top_block_gui):
 		self.dataOut.set_unbuffered(False)
 		self.channelFilter2 = blocks.multiply_const_vcc((1.0, ))
 		self.basebandScale2 = blocks.multiply_const_vcc((bbGain2, ))
-		self.analog_noise_source_x_0 = analog.noise_source_c(analog.GR_GAUSSIAN, 1, 0)
 
 		##################################################
 		# Connections
 		##################################################
 		self.connect((self.dbpskDemod, 0), (self.dbpskDec, 0))
+		self.connect((self.rfIn, 0), (self.basebandScale2, 0))
 		self.connect((self.basebandScale2, 0), (self.channelFilter2, 0))
 		self.connect((self.dbpskDec, 0), (self.dataOut, 0))
 		self.connect((self.channelFilter2, 0), (self.dbpskDemod, 0))
-		self.connect((self.analog_noise_source_x_0, 0), (self.basebandScale2, 0))
 
 
 	def get_stdValG(self):
@@ -97,6 +108,7 @@ class OCCAM_generated(grc_wxgui.top_block_gui):
 
 	def set_samplingRate2(self, samplingRate2):
 		self.samplingRate2 = samplingRate2
+		self.rfIn.set_samp_rate(self.samplingRate2)
 
 	def get_samplingRate(self):
 		return self.samplingRate
@@ -109,6 +121,7 @@ class OCCAM_generated(grc_wxgui.top_block_gui):
 
 	def set_rfGain2(self, rfGain2):
 		self.rfGain2 = rfGain2
+		self.rfIn.set_gain(self.rfGain2, 0)
 
 	def get_rfGain(self):
 		return self.rfGain
@@ -163,6 +176,7 @@ class OCCAM_generated(grc_wxgui.top_block_gui):
 
 	def set_carrierFreq(self, carrierFreq):
 		self.carrierFreq = carrierFreq
+		self.rfIn.set_center_freq(self.carrierFreq, 0)
 
 	def get_bbGain2(self):
 		return self.bbGain2
