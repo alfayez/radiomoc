@@ -543,6 +543,8 @@ class graph_check:
     # programs which are already setup properly
     def set_rate_consistency(self, node_list, top_matrix, block_list):
         cur_rate = 1.0
+        #print "TOP MATRIX= "
+        #print self.second_top_matrix
         self.set_rate_consistency_helper(node_list, top_matrix, block_list, cur_rate, TUP_INIT)
     def set_rate_consistency_helper(self, node_list, top_matrix, block_list, cur_rate, prev_path):
         # NOTES WHERE I LEFT:
@@ -560,30 +562,47 @@ class graph_check:
         for i in xrange(list_len):
             #print "node_list= ", node_list[i], " visited= ", self.visited_matrix[node_list[i][TUP_ARC]][node_list[i][TUP_ID]], " ARC= ", node_list[i][TUP_ARC]
             #print "Visited Matrix =\n", self.visited_matrix
+            #print "Top Matrix =\n", self.second_top_matrix
             node_rate = node_list[i][TUP_RATE]
             # If we never been to this node before
             if self.visited_matrix[node_list[i][TUP_ARC]][node_list[i][TUP_ID]] == 0:
-                self.visited_matrix[node_list[i][TUP_ARC]][node_list[i][TUP_ID]] = 1
-                cur_rate  = cur_rate * node_rate
-                #print "Cur Rate= ", cur_rate, " Node Rate= ", node_rate, #" Top MAtrix= \n", top_matrix                
-                self.set_new_node_relative_rate(node_list[i], cur_rate, top_matrix, block_list)
-                ret_is = self.is_sink(node_list[i][TUP_ID], top_matrix, block_list)
-                if ret_is[TUP_COND]  == False:
-                    node_list2= self.get_next_nodes(node_list[i], top_matrix, block_list)
-                    #print "Next Nodes= ", node_list2
-                    list2_len = len(node_list2)
-                    # run for a second time to get the outgoing rate of
-                    # the next node and not the incoming one
-                    for j in xrange(list2_len):
-                        #print "Cur Top MAtrix= \n", top_matrix
-                        ret_is = self.is_sink(node_list2[j][TUP_ID], top_matrix, block_list)
-                        if ret_is[TUP_COND]  == False:
-                            node_list3= self.get_next_node(node_list2[0][TUP_ARC], top_matrix, block_list)
-                            node_list2[0][TUP_RATE] = node_list3[TUP_RATE]
-                        self.set_rate_consistency_helper(node_list2, top_matrix, block_list, cur_rate, node_list[i])
-                    else:
-                        if self.DEBUG:
-                            print "FOUND SINK"
+                # If no rate change or if we found an interpolation block
+                if node_rate >= 1:
+                    self.visited_matrix[node_list[i][TUP_ARC]][node_list[i][TUP_ID]] = 1
+                    cur_rate  = cur_rate * node_rate
+                    #print "Cur Rate= ", cur_rate, " Node Rate= ", node_rate, #" Top MAtrix= \n", top_matrix                
+                    self.set_new_node_relative_rate(node_list[i], cur_rate, top_matrix, block_list)
+                    ret_is = self.is_sink(node_list[i][TUP_ID], top_matrix, block_list)
+                    if ret_is[TUP_COND]  == False:
+                        node_list2= self.get_next_nodes(node_list[i], top_matrix, block_list)
+                        #print "Next Nodes= ", node_list2
+                        list2_len = len(node_list2)
+                        # run for a second time to get the outgoing rate of
+                        # the next node and not the incoming one
+                        for j in xrange(list2_len):
+                            # print "Cur Top MAtrix= \n", top_matrix
+                            ret_is = self.is_sink(node_list2[j][TUP_ID], top_matrix, block_list)
+                            if ret_is[TUP_COND]  == False:
+                                node_list3= self.get_next_node(node_list2[0][TUP_ARC], top_matrix, block_list)
+                                node_list2[0][TUP_RATE] = node_list3[TUP_RATE]
+                            self.set_rate_consistency_helper(node_list2, top_matrix, block_list, cur_rate, node_list[i])
+                        else:
+                            if self.DEBUG:
+                                print "FOUND SINK"
+                # If we found a decimation block then we don't want to
+                # use fraction representation so go in reverse and
+                # multiple by 1/decimation to make the final decimated
+                # rate = 1
+                else:
+                    #print "Found decimation block = ", node_list[i][TUP_ID]
+                    cf  = cur_rate * (1/node_rate)
+                    temp_rate = 1.0
+                    self.set_new_node_relative_rate(node_list[i], temp_rate, top_matrix, block_list)
+                    prev_nodes= self.get_prev_visited_nodes(node_list[i][TUP_ID], top_matrix, block_list)
+                    list_len2 = len(prev_nodes)
+                    #print "Prev Nodes= ", prev_nodes, " list len2 = ", list_len2
+                    # for i in xrange(list_len2):
+                    self.set_rev_rate_consistency_helper(prev_nodes, top_matrix,block_list, cf)
             # If we visited this node before we need to ensure that
             # the expected relative rate from this iteration is the
             # same as the one we're finding.  If not then we need to
@@ -630,6 +649,8 @@ class graph_check:
         ret_is    = TUP_INIT
         node_rate = 1.0
         for i in xrange(list_len):
+            #print "Node list= ", node_list, " list len= ", list_len
+            #print "Node List i = ", node_list[i]
             node_rate = node_list[i][TUP_RATE]
             cur_rate  = cf * node_rate
             self.set_new_node_relative_rate(node_list[i], cur_rate, top_matrix, block_list)
