@@ -1,0 +1,179 @@
+csp-sdf-rx.occ
+2013-04-21 15:35:19.523646
+token_size_orig = 256
+vect_factor = 4
+run_time = 300
+configuration_time = 0.118190288544
+memory_total = 98304.0
+latency = 0.00114680055139
+throughput = 31018008.7027
+ALL = 
+
+output_buffer_fullness_var
+	 correlate_access_code_bb0 = 0.000955966952011
+	 constellation_receiver_cb0 = 0.000653379611102
+	 gr uhd usrp source0 = 0.062187520582
+	 gr_agc2_cc0 = 0.0585212884428
+	 fll_band_edge_cc0 = 0.00168400760672
+	 framer_sink_10 = 0.0
+	 file_sink0 = 0.0
+	 message_source0 = -0.0
+	 diff_decoder_bb0 = 0.00135539646051
+	 unpack_k_bits_bb0 = 0.00102847675613
+	 multiply_const_vcc0 = 0.0989576363939
+	 multiply_const_vcc1 = 0.000757225482751
+	 pfb_clock_sync_ccf0 = 0.0495362577721
+
+output_buffer_fullness
+	 correlate_access_code_bb0 = 0.0153333637863
+	 constellation_receiver_cb0 = 0.0104861119762
+	 gr uhd usrp source0 = 0.237261131406
+	 gr_agc2_cc0 = 0.482082545757
+	 fll_band_edge_cc0 = 0.0153293730691
+	 framer_sink_10 = 0.0
+	 file_sink0 = 0.0
+	 message_source0 = 0.0
+	 diff_decoder_bb0 = 0.0298289060593
+	 unpack_k_bits_bb0 = 0.0173092521727
+	 multiply_const_vcc0 = 0.261542618275
+	 multiply_const_vcc1 = 0.00562943983823
+	 pfb_clock_sync_ccf0 = 0.158509865403
+
+noutput_var
+	 correlate_access_code_bb0 = 27339.5023926
+	 constellation_receiver_cb0 = 26373.8936393
+	 gr uhd usrp source0 = 3.14087898233
+	 gr_agc2_cc0 = 34596.5285819
+	 fll_band_edge_cc0 = 54666.0160533
+	 framer_sink_10 = 209.406000089
+	 file_sink0 = -0.0
+	 message_source0 = -0.0
+	 diff_decoder_bb0 = 28713.886282
+	 unpack_k_bits_bb0 = 28243.8406945
+	 multiply_const_vcc0 = 20173.6691921
+	 multiply_const_vcc1 = 25021.0005629
+	 pfb_clock_sync_ccf0 = 55424.4621696
+
+produced_var
+	 correlate_access_code_bb0 = 27339.5023926
+	 constellation_receiver_cb0 = 26373.8936393
+	 gr uhd usrp source0 = 3416.9004372
+	 gr_agc2_cc0 = 34596.5285819
+	 fll_band_edge_cc0 = 54667.12913
+	 framer_sink_10 = 209.406000089
+	 file_sink0 = -0.0
+	 message_source0 = -0.0
+	 diff_decoder_bb0 = 28713.886282
+	 unpack_k_bits_bb0 = 28243.8406945
+	 multiply_const_vcc0 = 20173.6691921
+	 multiply_const_vcc1 = 25021.0005629
+	 pfb_clock_sync_ccf0 = 47014.8215462
+
+latency
+	 pfb_clock_sync_ccf0 = 0.00114680055139
+
+execution_time
+	 correlate_access_code_bb0 = 1.32200214844e-05
+	 constellation_receiver_cb0 = 3.53112734375e-05
+	 gr uhd usrp source0 = 0.00034018596875
+	 gr_agc2_cc0 = 2.63037578125e-05
+	 fll_band_edge_cc0 = 0.000628482375
+	 framer_sink_10 = 7.85172973633e-07
+	 file_sink0 = 0.0
+	 message_source0 = 0.0
+	 diff_decoder_bb0 = 4.16985302734e-06
+	 unpack_k_bits_bb0 = 4.57459570312e-06
+	 multiply_const_vcc0 = 1.46162529297e-05
+	 multiply_const_vcc1 = 1.46453037109e-05
+	 pfb_clock_sync_ccf0 = 6.45059765625e-05
+
+consistent
+	 pfb_clock_sync_ccf0 = True
+
+configuration_time
+	 pfb_clock_sync_ccf0 = 0.118190288544
+
+memory_total
+	 pfb_clock_sync_ccf0 = 98304.0
+
+produced
+	 correlate_access_code_bb0 = 327.404388428
+	 constellation_receiver_cb0 = 118.113937378
+	 gr uhd usrp source0 = 240.463546753
+	 gr_agc2_cc0 = 586.033935547
+	 fll_band_edge_cc0 = 818.643493652
+	 framer_sink_10 = 11.9226474762
+	 file_sink0 = 0.0
+	 message_source0 = 0.0
+	 diff_decoder_bb0 = 138.028717041
+	 unpack_k_bits_bb0 = 288.836456299
+	 multiply_const_vcc0 = 454.942657471
+	 multiply_const_vcc1 = 454.268157959
+	 pfb_clock_sync_ccf0 = 262.24798584
+
+input_buffer_fullness
+
+throughput
+	 pfb_clock_sync_ccf0 = 31018008.7027
+
+execution_time_var
+	 correlate_access_code_bb0 = 44077724.362
+	 constellation_receiver_cb0 = 2230243006.59
+	 gr uhd usrp source0 = 1.82388421699e+12
+	 gr_agc2_cc0 = 104821378.443
+	 fll_band_edge_cc0 = 10473588431.7
+	 framer_sink_10 = 601541.976648
+	 file_sink0 = -0.0
+	 message_source0 = -0.0
+	 diff_decoder_bb0 = 17152118.6597
+	 unpack_k_bits_bb0 = 5554477.0662
+	 multiply_const_vcc0 = 22672943.7243
+	 multiply_const_vcc1 = 33665031.77
+	 pfb_clock_sync_ccf0 = 2868293487.17
+
+memory
+	 correlate_access_code_bb0 = 1024.0
+	 constellation_receiver_cb0 = 1024.0
+	 gr uhd usrp source0 = 16384.0
+	 gr_agc2_cc0 = 16384.0
+	 fll_band_edge_cc0 = 16384.0
+	 framer_sink_10 = 0
+	 file_sink0 = 0
+	 message_source0 = 4096.0
+	 diff_decoder_bb0 = 1024.0
+	 unpack_k_bits_bb0 = 1024.0
+	 multiply_const_vcc0 = 16384.0
+	 multiply_const_vcc1 = 16384.0
+	 pfb_clock_sync_ccf0 = 8192.0
+
+input_buffer_fullness_var
+
+noutput
+	 correlate_access_code_bb0 = 327.404388428
+	 constellation_receiver_cb0 = 118.113937378
+	 gr uhd usrp source0 = 255.465576172
+	 gr_agc2_cc0 = 586.033935547
+	 fll_band_edge_cc0 = 818.643493652
+	 framer_sink_10 = 11.9226474762
+	 file_sink0 = 0.0
+	 message_source0 = 0.0
+	 diff_decoder_bb0 = 138.028717041
+	 unpack_k_bits_bb0 = 288.836456299
+	 multiply_const_vcc0 = 454.942657471
+	 multiply_const_vcc1 = 454.268157959
+	 pfb_clock_sync_ccf0 = 294.977935791
+	 pfb_clock_sync_ccf0 = 294.977935791
+message_source0 IO-SIG= 4file_sink0 IO-SIG= 0gr uhd usrp source0 IO-SIG= 8multiply_const_vcc1 IO-SIG= 8multiply_const_vcc0 IO-SIG= 8gr_agc2_cc0 IO-SIG= 8fll_band_edge_cc0 IO-SIG= 8pfb_clock_sync_ccf0 IO-SIG= 8constellation_receiver_cb0 IO-SIG= 1diff_decoder_bb0 IO-SIG= 1unpack_k_bits_bb0 IO-SIG= 1correlate_access_code_bb0 IO-SIG= 1framer_sink_10 IO-SIG= 0Second Topology Matrix= 
+[[ 1. -1.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.]
+ [ 0.  0.  2. -2.  0.  0.  0.  0.  0.  0.  0.  0.  0.]
+ [ 0.  0.  0.  2. -2.  0.  0.  0.  0.  0.  0.  0.  0.]
+ [ 0.  0.  0.  0.  2. -2.  0.  0.  0.  0.  0.  0.  0.]
+ [ 0.  0.  0.  0.  0.  2. -2.  0.  0.  0.  0.  0.  0.]
+ [ 0.  0.  0.  0.  0.  0.  2. -2.  0.  0.  0.  0.  0.]
+ [ 0.  0.  0.  0.  0.  0.  0.  1. -1.  0.  0.  0.  0.]
+ [ 0.  0.  0.  0.  0.  0.  0.  0.  1. -1.  0.  0.  0.]
+ [ 0.  0.  0.  0.  0.  0.  0.  0.  0.  1. -1.  0.  0.]
+ [ 0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  1. -1.  0.]
+ [ 0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  1. -1.]]
+Second Blocks List= 
+['message_source0', 'file_sink0', 'gr uhd usrp source0', 'multiply_const_vcc1', 'multiply_const_vcc0', 'gr_agc2_cc0', 'fll_band_edge_cc0', 'pfb_clock_sync_ccf0', 'constellation_receiver_cb0', 'diff_decoder_bb0', 'unpack_k_bits_bb0', 'correlate_access_code_bb0', 'framer_sink_10']
