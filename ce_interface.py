@@ -253,7 +253,7 @@ if __name__ == "__main__":
     vectorization_times = 16
     run_time_duration   = 60*5
     #run_time_duration   = 10 
-    token_size_size     = 256
+    token_size_size     = 1024 
     token_mode          = "linear"
     ce_handler    = ce_interface()
 
