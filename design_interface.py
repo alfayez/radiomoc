@@ -31,7 +31,7 @@ if __name__ == "__main__":
     parser.add_option("-r", "--run-time",     dest="run_time_pass",    help="How many seconds to run the graph for")
     parser.add_option("-o", "--out-file",     dest="out_file_pass",    help="File to write performance data")
     parser.add_option("-i", "--in-file",      dest="in_file_pass",     help="File to read in")
-    parser.add_option("-m", "--mode",         dest="token_mode_pass",  help="either linear or log")
+    parser.add_option("-m", "--mode",         dest="token_mode_pass",  help="either linear or exp")
     
 
     (options, args) = parser.parse_args()
@@ -77,16 +77,16 @@ if __name__ == "__main__":
     design_handler.token_size_orig      = int(options.token_size_pass)
     design_handler.vect_factor          = int(options.vect_factor_pass)
     #print "TOKEN_MODE= ", options.token_mode_pass, " len= ", len(options.token_mode_pass), " factor= ", options.vect_factor_pass
-    if options.token_mode_pass in 'log':
-        #print "LOG MODE"
+    if options.token_mode_pass in 'exp':
+        print "EXP MODE"
         if options.vect_factor_pass is "0" or options.vect_factor_pass is "1":
             #print "Either 0 or 1"
             design_handler.token_size           = int(options.token_size_pass)*1
-            #print "TOKEN_SIZE= ", design_handler.token_size
+            print "TOKEN_SIZE= ", design_handler.token_size
         else:
             #print "BEFORE CALC"
             design_handler.token_size           = int(options.token_size_pass)*(2**int(options.vect_factor_pass))
-            #print "TOKEN_SIZE= ", design_handler.token_size
+            print "TOKEN_SIZE= ", design_handler.token_size
     else:
         #print "LINEAR MODE"
         design_handler.token_size           = int(options.token_size_pass)*int(options.vect_factor_pass)
