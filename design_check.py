@@ -299,7 +299,7 @@ class graph_check:
         #print "Source List= ", source_list
         self.set_rate_consistency(source_list, self.second_top_matrix, self.second_blocks_list)
         self.second_is_consistent = self.is_consistent(self.second_top_matrix)
-        #print "2nd Second Top Matrix= \n", self.second_top_matrix
+        print "2nd Second Top Matrix= \n", self.second_top_matrix
         [errorCond, self.second_sched] = self.calculate_schedule(self.second_top_matrix)
         if self.DEBUG:
             print "GNURADIO top matrix= "
@@ -321,6 +321,9 @@ class graph_check:
         self.set_gnuradio_firing_vector()
         start_time = time.time()
         #self.gnuradio_tb.alloc(self.cur_bufer_size, self.gnu_mem_alloc_policy)
+        #print "Before ALLOC Token size= ", self.token_size
+        #print "SECOND TOP= "
+        #print self.second_top_matrix
         self.gnuradio_tb.alloc(self.token_size, self.gnu_mem_alloc_policy)
         elapse_time = elapse_time+time.time()-start_time
         if self.DEBUG:
@@ -567,7 +570,8 @@ class graph_check:
             # If we never been to this node before
             if self.visited_matrix[node_list[i][TUP_ARC]][node_list[i][TUP_ID]] == 0:
                 # If no rate change or if we found an interpolation block
-                if node_rate >= 1:
+                #if node_rate >= 1:
+                if cur_rate * node_rate >= 1:
                     self.visited_matrix[node_list[i][TUP_ARC]][node_list[i][TUP_ID]] = 1
                     cur_rate  = cur_rate * node_rate
                     #print "Cur Rate= ", cur_rate, " Node Rate= ", node_rate, #" Top MAtrix= \n", top_matrix                
@@ -645,6 +649,7 @@ class graph_check:
         #next_node = self.get_next_node(self, arc, top_matrix, block_list)
     # traverse in reverse mode to fix inconsistency
     def set_rev_rate_consistency_helper(self, node_list, top_matrix, block_list, cf):
+        #print "WHY ARE YOU REVERSING"
         list_len  = len(node_list)
         ret_is    = TUP_INIT
         node_rate = 1.0

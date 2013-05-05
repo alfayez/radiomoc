@@ -93,8 +93,12 @@ if __name__ == "__main__":
     #print "CONT"
     design_handler.run_time             = int(options.run_time_pass)
     design_handler.first_stage_topology_test(top_handler, top_handler.top_matrix)
+    #print "frst stage topology="
+    #print top_handler.top_matrix
 
     design_handler.second_stage_topology_test(top_handler, top_handler.top_matrix)
+    #print "frst stage topology="
+    #print top_handler.top_matrix
     design_handler.print_top_impl_info_file()
     # par_node = design_handler.find_parent_node(14, design_handler.second_top_matrix, design_handler.second_blocks_list)
     # print "PAR NODE= ", par_node
