@@ -249,7 +249,7 @@ class ce_interface:
 if __name__ == "__main__":
     print "Before system call"
     num_for_average     = 10
-    start_vect          = 0
+    start_vect          = 8 
     vectorization_times = 15
     run_time_duration   = 60*5
     #run_time_duration   = 10 
@@ -282,11 +282,11 @@ if __name__ == "__main__":
             #command_str = "python design_interface.py -t "+token_size+" -l "+vect_fact+" -a "+alloc_policy+ " -r "+run_time+" -o "+out_file_name+" -i "+in_file_name
             command_str2 = ['python', 'design_interface.py', '-t', str(token_size), '-l', str(vect_fact), '-a', str(alloc_policy), '-r', str(run_time), '-o', out_file_name, '-i', in_file_name, '-m', token_mode]
             
-            result = os.system(command_str)
-            print "command= ", command_str2
+            #result = os.system(command_str)
+            #print "command= ", command_str2
 
-            #proc = subprocess.Popen(command_str2, shell=False)
-            #result = proc.wait()
+            proc = subprocess.Popen(command_str2, shell=False)
+            result = proc.wait()
 
 
             #out, err = proc.communicate()

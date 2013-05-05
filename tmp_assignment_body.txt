@@ -1,0 +1,55 @@
+  REAL32 dataName   :
+  REAL32 samplingRate :
+  REAL32 samplingRate2:  
+  REAL32 carrierFreq  :
+  REAL32 rcFiltCoeff  :
+  REAL32 dataGain  :
+  REAL32 rfGain       :
+  REAL32 rfGain2       :
+  REAL32 bbGain       :
+  REAL32 bbGain2       :  
+  REAL32 excessBw :
+  REAL32 gaussGain    :
+  REAL32 recvThresh   :
+  
+  REAL32 seedValG     :
+  REAL32 meanValG     :
+  REAL32 stdValG      :
+  SEQ
+    dataName      := 1.0
+    samplingRate  := 320000.0
+    samplingRate2 := 640000.0
+    carrierFreq   := 462562500.0
+    rcFiltCoeff   := 1.0
+    dataGain      := 10.0
+    rfGain        := 1.0
+    rfGain2       := 25.0
+    bbGain        := 1.3
+    bbGain2       := 1.0
+    excessBw      := 0.35
+    gaussGain     := 0.3
+    recvThresh    := 0.3
+
+    seedValG      := 0.0
+    meanValG      := 0.0
+    stdValG       := 0.40
+  
+    paramOC ! dataName
+    paramOC ! samplingRate
+    paramOC ! samplingRate2
+    paramOC ! carrierFreq
+    paramOC ! rcFiltCoeff
+    paramOC ! dataGain
+    paramOC ! rfGain
+    paramOC ! rfGain2
+    paramOC ! bbGain
+    paramOC ! bbGain2
+    paramOC ! excessBw
+    paramOC ! gaussGain
+    paramOC ! recvThresh
+    
+    paramOC ! seedValG
+    paramOC ! meanValG
+    paramOC ! stdValG
+    
+:
