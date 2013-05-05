@@ -250,7 +250,7 @@ if __name__ == "__main__":
     print "Before system call"
     num_for_average     = 10
     start_vect          = 0
-    vectorization_times = 11
+    vectorization_times = 15
     run_time_duration   = 60*5
     #run_time_duration   = 10 
     token_size_size     = 1
