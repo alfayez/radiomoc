@@ -267,8 +267,8 @@ if __name__ == "__main__":
             ce_handler.alloc_vect.extend([1])
     #print "outfile_vect = ", ce_handler.out_file_vect
     token_size    = token_size_size
-    #in_file_name  = "csp-sdf-sim.occ"
-    in_file_name  = "csp-sdf-tx.occ"
+    in_file_name  = "csp-sdf-sim.occ"
+    #in_file_name  = "csp-sdf-tx.occ"
     #in_file_name  = "csp-sdf-rx.occ"    
     run_time      = str(run_time_duration)
     for i in range(vectorization_times-start_vect):
@@ -282,8 +282,8 @@ if __name__ == "__main__":
             #command_str = "python design_interface.py -t "+token_size+" -l "+vect_fact+" -a "+alloc_policy+ " -r "+run_time+" -o "+out_file_name+" -i "+in_file_name
             command_str2 = ['python', 'design_interface.py', '-t', str(token_size), '-l', str(vect_fact), '-a', str(alloc_policy), '-r', str(run_time), '-o', out_file_name, '-i', in_file_name, '-m', token_mode]
             
-            #result = os.system(command_str)
-            #print "command= ", command_str2
+            result = os.system(command_str)
+            print "command= ", command_str2
 
             #proc = subprocess.Popen(command_str2, shell=False)
             #result = proc.wait()
