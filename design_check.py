@@ -299,7 +299,7 @@ class graph_check:
         #print "Source List= ", source_list
         self.set_rate_consistency(source_list, self.second_top_matrix, self.second_blocks_list)
         self.second_is_consistent = self.is_consistent(self.second_top_matrix)
-        print "2nd Second Top Matrix= \n", self.second_top_matrix
+        #print "2nd Second Top Matrix= \n", self.second_top_matrix
         [errorCond, self.second_sched] = self.calculate_schedule(self.second_top_matrix)
         if self.DEBUG:
             print "GNURADIO top matrix= "
