@@ -269,9 +269,6 @@ class graph_check:
         # calculate the 1st level topology matrix and constraints
         [errorCond, self.first_sched] = self.calculate_schedule(top_matrix)
         self.first_is_consistent = self.is_consistent(top_matrix)
-        print "IS CONSISTENT= ", self.is_consistent(top_matrix)
-        print "TOP MAtrix=    ", top_matrix
-        
         self.setup_gnuradio_handle()
 
         #self.memory_usage(graph_handler, top_matrix)
@@ -363,8 +360,10 @@ class graph_check:
         num_actors   = len(top_matrix[0])
         if self.rankVal < num_actors:
             self.top_impl_info[CONSISTENT] = True
+            return True
         else:
             self.top_impl_info[CONSISTENT] = False
+            return False
     def find_sinks(self, top_matrix, block_list):
         row = len(top_matrix)
         col = len(top_matrix[0])
