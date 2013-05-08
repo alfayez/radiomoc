@@ -268,8 +268,12 @@ class graph_check:
     def first_stage_topology_test(self, graph_handler, top_matrix):
         # calculate the 1st level topology matrix and constraints
         [errorCond, self.first_sched] = self.calculate_schedule(top_matrix)
-        self.setup_gnuradio_handle()
         self.first_is_consistent = self.is_consistent(top_matrix)
+        print "IS CONSISTENT= ", self.is_consistent(top_matrix)
+        print "TOP MAtrix=    ", top_matrix
+        
+        self.setup_gnuradio_handle()
+
         #self.memory_usage(graph_handler, top_matrix)
         if self.DEBUG:
             print "First Stage"

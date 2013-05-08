@@ -82,10 +82,12 @@ class ce_interface:
         scatter(vect_vect_loc, self.lat_vect_def, linewidth=2.0, color='blue')
 
         for i in xrange(ce_handler.top_sub_plot):
-            plot(vect_vect_loc, self.lat_vect_top[i], linewidth=2.0, color=color_loc[i], label='Token Base= '+str(self.token_graph[i]))
+            plot(vect_vect_loc, self.lat_vect_top[i], linewidth=2.0,
+            #color=color_loc[i], label='Buffer Scaling= '+str(self.token_graph[i]))
+            color=color_loc[i], label='Topology Matrix Allocation')
             scatter(vect_vect_loc, self.lat_vect_top[i], linewidth=2.0, color=color_loc[i])
 
-        xlabel('Token Multiple Factor')
+        xlabel('Buffer Scaling Factor')
         ylabel('Latency (ms)')
         legend(loc= 'upper left')
         # set X-ticks
@@ -114,10 +116,12 @@ class ce_interface:
         scatter(vect_vect_loc, self.mem_vect_def, linewidth=2.0, color='blue')
 
         for i in xrange(ce_handler.top_sub_plot):
-            plot(vect_vect_loc, self.mem_vect_top[i], linewidth=2.0, color=color_loc[i], label='Token Base= '+str(self.token_graph[i]))
+            plot(vect_vect_loc, self.mem_vect_top[i], linewidth=2.0,
+            #color=color_loc[i], label='Buffer Scaling Base= '+str(self.token_graph[i]))
+            color=color_loc[i], label='Topology Matrix Allocation')
             scatter(vect_vect_loc, self.mem_vect_top[i], linewidth=2.0, color=color_loc[i])
 
-        xlabel('Token Multiple Factor')
+        xlabel('Buffer Scaling Factor')
         ylabel('Memory (KB)')
         legend(loc= 'upper left')
         # set X-ticks
@@ -142,10 +146,12 @@ class ce_interface:
         scatter(vect_vect_loc, self.thru_vect_def, linewidth=2.0, color='blue')
 
         for i in xrange(ce_handler.top_sub_plot):
-            plot(vect_vect_loc, self.thru_vect_top[i], linewidth=2.0, color=color_loc[i], label='Token Base= '+str(self.token_graph[i]))
+            plot(vect_vect_loc, self.thru_vect_top[i], linewidth=2.0,
+            #color=color_loc[i], label='Buffer Scaling Base= '+str(self.token_graph[i])
+            color=color_loc[i], label='Topology Matrix Allocation')
             scatter(vect_vect_loc, self.thru_vect_top[i], linewidth=2.0, color=color_loc[i])
 
-        xlabel('Token Multiple Factor')
+        xlabel('Buffer Scaling Factor')
         ylabel('Throughput (KB/sec)')
         legend(loc= 'upper left')
         # set X-ticks
@@ -172,10 +178,12 @@ class ce_interface:
         scatter(vect_vect_loc, self.config_vect_def, linewidth=2.0, color='blue')
 
         for i in xrange(ce_handler.top_sub_plot):
-            plot(vect_vect_loc, self.config_vect_top[i], linewidth=2.0, color=color_loc[i], label='Token Base= '+str(self.token_graph[i]))
+            plot(vect_vect_loc, self.config_vect_top[i],
+            #linewidth=2.0, color=color_loc[i], label='Buffer Scaling Base= '+str(self.token_graph[i]))
+            linewidth=2.0, color=color_loc[i], label='Topology Matrix Allocation')
             scatter(vect_vect_loc, self.config_vect_top[i], linewidth=2.0, color=color_loc[i])
 
-        xlabel('Token Multiple Factor')
+        xlabel('Buffer Scaling Factor')
         ylabel('Reconfiguration Time (ms)')
         legend(loc= 'upper left')
         # set X-ticks
@@ -272,25 +280,28 @@ if __name__ == "__main__":
  
     num_for_average     = 10
     start_vect          = 0 
-    vectorization_times = 16
+    vectorization_times = 15
     token_size_size     = 1024 
     top_index           = 0
 
     ce_handler               = ce_interface()    
 
     # TX
-    folder_names        = ["csp-sdf-tx.occ-2013-04-151366039201.6-TOKEN-256/", "csp-sdf-tx.occ-2013-04-TOKEN-128/"]
+    folder_names       = ["csp-sdf-tx.occ-2013-05-051367732455.05-TOKEN-EXP/"]
+    #folder_names        = ["csp-sdf-tx.occ-2013-04-151366039201.6-TOKEN-256/", "csp-sdf-tx.occ-2013-04-TOKEN-128/"]
 
     # SIM
+    #folder_names         = ["csp-sdf-sim.occ-2013-05-061367826430.19-TOKEN-EXP/"]
     #folder_names        = ["csp-sdf-sim.occ-2013-04-181366304302.77-TOKEN-256/", "csp-sdf-sim.occ-2013-04-171366213851.23-TOKEN-128/"]
 
     # RX
-    #folder_names        = ["csp-sdf-rx.occ-2013-04-231366737255.4-TOKEN-512-CORRECT-ONE/", "csp-sdf-rx.occ-2013-04-201366484002.41-TOKEN-128-NOT-256/"]
+    #folder_names         = ["csp-sdf-rx.occ-2013-05-061367893844.16-TOKEN-EXP/"]
+    # folder_names        = ["csp-sdf-rx.occ-2013-04-231366737255.4-TOKEN-512-CORRECT-ONE/", "csp-sdf-rx.occ-2013-04-201366484002.41-TOKEN-128-NOT-256/"]
 
     # RX
     #ce_handler.token_graph    = [512, 128]
     # TX and SIM
-    ce_handler.token_graph    = [256, 128]
+    ce_handler.token_graph    = [1, 128]
 
     ce_handler.top_sub_plot  = len(folder_names)
     ce_handler.vect_vect     = range(start_vect, vectorization_times)
