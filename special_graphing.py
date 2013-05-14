@@ -152,7 +152,7 @@ class ce_interface:
             scatter(vect_vect_loc, self.thru_vect_top[i], linewidth=2.0, color=color_loc[i])
 
         xlabel('Buffer Scaling Factor')
-        ylabel('Throughput (KB/sec)')
+        ylabel('Throughput (samples/sec)')
         legend(loc= 'upper left')
         # set X-ticks
         set_xticks = np.linspace(vect_vect_loc[0], vect_vect_loc[len_vect-1], len_vect, endpoint=True)
@@ -245,18 +245,23 @@ class ce_interface:
                 # divide by 1024 to make into KB/s
                 sanity_check = sanity_check + 1
                 if(run_num is 0):
-                    value = float(tokens[2])/1024
+                    #value = float(tokens[2])/1024
+                    value = float(tokens[2])
                     value = value/run_len                    
                     thru_vect_local.extend([value])
                 else:
-                    value = float(tokens[2])/1024
+                    #value = float(tokens[2])/1024
+                    value = float(tokens[2])
                     value = value/run_len
                     thru_vect_local[last_ind] = thru_vect_local[last_ind] + value                    
             elif "configuration_time" in line:
                 sanity_check = sanity_check + 1
                 if(run_num is 0):
                     value = float(tokens[2])*1000
-                    value = value/run_len                    
+                    value = value/run_len
+                    #print "line= ", line
+                    #print "value= ", value
+                    #raw_input ('Press Enter to continue: ')
                     config_vect_local.extend([value])
                 else:
                     value = float(tokens[2])*1000
@@ -281,7 +286,7 @@ if __name__ == "__main__":
     num_for_average     = 10
     start_vect          = 0 
     vectorization_times = 15
-    token_size_size     = 1024 
+    token_size_size     = 1
     top_index           = 0
 
     ce_handler               = ce_interface()    
