@@ -25,10 +25,19 @@ class ce_interface:
         self.vect_vect     = []
         self.run_vect      = []
         self.token_graph   = []
+
         self.mem_vect_top      = []
         self.lat_vect_top      = []
         self.thru_vect_top     = []
         self.config_vect_top   = []
+        self.mem_vect_top2      = np.zeros((1,1))
+        self.lat_vect_top2      = np.zeros((1,1))
+        self.thru_vect_top2     = np.zeros((1,1))
+        self.config_vect_top2   = np.zeros((1,1))
+        self.mem_vect_top2_var      = np.zeros((1,1))
+        self.lat_vect_top2_var      = np.zeros((1,1))
+        self.thru_vect_top2_var     = np.zeros((1,1))
+        self.config_vect_top2_var   = np.zeros((1,1))
 
         self.top_sub_plot      = 1
         
@@ -37,10 +46,70 @@ class ce_interface:
         self.thru_vect_def     = []
         self.config_vect_def   = []
         
+        self.mem_vect_def2      = np.zeros((1,1))
+        self.lat_vect_def2      = np.zeros((1,1))
+        self.thru_vect_def2     = np.zeros((1,1))
+        self.config_vect_def2   = np.zeros((1,1))
+        self.mem_vect_def2_var      = np.zeros((1,1))
+        self.lat_vect_def2_var      = np.zeros((1,1))
+        self.thru_vect_def2_var     = np.zeros((1,1))
+        self.config_vect_def2_var   = np.zeros((1,1))
+        
         self.infile_name       = ""
         
         self.i_cur         = 0 
 
+    def calc_var_help(self, var_vect, mean_val):
+        var_val = 0
+        #print "VAR= ", var_vect        
+        avg_len  = len(var_vect)
+        #print "AVG LEN= ", avg_len
+        #print "var_val0= ", var_val
+        for j in range(avg_len):
+            #print "j= ", j
+            #print "var_val1= ", var_vect
+            #print "mean_val= ", mean_val
+            #print "var_vect[j]= ", var_vect[j]
+            var_val = var_val + pow((mean_val - var_vect[j]),2)/avg_len
+        #print "var_val2= ", var_val
+        var_val = sqrt(var_val)
+        #print "var_val3= ", var_val
+        return var_val
+    def calc_var(self):
+        vect_len = len(self.thru_vect_top[0])
+        #print "VECT LEN= ", vect_len
+        #raw_input("HERE")
+        for i in range(vect_len+1):
+            #print "I= ", i            
+            if i == 0:
+                self.lat_vect_def2_var[i]    = self.calc_var_help(self.lat_vect_def2, self.lat_vect_def[i])
+                self.thru_vect_def2_var[i]   = self.calc_var_help(self.thru_vect_def2, self.thru_vect_def[i])
+                self.config_vect_def2_var[i] = self.calc_var_help(self.config_vect_def2, self.config_vect_def[i])
+                #print "DEF in var= ", self.config_vect_def2, " mean= ", self.config_vect_def[i]
+                #print "DEF self.config_vect_def2_var[i]= ", self.config_vect_def2_var[i]
+                #name = raw_input('Something')
+                #for j in xrange(vect_len-1):
+                #    print "j= ", self.lat_vect_def2_var
+                #    self.lat_vect_def2_var[j+1]    = self.lat_vect_def2_var[0]
+                #    self.thru_vect_def2_var[j+1]   = self.thru_vect_def2_var[0]
+                #    self.config_vect_def2_var[j+1] = self.config_vect_def2_var[0]
+            else:
+                #print "TOP2_var = ", len(self.lat_vect_top2_var)
+                #print "LAT2 = ", self.lat_vect_top2
+                #print "LAT = ", self.lat_vect_top[0]
+                self.lat_vect_top2_var[i-1]    = self.calc_var_help(self.lat_vect_top2[i-1], self.lat_vect_top[0][i-1])
+                self.thru_vect_top2_var[i-1]   = self.calc_var_help(self.thru_vect_top2[i-1],self.thru_vect_top[0][i-1])
+                self.config_vect_top2_var[i-1] = self.calc_var_help(self.config_vect_top2[i-1], self.config_vect_top[0][i-1])
+                #print "in var= ", self.config_vect_top2[i-1], " mean= ", self.config_vect_top[0][i-1]
+                #print "self.config_vect_top2_var[i-1]= ", self.config_vect_top2_var[i-1]
+                #name = raw_input('Something')
+        #print "config_VAR= ", self.config_vect_def2_var
+        #print "config_VAR_top= ", self.config_vect_top2_var
+        #print "thru_VAR= ", self.thru_vect_def2_var
+        #print "thru_VAR_top= ", self.thru_vect_top2_var
+        #print "lat_VAR= ", self.lat_vect_def2_var
+        #print "lat_VAR_top= ", self.lat_vect_top2_var
+        #name = raw_input('Something')
     def visualize_performance_results(self, num_for_average):
         color_loc        = ['green', 'black', 'red', 'yellow']
         #index_temp    = 0
@@ -56,7 +125,7 @@ class ce_interface:
             vect_vect_loc.extend([self.vect_vect[i+1]])
 
         vect_vect_loc.extend([self.vect_vect[len_vect]])
-
+        self.calc_var()
         # save data to special folder
         #save_file   = "data.dat"
         #dir_name    = '/home/alfayez/workspace/dissertation_data/'
@@ -76,28 +145,35 @@ class ce_interface:
         #############################################################################
         # Latency Plot
         #############################################################################
-        
+        xzero = zeros(len(vect_vect_loc))        
         figure(0)
         plot(vect_vect_loc, self.lat_vect_def, linewidth=2.0, color='blue', label='Default Allocation')
-        scatter(vect_vect_loc, self.lat_vect_def, linewidth=2.0, color='blue')
-
+        #scatter(vect_vect_loc, self.lat_vect_def, linewidth=2.0,
+        #color='blue')
+        print "VAR= ", self.lat_vect_def2_var
+        errorbar(vect_vect_loc, self.lat_vect_def,yerr=self.lat_vect_def2_var, xerr=xzero,
+                 linewidth=1.5, color='blue',fmt='o')
         for i in xrange(ce_handler.top_sub_plot):
             plot(vect_vect_loc, self.lat_vect_top[i], linewidth=2.0,
-            #color=color_loc[i], label='Buffer Scaling= '+str(self.token_graph[i]))
             color=color_loc[i], label='Topology Matrix Allocation')
-            scatter(vect_vect_loc, self.lat_vect_top[i], linewidth=2.0, color=color_loc[i])
-
+            #scatter(vect_vect_loc, self.lat_vect_top[i], linewidth=2.0, color=color_loc[i])
+            errorbar(vect_vect_loc, self.lat_vect_top[i],
+                     yerr=self.lat_vect_top2_var, xerr=xzero,fmt='o',
+                     linewidth=1.5, color=color_loc[i])
+            
+            
         xlabel('Buffer Scaling Factor')
         ylabel('Latency (ms)')
         legend(loc= 'upper left')
         # set X-ticks
-        set_xticks = np.linspace(vect_vect_loc[0], vect_vect_loc[len_vect-1], len_vect, endpoint=True)
+        
+        set_xticks = np.linspace(vect_vect_loc[0], vect_vect_loc[len_vect-1]+1, len_vect+1, endpoint=True)
         xticks(set_xticks)
         # set y limit
         max_top = max(self.lat_vect_top[0])
         max_def = max(self.lat_vect_def)
         max_both = max(max_top, max_def)
-        max_both = max_both*1.3
+        max_both = max_both*1.5
         ylim(0.0, max_both)
         #plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
         pic_name = "latency.png"
@@ -125,7 +201,7 @@ class ce_interface:
         ylabel('Memory (KB)')
         legend(loc= 'upper left')
         # set X-ticks
-        set_xticks = np.linspace(vect_vect_loc[0], vect_vect_loc[len_vect-1], len_vect, endpoint=True)
+        set_xticks = np.linspace(vect_vect_loc[0], vect_vect_loc[len_vect-1]+1, len_vect+1, endpoint=True)
         xticks(set_xticks)
         # set y limit
         max_top = ceil(max(self.mem_vect_top[0]))
@@ -143,19 +219,26 @@ class ce_interface:
         #############################################################################
         figure(2)
         plot(vect_vect_loc, self.thru_vect_def, linewidth=2.0, color='blue', label='Default Allocation')
-        scatter(vect_vect_loc, self.thru_vect_def, linewidth=2.0, color='blue')
+        #scatter(vect_vect_loc, self.thru_vect_def, linewidth=2.0,
+        #color='blue')
+
+        errorbar(vect_vect_loc, self.thru_vect_def, linewidth=1.5,
+        color='blue', yerr=self.thru_vect_def2_var, xerr=xzero, fmt='o')
 
         for i in xrange(ce_handler.top_sub_plot):
             plot(vect_vect_loc, self.thru_vect_top[i], linewidth=2.0,
             #color=color_loc[i], label='Buffer Scaling Base= '+str(self.token_graph[i])
             color=color_loc[i], label='Topology Matrix Allocation')
-            scatter(vect_vect_loc, self.thru_vect_top[i], linewidth=2.0, color=color_loc[i])
+            #scatter(vect_vect_loc, self.thru_vect_top[i], linewidth=2.0, color=color_loc[i])
+            errorbar(vect_vect_loc, self.thru_vect_top[i],
+            linewidth=1.5, color=color_loc[i],
+                     fmt='o', yerr=self.thru_vect_top2_var, xerr=xzero)
 
         xlabel('Buffer Scaling Factor')
         ylabel('Throughput (samples/sec)')
         legend(loc= 'upper left')
         # set X-ticks
-        set_xticks = np.linspace(vect_vect_loc[0], vect_vect_loc[len_vect-1], len_vect, endpoint=True)
+        set_xticks = np.linspace(vect_vect_loc[0], vect_vect_loc[len_vect-1]+1, len_vect+1, endpoint=True)
         xticks(set_xticks)
         # set y limit
         max_top = ceil(max(self.thru_vect_top[0]))
@@ -175,25 +258,30 @@ class ce_interface:
         #############################################################################
         figure(3)
         plot(vect_vect_loc, self.config_vect_def, linewidth=2.0, color='blue', label='Default Allocation')
-        scatter(vect_vect_loc, self.config_vect_def, linewidth=2.0, color='blue')
+        #scatter(vect_vect_loc, self.config_vect_def, linewidth=2.0, color='blue')
 
+        errorbar(vect_vect_loc, self.config_vect_def, linewidth=1.5,
+        color='blue', yerr=self.config_vect_def2_var, xerr=xzero, fmt='o')
+        
         for i in xrange(ce_handler.top_sub_plot):
             plot(vect_vect_loc, self.config_vect_top[i],
             #linewidth=2.0, color=color_loc[i], label='Buffer Scaling Base= '+str(self.token_graph[i]))
             linewidth=2.0, color=color_loc[i], label='Topology Matrix Allocation')
-            scatter(vect_vect_loc, self.config_vect_top[i], linewidth=2.0, color=color_loc[i])
+            #scatter(vect_vect_loc, self.config_vect_top[i], linewidth=2.0, color=color_loc[i])
+            errorbar(vect_vect_loc, self.config_vect_top[i], linewidth=1.5, color=color_loc[i],
+            yerr=self.config_vect_top2_var, xerr=xzero, fmt='o')
 
         xlabel('Buffer Scaling Factor')
         ylabel('Reconfiguration Time (ms)')
         legend(loc= 'upper left')
         # set X-ticks
-        set_xticks = np.linspace(vect_vect_loc[0], vect_vect_loc[len_vect-1], len_vect, endpoint=True)
+        set_xticks = np.linspace(vect_vect_loc[0], vect_vect_loc[len_vect-1]+1, len_vect+1, endpoint=True)
         xticks(set_xticks)
         # set y limit
         max_top = max(self.config_vect_top[0])
         max_def = max(self.config_vect_def)
         max_both = max(max_top, max_def)
-        max_both = max_both*1.3
+        max_both = max_both*3.3
         min_top = max(self.config_vect_top[0])
         min_def = max(self.config_vect_def)
         min_both = min(min_top, min_def)
@@ -207,10 +295,14 @@ class ce_interface:
         savefig(pic_name, dpi=300)
         #os.system("mv"+" "+pic_name+" "+final_folder_name)
 
-        show()        
+        show()
+        print "lat top= ", self.lat_vect_top2_var
+        print "thru top= ", self.thru_vect_top2_var
+        print "config top= ", self.config_vect_top2_var
+        
     def set_ranges(self, vect_range):
         self.vect_range
-    def add_data_point(self, file_name, mem_vect_local,lat_vect_local, thru_vect_local, config_vect_local, run_num, run_len, override):
+    def add_data_point(self, file_name, mem_vect_local,lat_vect_local, thru_vect_local, config_vect_local, run_num, run_len, i, j, override):
         sanity_check  = 0
         ifile_handler = open(file_name, 'r')
         line          = ifile_handler.readline()
@@ -241,6 +333,11 @@ class ce_interface:
                     value = float(tokens[2])*1000
                     value = value/run_len
                     lat_vect_local[last_ind] = lat_vect_local[last_ind] + value
+                value_save = float(tokens[2])*1000
+                if i == 0:
+                    self.lat_vect_def2[j] = copy.deepcopy(value_save)
+                else:
+                    self.lat_vect_top2[i-1][j] = copy.deepcopy(value_save)
             elif "throughput" in line:
                 # divide by 1024 to make into KB/s
                 sanity_check = sanity_check + 1
@@ -254,6 +351,11 @@ class ce_interface:
                     value = float(tokens[2])
                     value = value/run_len
                     thru_vect_local[last_ind] = thru_vect_local[last_ind] + value                    
+                value_save = float(tokens[2])
+                if i == 0:
+                    self.thru_vect_def2[j] = copy.deepcopy(value_save)
+                else:
+                    self.thru_vect_top2[i-1][j] = copy.deepcopy(value_save)
             elif "configuration_time" in line:
                 sanity_check = sanity_check + 1
                 if(run_num is 0):
@@ -267,6 +369,11 @@ class ce_interface:
                     value = float(tokens[2])*1000
                     value = value/run_len
                     config_vect_local[last_ind] = config_vect_local[last_ind] + value                    
+                value_save = float(tokens[2])*1000
+                if i == 0:
+                    self.config_vect_def2[j] = copy.deepcopy(value_save)
+                else:
+                    self.config_vect_top2[i-1][j] = copy.deepcopy(value_save)
             if sanity_check == 4:
                 break
             line   = ifile_handler.readline()
@@ -325,6 +432,26 @@ if __name__ == "__main__":
     ce_handler.thru_vect_top   = [[],[],[],[]]
     ce_handler.config_vect_top = [[],[],[],[]]
 
+    ce_handler.mem_vect_def2      = np.zeros(num_for_average)
+    ce_handler.lat_vect_def2      = np.zeros(num_for_average)
+    ce_handler.thru_vect_def2     = np.zeros(num_for_average)
+    ce_handler.config_vect_def2   = np.zeros(num_for_average)
+
+    ce_handler.mem_vect_def2_var      = np.zeros(vectorization_times-start_vect-1)
+    ce_handler.lat_vect_def2_var      = np.zeros(vectorization_times-start_vect-1)
+    ce_handler.thru_vect_def2_var     = np.zeros(vectorization_times-start_vect-1)
+    ce_handler.config_vect_def2_var   = np.zeros(vectorization_times-start_vect-1)
+
+    ce_handler.mem_vect_top2      = np.zeros((vectorization_times-start_vect-1,num_for_average))
+    ce_handler.lat_vect_top2      = np.zeros((vectorization_times-start_vect-1,num_for_average))
+    ce_handler.thru_vect_top2     = np.zeros((vectorization_times-start_vect-1,num_for_average))
+    ce_handler.config_vect_top2   = np.zeros((vectorization_times-start_vect-1,num_for_average))
+
+    ce_handler.mem_vect_top2_var      = np.zeros(vectorization_times-start_vect-1)
+    ce_handler.lat_vect_top2_var      = np.zeros(vectorization_times-start_vect-1)
+    ce_handler.thru_vect_top2_var     = np.zeros(vectorization_times-start_vect-1)
+    ce_handler.config_vect_top2_var   = np.zeros(vectorization_times-start_vect-1)
+
     for k in range(ce_handler.top_sub_plot):
         ce_handler.mem_vect_def   =[]
         ce_handler.lat_vect_def   =[]
@@ -353,6 +480,8 @@ if __name__ == "__main__":
                                               ce_handler.config_vect_def,
                                               j,
                                               num_for_average,
+                                              i,
+                                              j,
                                               True)
                 else:
                     ce_handler.add_data_point(out_file_name,
@@ -362,6 +491,8 @@ if __name__ == "__main__":
                                               ce_handler.config_vect_top[k],
                                               j,
                                               num_for_average,
+                                              i,
+                                              j,
                                               False)
         print "vect LAT def = ", ce_handler.lat_vect_def
     #print "Mem top= ", ce_handler.mem_vect_top
